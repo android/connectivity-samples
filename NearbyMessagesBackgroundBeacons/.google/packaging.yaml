@@ -1,0 +1,23 @@
+
+# GOOGLE SAMPLE PACKAGING DATA
+#
+# This file is used by Google as part of our samples packaging process.
+# End users may safely ignore this file. It has no relevance to other systems.
+---
+status:       PUBLISHED
+technologies: [Android]
+categories:   [Connectivity]
+languages:    [Java]
+solutions:    [Mobile]
+github:       android/connectivity
+level:        ADVANCED
+apiRefs:
+    - google:com.google.android.gms.nearby.Nearby
+    - google:com.google.android.gms.nearby.messages.Messages
+    - google:com.google.android.gms.nearby.messages.MessageListener
+    - google:com.google.android.gms.nearby.messages.MessagesOptions
+    - google:com.google.android.gms.nearby.messages.NearbyMessagesStatusCodes
+    - google:com.google.android.gms.nearby.messages.NearbyPermissions
+    - google:com.google.android.gms.nearby.messages.Strategy
+    - google:com.google.android.gms.nearby.messages.SubscribeOptions
+license: apache2
