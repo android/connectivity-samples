@@ -1,0 +1,22 @@
+
+# GOOGLE SAMPLE PACKAGING DATA
+#
+# This file is used by Google as part of our samples packaging process.
+# End users may safely ignore this file. It has no relevance to other systems.
+---
+status:       PUBLISHED
+technologies: [Android]
+categories:   [Connectivity]
+languages:    [Java]
+solutions:    [Mobile]
+github:       android/connectivity
+level:        ADVANCED
+icon:         screenshots/big_icon.png
+apiRefs:
+    - android:android.net.wifi.ScanResult
+    - android:android.net.wifi.WifiManager
+    - android:android.net.wifi.rtt.RangingRequest
+    - android:android.net.wifi.rtt.RangingResult
+    - android:android.net.wifi.rtt.RangingResultCallback
+    - android:android.net.wifi.rtt.WifiRttManager
+license: apache2

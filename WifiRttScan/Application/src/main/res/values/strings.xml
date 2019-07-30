@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Copyright 2018 Google Inc. All rights reserved.
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+       http://www.apache.org/licenses/LICENSE-2.0
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<resources>
+    <string name="action_settings">Settings</string>
+
+    <string name="title_activity_location_permission_request">Location Permission Required</string>
+    <string name="main_message_activity_location_permission_request">See distances to access points with Wifi RTT (permission required).</string>
+    <string name="details_message_activity_location_permission_request">This app needs access to your phone\'s location to show the distances between this device and Wifi RTT enabled access points.</string>
+    <string name="no_thanks_activity_location_permission_request">No Thanks</string>
+    <string name="continue_activity_location_permission_request">Continue</string>
+
+    <string name="recycler_row_header_label_ssid">SSID</string>
+    <string name="recycler_row_header_label_bssid">BSSID</string>
+    <string name="retrieving_access_points">Retrieving Access Points&#8230;</string>
+    <string name="scan_wifi_button_label">Scan WiFi</string>
+    <string name="introduction_text">Click the button below to scan access points.</string>
+
+    <!-- Strings for AccessPointRangingResultsActivity. -->
+    <string name="title_activity_access_point_ranging_results">Access Point Ranging Results</string>
+    <string name="activity_access_point_ranging_results_requesting_default">Requesting&#8230;</string>
+    <string name="range_label_activity_access_point_ranging_results">Range (m):</string>
+    <string name="range_mean_label_activity_access_point_ranging_results">Range-mean (m):</string>
+    <string name="range_sd_label_activity_access_point_ranging_results">RangeSD (m):</string>
+    <string name="range_sd_mean_activity_access_point_ranging_results">RangeSD-mean (m):</string>
+    <string name="rssi_label_activity_access_point_ranging_results">RSSI (dBm):</string>
+    <string name="successes_in_burst_label_activity_access_point_ranging_results">Successes in burst:</string>
+    <string name="success_ratio_label_activity_access_point_ranging_results">Success Ratio:</string>
+
+    <string name="stats_window_size_label_activity_access_point_ranging_results">Stats window size:</string>
+    <string name="ranging_period_label_activity_access_point_ranging_results">Ranging period (ms):</string>
+
+    <string name="reset_label_activity_access_point_ranging_results">Reset Ranging Requests</string>
+    <string name="number_of_requests_label_activity_access_point_ranging_results">Number of requests:</string>
+    <string name="mac_mismatch_message_activity_access_point_ranging_results">Callback MAC address doesn\'t match original request MAC address.</string>
+
+</resources>
