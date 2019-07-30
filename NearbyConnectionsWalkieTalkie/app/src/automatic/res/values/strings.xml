@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">WalkieTalkie Automatic</string>
+
+    <string name="status_searching">Looking for a device to connect to</string>
+</resources>

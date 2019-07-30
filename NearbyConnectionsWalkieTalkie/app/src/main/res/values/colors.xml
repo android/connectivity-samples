@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#000000</color>
+    <color name="colorPrimaryDark">#000000</color>
+    <color name="colorAccent">#66BB6A</color>
+
+    <color name="textColor">#FFFFFF</color>
+
+    <color name="state_unknown">#78909C</color>
+    <color name="state_connected">#0097A7</color>
+
+    <color name="log_verbose">#FFFFFF</color>
+    <color name="log_debug">#EEEEEE</color>
+    <color name="log_warning">#E57373</color>
+    <color name="log_error">#F44336</color>
+</resources>

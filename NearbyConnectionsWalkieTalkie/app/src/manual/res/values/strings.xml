@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">WalkieTalkie Manual</string>
+
+    <string name="status_advertising">Advertising</string>
+    <string name="status_discovering">Have one person shake their device. Everyone else, stand still.</string>
+</resources>
