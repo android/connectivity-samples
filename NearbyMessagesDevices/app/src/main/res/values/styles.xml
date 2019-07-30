@@ -1,0 +1,21 @@
+<resources>
+
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+
+        <item name="android:textViewStyle">@style/MyTextViewStyle</item>
+        <item name="switchStyle">@style/MySwitchCompatStyle</item>
+    </style>
+
+    <style name="MyTextViewStyle" parent="android:Widget.TextView">
+        <item name="android:textSize">@dimen/textsize_default</item>
+    </style>
+
+    <style name="MySwitchCompatStyle" parent="Widget.AppCompat.CompoundButton.Switch">
+        <item name="showText">false</item>
+        <item name="android:textSize">@dimen/textsize_default</item>
+        <item name="android:minHeight">@dimen/min_a11y_dimen</item>
+    </style>
+</resources>
