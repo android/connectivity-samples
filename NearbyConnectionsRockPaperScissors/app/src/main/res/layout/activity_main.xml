@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_margin="16dp"
+    android:orientation="vertical">
+
+  <TextView
+      android:id="@+id/name"
+      style="@style/StatusText"/>
+
+  <TextView
+      android:id="@+id/opponent_name"
+      style="@style/StatusText"/>
+
+  <TextView
+      android:id="@+id/status"
+      style="@style/StatusText"/>
+
+  <TextView
+      android:id="@+id/score"
+      android:layout_width="match_parent"
+      android:layout_height="0dp"
+      android:layout_weight="1"
+      android:gravity="center"
+      android:textSize="80sp"/>
+
+  <LinearLayout
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:orientation="horizontal">
+
+    <Button
+        android:id="@+id/rock"
+        android:drawableTop="@drawable/rock"
+        android:text="@string/choice_rock"
+        style="@style/MoveButton"/>
+
+    <Button
+        android:id="@+id/paper"
+        android:drawableTop="@drawable/paper"
+        android:text="@string/choice_paper"
+        style="@style/MoveButton"/>
+
+    <Button
+        android:id="@+id/scissors"
+        android:drawableTop="@drawable/scissors"
+        android:text="@string/choice_scissors"
+        style="@style/MoveButton"/>
+  </LinearLayout>
+
+  <Button
+      android:id="@+id/find_opponent"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:onClick="findOpponent"
+      android:text="@string/action_find_opponents"
+      style="@style/Widget.AppCompat.Button.Colored"/>
+
+  <Button
+      android:id="@+id/disconnect"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:onClick="disconnect"
+      android:text="@string/action_disconnect"
+      style="@style/Widget.AppCompat.Button.Colored"/>
+</LinearLayout>

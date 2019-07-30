@@ -1,0 +1,29 @@
+
+# GOOGLE SAMPLE PACKAGING DATA
+#
+# This file is used by Google as part of our samples packaging process.
+# End users may safely ignore this file. It has no relevance to other systems.
+---
+status:       PUBLISHED
+technologies: [Android]
+categories:   [Connectivity]
+languages:    [Java]
+solutions:    [Mobile]
+github:       android/connectivity
+level:        ADVANCED
+apiRefs:
+    - google:com.google.android.gms.nearby.Nearby
+    - google:com.google.android.gms.nearby.connection.AdvertisingOptions
+    - google:com.google.android.gms.nearby.connection.ConnectionInfo
+    - google:com.google.android.gms.nearby.connection.ConnectionLifecycleCallback
+    - google:com.google.android.gms.nearby.connection.ConnectionResolution
+    - google:com.google.android.gms.nearby.connection.ConnectionsClient
+    - google:com.google.android.gms.nearby.connection.DiscoveredEndpointInfo
+    - google:com.google.android.gms.nearby.connection.DiscoveryOptions
+    - google:com.google.android.gms.nearby.connection.EndpointDiscoveryCallback
+    - google:com.google.android.gms.nearby.connection.Payload
+    - google:com.google.android.gms.nearby.connection.PayloadCallback
+    - google:com.google.android.gms.nearby.connection.PayloadTransferUpdate
+    - google:com.google.android.gms.nearby.connection.PayloadTransferUpdate.Status
+    - google:com.google.android.gms.nearby.connection.Strategy
+license: apache2
