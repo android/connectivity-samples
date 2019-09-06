@@ -1,0 +1,74 @@
+/* Copyright (C) 2018 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+/*
+    sub module to download the Google Play games
+ */
+project.ext {
+    if (!project.hasProperty('gpg_sdk_link')) {
+        gpg_sdk_link = System.getenv("GPG_SDK_LINK")
+        if (gpg_sdk_link == null || gpg_sdk_link.isEmpty()) {
+            gpg_sdk_link = 'https://developers.google.com/games/services/downloads/gpg-cpp-sdk.v3.0.zip'
+        }
+    }
+}
+task download_and_stage_gpg_sdk(dependsOn:'unzip_gpg_sdk') {
+
+}
+
+task fetch_gpg_cpp_sdk () {
+
+    doFirst {
+        ant.get(src: gpg_sdk_link, dest: 'gpg_cpp_sdk.zip', skipexisting: 'true')
+    }
+    doLast {
+        println "Got ${gpg_sdk_link} as gpg_cpp_sdk.zip"
+    }
+    outputs.files('gpg_cpp_sdk.zip')
+    outputs.upToDateWhen {file('gpg_cpp_sdk.zip').exists()}
+}
+fetch_gpg_cpp_sdk.description = "Download the gpg sdk from the specified location"
+
+task unzip_gpg_sdk() {
+    def dest = file( "${project.projectDir}/gpg-cpp-sdk")
+    doFirst {
+        if (!dest.exists()) {
+            copy {
+                from(zipTree('gpg_cpp_sdk.zip')) {
+                    include 'gpg-cpp-sdk/android/**/*'
+                }
+
+                into { project.projectDir }
+            }
+        } else {
+            println "Skipping sdk unzipping, ${dest.absolutePath} exists"
+        }
+    }
+    outputs.upToDateWhen {file("${dest.absolutePath}/android").exists() &&
+            file('gpg-cpp-sdk/android/lib/c++/arm64-v8a/libgpg.a').exists()}
+    description = "Unzips the GPG SDK into the correct dir for NDK"
+    dependsOn fetch_gpg_cpp_sdk
+}
+
+task clean() {
+    doFirst {
+        file('gpg_cpp_sdk.zip').delete()
+    }
+    doLast {
+        delete 'gpg-cpp-sdk'
+        delete 'build'
+    }
+}
+
+defaultTasks = ['unzip_gpg_sdk']
