@@ -1,0 +1,18 @@
+# GOOGLE SAMPLE PACKAGING DATA
+#
+# This file is used by Google as part of our samples packaging process.
+# End users may safely ignore this file. It has no relevance to other systems.
+---
+status:       PUBLISHED
+technologies: [Android]
+categories:   [Connectivity]
+languages:    [Java]
+solutions:    [Mobile]
+github:       android/connectivity
+level:        ADVANCED
+apiRefs:
+    - android:org.chromium.net.CronetEngine
+    - android:org.chromium.net.CronetException
+    - android:org.chromium.net.UrlRequest
+    - android:org.chromium.net.UrlResponseInfo
+license: apache2
