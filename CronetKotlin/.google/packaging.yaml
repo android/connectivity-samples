@@ -11,5 +11,8 @@ solutions:    [Mobile]
 github:       android/connectivity
 level:        ADVANCED
 apiRefs:
-    - google:com.google.android.gms.nearby.Nearby
+    - android:org.chromium.net.CronetEngine
+    - android:org.chromium.net.CronetException
+    - android:org.chromium.net.UrlRequest
+    - android:org.chromium.net.UrlResponseInfo
 license: apache2
