@@ -16,12 +16,10 @@ android {
         manual {
             dimension "mode"
             applicationId "com.google.location.nearby.apps.walkietalkie.manual"
-            dimension 'default'
         }
         automatic {
             dimension "mode"
             applicationId "com.google.location.nearby.apps.walkietalkie.automatic"
-            dimension 'default'
         }
     }
 }
