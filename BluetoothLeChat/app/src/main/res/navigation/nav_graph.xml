@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto" android:id="@+id/nav_graph"
+    app:startDestination="@id/enableBluetoothFragment">
+
+    <fragment
+        android:id="@+id/bluetoothChatFragment"
+        android:name="com.example.bluetoothlechat.chat.BluetoothChatFragment"
+        android:label="BluetoothChatFragment" >
+        <action
+            android:id="@+id/action_find_new_device"
+            app:destination="@id/deviceListFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/deviceListFragment"
+        android:name="com.example.bluetoothlechat.scan.DeviceScanFragment"
+        android:label="DeviceListFragment" />
+    <fragment
+        android:id="@+id/locationRequiredFragment"
+        android:name="com.example.bluetoothlechat.bluetooth.LocationRequiredFragment"
+        android:label="LocationRequiredFragment" >
+        <action
+            android:id="@+id/action_start_chat"
+            app:destination="@id/bluetoothChatFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/enableBluetoothFragment"
+        android:name="com.example.bluetoothlechat.bluetooth.EnableBluetoothFragment"
+        android:label="EnableBluetoothFragment" >
+        <action
+            android:id="@+id/action_check_location_permissions"
+            app:destination="@id/locationRequiredFragment" />
+    </fragment>
+</navigation>
