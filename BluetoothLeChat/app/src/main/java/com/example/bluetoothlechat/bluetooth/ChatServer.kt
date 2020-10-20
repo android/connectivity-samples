@@ -36,8 +36,10 @@ object ChatServer {
     // hold reference to app context to run the chat server
     private var app: Application? = null
     private lateinit var bluetoothManager: BluetoothManager
-    // BluetoothAdapter should never be null since BLE is required per
-    // the <uses-feature> tag in the AndroidManifest.xml
+    // BluetoothAdapter should never be null if the app is installed from the Play store
+    // since BLE is required per the <uses-feature> tag in the AndroidManifest.xml.
+    // If the app is installed on an emulator without bluetooth then the app will crash
+    // on launch since installing via Android Studio bypasses the <uses-feature> flags
     private val adapter: BluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
 
     // This property will be null if bluetooth is not enabled or if advertising is not
