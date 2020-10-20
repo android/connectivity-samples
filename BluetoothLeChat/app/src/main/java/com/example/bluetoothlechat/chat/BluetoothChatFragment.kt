@@ -34,7 +34,6 @@ import com.example.bluetoothlechat.databinding.FragmentBluetoothChatBinding
 import com.example.bluetoothlechat.gone
 import com.example.bluetoothlechat.visible
 
-const val SCAN_REQUEST_KEY = "device_scan_request"
 private const val TAG = "BluetoothChatFragment"
 
 class BluetoothChatFragment : Fragment() {

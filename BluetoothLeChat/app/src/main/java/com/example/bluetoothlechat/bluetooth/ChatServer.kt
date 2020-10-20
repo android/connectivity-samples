@@ -159,7 +159,6 @@ object ChatServer {
         return service
     }
 
-    // region setup advertising
     /**
      * Start advertising this device so other BLE devices can see it and connect
      */
@@ -215,7 +214,6 @@ object ChatServer {
             .setTimeout(0)
             .build()
     }
-    // endregion
 
     /**
      * Custom callback for the Gatt Server this device implements

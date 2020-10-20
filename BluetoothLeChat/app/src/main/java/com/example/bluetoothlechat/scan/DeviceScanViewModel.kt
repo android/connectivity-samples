@@ -66,7 +66,6 @@ class DeviceScanViewModel(app: Application) : AndroidViewModel(app) {
         stopScanning()
     }
 
-    // region Scanning
     fun startScan() {
         // If advertisement is not supported on this device then other devices will not be able to
         // discover and connect to it.
@@ -119,7 +118,6 @@ class DeviceScanViewModel(app: Application) : AndroidViewModel(app) {
             .setScanMode(ScanSettings.SCAN_MODE_LOW_POWER)
             .build()
     }
-    // endregion
 
     /**
      * Custom ScanCallback object - adds found devices to list on success, displays error on failure.
