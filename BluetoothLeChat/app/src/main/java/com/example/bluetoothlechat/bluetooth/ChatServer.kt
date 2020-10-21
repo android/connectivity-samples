@@ -190,14 +190,17 @@ object ChatServer {
     private fun buildAdvertiseData(): AdvertiseData {
         /**
          * Note: There is a strict limit of 31 Bytes on packets sent over BLE Advertisements.
-         * This includes everything put into AdvertiseData including UUIDs, device info, &
+         * This limit is outlined in section 2.3.1.1 of this document:
+         * https://inst.eecs.berkeley.edu/~ee290c/sp18/note/BLE_Vol6.pdf
+         *
+         * This limit includes everything put into AdvertiseData including UUIDs, device info, &
          * arbitrary service or manufacturer data.
          * Attempting to send packets over this limit will result in a failure with error code
          * AdvertiseCallback.ADVERTISE_FAILED_DATA_TOO_LARGE. Catch this error in the
          * onStartFailure() method of an AdvertiseCallback implementation.
          */
         val dataBuilder = AdvertiseData.Builder()
-            .addServiceUuid(ParcelUuid( SERVICE_UUID))
+            .addServiceUuid(ParcelUuid(SERVICE_UUID))
             .setIncludeDeviceName(true)
 
         /* For example - this will cause advertising to fail (exceeds size limit) */
