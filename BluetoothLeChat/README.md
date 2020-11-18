@@ -19,12 +19,12 @@ The sample demonstrates the following, using the [Bluetooth LE API][1]:
 4. [Read][5] BLE attributes from the GATT server
 6. [Close][6] the connection when it is no longer needed
 
-[1]: https://developer.android.com/guide/topics/connectivity/bluetooth-le
-[2]: https://developer.android.com/guide/topics/connectivity/bluetooth-le#permissions
-[3]: https://developer.android.com/guide/topics/connectivity/bluetooth-le#find
-[4]: https://developer.android.com/guide/topics/connectivity/bluetooth-le#connect
-[5]: https://developer.android.com/guide/topics/connectivity/bluetooth-le#read
-[6]: https://developer.android.com/guide/topics/connectivity/bluetooth-le#close
+[1]: https://developer.android.com/guide/topics/connectivity/bluetooth/ble-overview.md
+[2]: https://developer.android.com/guide/topics/connectivity/bluetooth/setup.md
+[3]: https://developer.android.com/guide/topics/connectivity/bluetooth/find-ble-devices.md
+[4]: https://developer.android.com/guide/topics/connectivity/bluetooth/connect-gatt-server.md
+[5]: https://developer.android.com/guide/topics/connectivity/bluetooth/transfer-ble-data.md
+[6]: https://developer.android.com/guide/topics/connectivity/bluetooth/connect-gatt-server.md
 
 Pre-requisites
 --------------
