@@ -1,1 +1,2 @@
-include 'Application'
+include ':app'
+rootProject.name = "Bluetooth Advertisements"
