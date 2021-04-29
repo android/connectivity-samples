@@ -1,5 +1,5 @@
-/**
- * Copyright (C) 2021 Google Inc. All Rights Reserved.
+/*
+ * Copyright (C) 2021 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,6 +34,9 @@ import com.example.bluetoothadvertisements.service.AdvertiserService
 
 private const val TAG = "AdvertiserFragment"
 
+/**
+ * Allows user to choose to advertise or stop advertising this device by flipping a switch
+ */
 class AdvertiserFragment : Fragment() {
 
     private lateinit var binding: FragmentAdvertiserBinding

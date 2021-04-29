@@ -1,5 +1,5 @@
-/**
- * Copyright (C) 2021 Google Inc. All Rights Reserved.
+/*
+ * Copyright (C) 2021 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,6 +37,9 @@ import com.example.bluetoothadvertisements.databinding.FragmentScannerBinding
 private const val TAG = "ScannerFragment"
 private const val SCAN_PERIOD_IN_MILLIS: Long = 90_000
 
+/**
+ * Displays remote nearby bluetooth devices
+ */
 class ScannerFragment : Fragment() {
 
     private lateinit var binding: FragmentScannerBinding

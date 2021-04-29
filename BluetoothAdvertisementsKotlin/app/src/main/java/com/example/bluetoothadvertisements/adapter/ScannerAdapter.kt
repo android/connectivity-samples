@@ -1,5 +1,5 @@
-/**
- * Copyright (C) 2021 Google Inc. All Rights Reserved.
+/*
+ * Copyright (C) 2021 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,9 @@ import com.example.bluetoothadvertisements.databinding.VhScanResultBinding
 
 private const val TAG = "ScannerAdapter"
 
+/**
+ * Adapter for displaying remote Bluetooth devices that are being advertised
+ */
 class ScannerAdapter : RecyclerView.Adapter<ScannerAdapter.ScanResultVh>() {
 
     private var itemsList: MutableList<ScanResult> = arrayListOf()

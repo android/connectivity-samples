@@ -1,5 +1,5 @@
-/**
- * Copyright (C) 2021 Google Inc. All Rights Reserved.
+/*
+ * Copyright (C) 2021 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,6 +33,9 @@ import android.util.Log
 import com.example.bluetoothadvertisements.*
 import java.util.concurrent.TimeUnit
 
+/**
+ * Allows this device to advertise itself to other nearby devices
+ */
 class AdvertiserService : Service() {
 
     private val TAG = "AdvertiserService"
@@ -44,16 +47,6 @@ class AdvertiserService : Service() {
      * Length of time to allow advertising before automatically shutting off. (10 minutes)
      */
     private val TIMEOUT: Long = TimeUnit.MILLISECONDS.convert(10, TimeUnit.MINUTES)
-
-    companion object {
-        /**
-         * A global variable to let AdvertiserFragment check if the Service is running without needing
-         * to start or bind to it.
-         * This is the best practice method as defined here:
-         * https://groups.google.com/forum/#!topic/android-developers/jEvXMWgbgzE
-         */
-        var running: Boolean = false
-    }
 
     override fun onBind(intent: Intent?): IBinder? {
         return null // no binding necessary. This Service will only be started
@@ -159,6 +152,16 @@ class AdvertiserService : Service() {
             broadcastFailureIntent(ADVERTISING_TIMED_OUT)
         }
         handler?.postDelayed(runnable, TIMEOUT)
+    }
+
+    companion object {
+        /**
+         * A global variable to let AdvertiserFragment check if the Service is running without needing
+         * to start or bind to it.
+         * This is the best practice method as defined here:
+         * https://groups.google.com/forum/#!topic/android-developers/jEvXMWgbgzE
+         */
+        var running: Boolean = false
     }
 
 }

@@ -1,5 +1,5 @@
-/**
- * Copyright (C) 2021 Google Inc. All Rights Reserved.
+/*
+ * Copyright (C) 2021 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,10 @@ import com.example.bluetoothadvertisements.databinding.ActivityMainBinding
 
 private const val TAG = "MainActivity"
 
+/**
+ * Demos how to advertise a bluetooth device and also how to scan for remote nearby bluetooth
+ * devices.
+ */
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
