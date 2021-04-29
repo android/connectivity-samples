@@ -14,8 +14,7 @@
      See the License for the specific language governing permissions and
      limitations under the License.
 -->
-<FrameLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -23,21 +22,21 @@
         android:id="@+id/not_connected_container"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_gravity="center">
+        android:layout_gravity="center"
+        android:orientation="vertical">
 
         <TextView
             android:id="@+id/connect_device_message"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/no_connected_device_message"/>
+            android:text="@string/no_connected_device_message" />
 
         <Button
             android:id="@+id/connect_devices"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:text="@string/connect_device_prompt"/>
+            android:text="@string/connect_device_prompt" />
     </LinearLayout>
 
     <LinearLayout
@@ -50,26 +49,26 @@
             android:id="@+id/connected_device_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="18sp"
+            android:layout_gravity="center_horizontal"
             android:padding="16dp"
-            android:layout_gravity="center_horizontal"/>
+            android:textSize="18sp" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/messages"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="1"/>
+            android:layout_weight="1" />
 
         <EditText
             android:id="@+id/message_text"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content" />
 
         <Button
             android:id="@+id/send_message"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/send_message_button"/>
+            android:text="@string/send_message_button" />
     </LinearLayout>
 
 </FrameLayout>

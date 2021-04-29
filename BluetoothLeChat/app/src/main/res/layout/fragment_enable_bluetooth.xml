@@ -14,8 +14,7 @@
      See the License for the specific language governing permissions and
      limitations under the License.
 -->
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/error"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
@@ -26,13 +25,13 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:text="@string/bt_not_enabled"/>
+        android:text="@string/bt_not_enabled" />
 
     <Button
         android:id="@+id/error_action"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:text="@string/enable_bluetooth_prompt"/>
+        android:text="@string/enable_bluetooth_prompt" />
 
 </LinearLayout>

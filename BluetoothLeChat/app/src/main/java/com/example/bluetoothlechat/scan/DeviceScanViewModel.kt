@@ -16,9 +16,11 @@
 package com.example.bluetoothlechat.scan
 
 import android.app.Application
-import android.bluetooth.*
+import android.bluetooth.BluetoothAdapter
+import android.bluetooth.BluetoothDevice
 import android.bluetooth.le.*
 import android.os.Handler
+import android.os.Looper
 import android.os.ParcelUuid
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
@@ -29,6 +31,7 @@ import com.example.bluetoothlechat.scan.DeviceScanViewState.*
 
 
 private const val TAG = "DeviceScanViewModel"
+
 // 30 second scan period
 private const val SCAN_PERIOD = 30000L
 
@@ -66,7 +69,7 @@ class DeviceScanViewModel(app: Application) : AndroidViewModel(app) {
         stopScanning()
     }
 
-    fun startScan() {
+    private fun startScan() {
         // If advertisement is not supported on this device then other devices will not be able to
         // discover and connect to it.
         if (!adapter.isMultipleAdvertisementSupported) {
@@ -81,7 +84,7 @@ class DeviceScanViewModel(app: Application) : AndroidViewModel(app) {
             _viewState.value = ActiveScan
 
             // Stop scanning after the scan period
-            Handler().postDelayed({ stopScanning() }, SCAN_PERIOD)
+            Handler(Looper.myLooper()!!).postDelayed({ stopScanning() }, SCAN_PERIOD)
 
             // Kick off a new scan
             scanCallback = DeviceScanCallback()

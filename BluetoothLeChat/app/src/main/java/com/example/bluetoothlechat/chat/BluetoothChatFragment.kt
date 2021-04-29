@@ -27,9 +27,9 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.bluetoothlechat.bluetooth.Message
 import com.example.bluetoothlechat.R
 import com.example.bluetoothlechat.bluetooth.ChatServer
+import com.example.bluetoothlechat.bluetooth.Message
 import com.example.bluetoothlechat.databinding.FragmentBluetoothChatBinding
 import com.example.bluetoothlechat.gone
 import com.example.bluetoothlechat.visible
@@ -39,12 +39,13 @@ private const val TAG = "BluetoothChatFragment"
 class BluetoothChatFragment : Fragment() {
 
     private var _binding: FragmentBluetoothChatBinding? = null
+
     // this property is valid between onCreateView and onDestroyView.
     private val binding: FragmentBluetoothChatBinding
         get() = _binding!!
 
     private val deviceConnectionObserver = Observer<DeviceConnectionState> { state ->
-        when(state) {
+        when (state) {
             is DeviceConnectionState.Connected -> {
                 val device = state.device
                 Log.d(TAG, "Gatt connection observer: have device $device")
@@ -54,7 +55,6 @@ class BluetoothChatFragment : Fragment() {
                 showDisconnected()
             }
         }
-
     }
 
     private val connectionRequestObserver = Observer<BluetoothDevice> { device ->
@@ -77,7 +77,7 @@ class BluetoothChatFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         _binding = FragmentBluetoothChatBinding.inflate(inflater, container, false)
 
         Log.d(TAG, "chatWith: set adapter $adapter")
