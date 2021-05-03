@@ -31,4 +31,6 @@
     <string name="connect_device_prompt">Connect with nearby devices</string>
     <string name="send_message_button">Send Message</string>
     <string name="chatting_with_device">Chatting with %1$s</string>
+    <string name="your_device_address">Your device address:</string>
+    <string name="scanning_header">Choose a device to chat with:</string>
 </resources>
