@@ -43,7 +43,7 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
 
         if (savedInstanceState == null) {
-            verifyBluetooth()
+            verifyBluetoothCapabilities()
         }
     }
 
@@ -53,11 +53,11 @@ class MainActivity : AppCompatActivity() {
             when (requestCode) {
                 REQUEST_ENABLE_BT -> {
                     Log.d(TAG, "onActivityResult: REQUEST_ENABLE_BT")
-                    verifyBluetooth()
+                    verifyBluetoothCapabilities()
                 }
                 PERMISSION_REQUEST_LOCATION -> {
                     Log.d(TAG, "onActivityResult: PERMISSION_REQUEST_COARSE_LOCATION")
-                    verifyBluetooth()
+                    verifyBluetoothCapabilities()
                 }
             }
         }
@@ -87,7 +87,7 @@ class MainActivity : AppCompatActivity() {
         fragTransaction.commit()
     }
 
-    private fun verifyBluetooth() {
+    private fun verifyBluetoothCapabilities() {
         val bluetoothAdapter = (getSystemService(BLUETOOTH_SERVICE) as BluetoothManager).adapter
 
         when {

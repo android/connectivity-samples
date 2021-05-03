@@ -19,10 +19,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.bluetoothadvertisements">
 
-    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
-    <uses-permission android:name="android.permission.BLUETOOTH"/>
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <!--  Between Android N and R, fine location access is needed for scanning for nearby devices-->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
     <application
         android:allowBackup="false"
@@ -33,11 +34,11 @@
         android:theme="@style/Theme.BluetoothAdvertisements">
         <activity
             android:name=".MainActivity"
+            android:exported="true"
             android:label="@string/app_name"
             android:theme="@style/Theme.BluetoothAdvertisements.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -45,8 +46,7 @@
         <service
             android:name=".service.AdvertiserService"
             android:enabled="true"
-            android:exported="false"
-            >
+            android:exported="false">
 
         </service>
     </application>

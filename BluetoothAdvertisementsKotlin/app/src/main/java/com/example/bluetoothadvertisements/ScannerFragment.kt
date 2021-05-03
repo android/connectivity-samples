@@ -78,7 +78,7 @@ class ScannerFragment : Fragment() {
         val isLocationPermissionRequired = Build.VERSION.SDK_INT >= Build.VERSION_CODES.N
                 && Build.VERSION.SDK_INT <= Build.VERSION_CODES.R
         val isLocationAccessNotGranted =
-            (checkSelfPermission(requireContext(), LOCATION_PERMISSION_TYPE)
+            (checkSelfPermission(requireContext(), LOCATION_FINE_PERM)
                     != PackageManager.PERMISSION_GRANTED)
 
         if (isLocationPermissionRequired && isLocationAccessNotGranted) {
@@ -89,7 +89,7 @@ class ScannerFragment : Fragment() {
     }
 
     private fun requestLocationPermission() {
-        if (shouldShowRequestPermissionRationale(LOCATION_PERMISSION_TYPE)) {
+        if (shouldShowRequestPermissionRationale(LOCATION_FINE_PERM)) {
             val alertDialogBuilder = AlertDialog.Builder(requireContext())
             with(alertDialogBuilder) {
                 setTitle(getString(R.string.loc_req_title))
@@ -103,7 +103,7 @@ class ScannerFragment : Fragment() {
     }
 
     private fun makeLocationRequest() = requestPermissions(
-        arrayOf(LOCATION_PERMISSION_TYPE),
+        arrayOf(LOCATION_FINE_PERM),
         PERMISSION_REQUEST_LOCATION
     )
 

@@ -103,3 +103,5 @@ class AdvertiserFragment : Fragment() {
     private fun createServiceIntent(): Intent =
         Intent(requireContext(), AdvertiserService::class.java)
 }
+
+
