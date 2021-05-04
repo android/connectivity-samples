@@ -98,7 +98,7 @@ object ChatServer {
      * This method, which some might be tempted to use, returns a default value,
      * usually 02:00:00:00:00:00
      */
-    fun getYourDeviceAddress() = bluetoothManager.adapter.address
+    fun getYourDeviceAddress(): String = bluetoothManager.adapter.address
 
     fun setCurrentChatConnection(device: BluetoothDevice) {
         currentDevice = device

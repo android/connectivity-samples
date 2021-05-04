@@ -15,7 +15,6 @@
  */
 package com.example.bluetoothlechat.scan
 
-import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.os.Bundle
 import android.util.Log
@@ -27,10 +26,13 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.bluetoothlechat.*
+import com.example.bluetoothlechat.R
 import com.example.bluetoothlechat.bluetooth.ChatServer
 import com.example.bluetoothlechat.databinding.FragmentDeviceScanBinding
+import com.example.bluetoothlechat.exhaustive
+import com.example.bluetoothlechat.gone
 import com.example.bluetoothlechat.scan.DeviceScanViewState.*
+import com.example.bluetoothlechat.visible
 
 private const val TAG = "DeviceScanFragment"
 const val GATT_KEY = "gatt_bundle_key"
@@ -38,6 +40,7 @@ const val GATT_KEY = "gatt_bundle_key"
 class DeviceScanFragment : Fragment() {
 
     private var _binding: FragmentDeviceScanBinding? = null
+
     // This property is only valid between onCreateView and onDestroyView.
     private val binding
         get() = _binding!!
@@ -69,8 +72,8 @@ class DeviceScanFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         _binding = FragmentDeviceScanBinding.inflate(inflater, container, false)
-        val devAddr = getString(R.string.your_device_address)+ ChatServer.getYourDeviceAddress()
-        binding.yourDeviceAddr.text =devAddr
+        val devAddr = getString(R.string.your_device_address) + ChatServer.getYourDeviceAddress()
+        binding.yourDeviceAddr.text = devAddr
         binding.deviceList.apply {
             layoutManager = LinearLayoutManager(requireContext())
             adapter = deviceScanAdapter
