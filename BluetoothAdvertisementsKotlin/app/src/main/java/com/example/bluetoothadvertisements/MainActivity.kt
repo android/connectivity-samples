@@ -21,8 +21,6 @@ import android.bluetooth.BluetoothManager
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
-import android.view.Menu
-import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import com.example.bluetoothadvertisements.databinding.ActivityMainBinding
 
@@ -47,46 +45,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-
-        if (resultCode == RESULT_OK) {
-            when (requestCode) {
-                REQUEST_ENABLE_BT -> {
-                    Log.d(TAG, "onActivityResult: REQUEST_ENABLE_BT")
-                    verifyBluetoothCapabilities()
-                }
-                PERMISSION_REQUEST_LOCATION -> {
-                    Log.d(TAG, "onActivityResult: PERMISSION_REQUEST_COARSE_LOCATION")
-                    verifyBluetoothCapabilities()
-                }
-            }
-        }
-        super.onActivityResult(requestCode, resultCode, data)
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        menuInflater.inflate(R.menu.menu_main, menu)
-        return true
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        return when (item.itemId) {
-            R.id.action_settings -> true
-            else -> super.onOptionsItemSelected(item)
-        }
-    }
-
-    private fun setupFragments() {
-        val fragTransaction = supportFragmentManager.beginTransaction()
-        fragTransaction.replace(R.id.scanner_fragment_container, ScannerFragment())
-        fragTransaction.replace(R.id.advertiser_fragment_container, AdvertiserFragment())
-        fragTransaction.commit()
-    }
-
     private fun verifyBluetoothCapabilities() {
         val bluetoothAdapter = (getSystemService(BLUETOOTH_SERVICE) as BluetoothManager).adapter
 
@@ -98,11 +56,31 @@ class MainActivity : AppCompatActivity() {
             bluetoothAdapter.isEnabled && !bluetoothAdapter.isMultipleAdvertisementSupported ->
                 showErrorText("Bluetooth Advertisements are not supported.")
             !bluetoothAdapter.isEnabled ->
+                // Prompt the use to allow the app to turn on Bluetooth
                 startActivityForResult(
-                    Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE),
-                    REQUEST_ENABLE_BT
+                        Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE),
+                        REQUEST_ENABLE_BT
                 )
         }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (resultCode == RESULT_OK && requestCode == REQUEST_ENABLE_BT) {
+            Log.d(TAG, "onActivityResult: REQUEST_ENABLE_BT")
+            verifyBluetoothCapabilities()
+        }
+        super.onActivityResult(requestCode, resultCode, data)
+    }
+
+    /**
+     * Setups up two Fragments in the Activity: one shows the list of nearby devices; one shows the
+     * switch for advertising to nearby devices.
+     */
+    private fun setupFragments() {
+        val fragTransaction = supportFragmentManager.beginTransaction()
+        fragTransaction.replace(R.id.scanner_fragment_container, ScannerFragment())
+        fragTransaction.replace(R.id.advertiser_fragment_container, AdvertiserFragment())
+        fragTransaction.commit()
     }
 
     private fun showErrorText(msg: String) {

@@ -46,7 +46,7 @@ class AdvertiserFragment : Fragment() {
         super.onCreate(savedInstanceState)
         btAdvertisingFailureReceiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context?, intent: Intent?) {
-                val errorCode = intent?.getIntExtra(BT_ADVERTISING_FAILED_EXTRA_CODE, NEGATIVE_ONE)
+                val errorCode = intent?.getIntExtra(BT_ADVERTISING_FAILED_EXTRA_CODE, INVALID_CODE)
                 binding.advertiseSwitch.isChecked = false
 
                 var errMsg = when (errorCode) {
@@ -65,9 +65,9 @@ class AdvertiserFragment : Fragment() {
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle? ): View {
         binding = FragmentAdvertiserBinding.inflate(inflater, container, false)
         return binding.root
     }

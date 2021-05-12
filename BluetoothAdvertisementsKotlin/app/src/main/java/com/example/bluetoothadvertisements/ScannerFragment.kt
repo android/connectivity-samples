@@ -48,7 +48,6 @@ class ScannerFragment : Fragment() {
     private var bluetoothLeScanner: BluetoothLeScanner? = null
     private var handler: Handler? = null
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
@@ -56,8 +55,8 @@ class ScannerFragment : Fragment() {
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+            inflater: LayoutInflater, container: ViewGroup?,
+            savedInstanceState: Bundle?
     ): View {
         binding = FragmentScannerBinding.inflate(inflater, container, false)
         handler = Handler(Looper.myLooper()!!)
@@ -75,11 +74,11 @@ class ScannerFragment : Fragment() {
          * But between Android N and R location permission is required for Bluetooth scanning.
          * The code below requests location access if it's required and has not yet been granted.
          */
-        val isLocationPermissionRequired = Build.VERSION.SDK_INT >= Build.VERSION_CODES.N
-                && Build.VERSION.SDK_INT <= Build.VERSION_CODES.R
+        val isLocationPermissionRequired =
+                Build.VERSION.SDK_INT in Build.VERSION_CODES.N..Build.VERSION_CODES.R
         val isLocationAccessNotGranted =
-            (checkSelfPermission(requireContext(), LOCATION_FINE_PERM)
-                    != PackageManager.PERMISSION_GRANTED)
+                (checkSelfPermission(requireContext(), LOCATION_FINE_PERM)
+                        != PackageManager.PERMISSION_GRANTED)
 
         if (isLocationPermissionRequired && isLocationAccessNotGranted) {
             requestLocationPermission()
@@ -94,7 +93,7 @@ class ScannerFragment : Fragment() {
             with(alertDialogBuilder) {
                 setTitle(getString(R.string.loc_req_title))
                 setMessage(getString(R.string.loc_req_msg))
-                setPositiveButton(getString(R.string.okay)){ _, _ -> makeLocationRequest()}
+                setPositiveButton(getString(R.string.okay)) { _, _ -> makeLocationRequest() }
             }
             alertDialogBuilder.create().show()
         } else {
@@ -103,14 +102,14 @@ class ScannerFragment : Fragment() {
     }
 
     private fun makeLocationRequest() = requestPermissions(
-        arrayOf(LOCATION_FINE_PERM),
-        PERMISSION_REQUEST_LOCATION
+            arrayOf(LOCATION_FINE_PERM),
+            PERMISSION_REQUEST_LOCATION
     )
 
     override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
+            requestCode: Int,
+            permissions: Array<out String>,
+            grantResults: IntArray
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         when (requestCode) {
@@ -120,9 +119,9 @@ class ScannerFragment : Fragment() {
                 }
             }
             else -> Toast.makeText(
-                requireContext(),
-                getString(R.string.loc_req_denied_msg),
-                Toast.LENGTH_LONG
+                    requireContext(),
+                    getString(R.string.loc_req_denied_msg),
+                    Toast.LENGTH_LONG
             ).show()
         }
     }
@@ -138,7 +137,7 @@ class ScannerFragment : Fragment() {
     private fun initialize() {
         if (bluetoothLeScanner == null) {
             val manager =
-                requireContext().getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
+                    requireContext().getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
             val bluetoothAdapter = manager.adapter
             bluetoothLeScanner = bluetoothAdapter.bluetoothLeScanner
         }
@@ -152,7 +151,7 @@ class ScannerFragment : Fragment() {
             Toast.makeText(requireContext(), getString(R.string.bt_scanning), Toast.LENGTH_LONG).show()
             return
         }
-        handler?.postDelayed( { stopScanning() }, SCAN_PERIOD_IN_MILLIS)
+        handler?.postDelayed({ stopScanning() }, SCAN_PERIOD_IN_MILLIS)
         scanCallback = SampleScanCallback()
         bluetoothLeScanner?.startScan(buildScanFilters(), buildScanSettings(), scanCallback)
     }
@@ -167,14 +166,14 @@ class ScannerFragment : Fragment() {
 
     private fun buildScanFilters(): List<ScanFilter> {
         val scanFilter = ScanFilter.Builder()
-            .setServiceUuid(Service_UUID)
-            .build()
+                .setServiceUuid(ScanFilterService_UUID)
+                .build()
         Log.d(TAG, "buildScanFilters")
         return listOf(scanFilter)
     }
 
     private fun buildScanSettings() = ScanSettings.Builder()
-        .setScanMode(ScanSettings.SCAN_MODE_LOW_POWER).build()
+            .setScanMode(ScanSettings.SCAN_MODE_LOW_POWER).build()
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
@@ -209,9 +208,9 @@ class ScannerFragment : Fragment() {
             super.onScanFailed(errorCode)
             Log.d(TAG, "onScanFailed: errorCode $errorCode")
             Toast.makeText(
-                requireContext(),
-                "Scan failed with error code $errorCode",
-                Toast.LENGTH_LONG
+                    requireContext(),
+                    "Scan failed with error code $errorCode",
+                    Toast.LENGTH_LONG
             ).show()
         }
     }

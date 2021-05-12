@@ -119,7 +119,7 @@ class AdvertiserService : Service() {
         .setTimeout(0).build()
 
     private fun buildAdvertiseData() = AdvertiseData.Builder()
-        .addServiceUuid(Service_UUID).setIncludeDeviceName(true).build()
+        .addServiceUuid(ScanFilterService_UUID).setIncludeDeviceName(true).build()
 
     private fun sampleAdvertiseCallback() = object : AdvertiseCallback() {
         override fun onStartFailure(errorCode: Int) {
