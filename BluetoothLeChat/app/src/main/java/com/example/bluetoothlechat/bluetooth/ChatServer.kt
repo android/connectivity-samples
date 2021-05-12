@@ -90,6 +90,16 @@ object ChatServer {
         stopAdvertising()
     }
 
+    /**
+     * The questions of how to obtain a device's own MAC address comes up a lot. The answer is
+     * you cannot; it would be a security breach. Only system apps can get that permission.
+     * Otherwise apps might use that address to fingerprint a device (e.g. for advertising, etc.)
+     * A user can find their own MAC address through Settings, but apps cannot find it.
+     * This method, which some might be tempted to use, returns a default value,
+     * usually 02:00:00:00:00:00
+     */
+    fun getYourDeviceAddress(): String = bluetoothManager.adapter.address
+
     fun setCurrentChatConnection(device: BluetoothDevice) {
         currentDevice = device
         // Set gatt so BluetoothChatFragment can display the device data
