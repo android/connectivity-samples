@@ -65,9 +65,10 @@ class AdvertiserFragment : Fragment() {
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle? ): View {
+            inflater: LayoutInflater,
+            container: ViewGroup?,
+            savedInstanceState: Bundle?
+    ): View {
         binding = FragmentAdvertiserBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -101,7 +102,7 @@ class AdvertiserFragment : Fragment() {
     }
 
     private fun createServiceIntent(): Intent =
-        Intent(requireContext(), AdvertiserService::class.java)
+            Intent(requireContext(), AdvertiserService::class.java)
 }
 
 

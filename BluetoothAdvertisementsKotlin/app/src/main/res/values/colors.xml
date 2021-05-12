@@ -15,7 +15,6 @@
      limitations under the License.
 -->
 <resources>
-
     <!-- Primary brand color. -->
     <color name="colorPrimary">@color/blue</color>
     <color name="colorPrimaryDark">@color/blue_dark</color>
