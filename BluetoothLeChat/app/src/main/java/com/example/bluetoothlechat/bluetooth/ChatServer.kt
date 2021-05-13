@@ -225,7 +225,7 @@ object ChatServer {
      */
     private fun buildAdvertiseSettings(): AdvertiseSettings {
         return AdvertiseSettings.Builder()
-            .setAdvertiseMode(AdvertiseSettings.ADVERTISE_MODE_LOW_LATENCY)
+            .setAdvertiseMode(AdvertiseSettings.ADVERTISE_MODE_LOW_POWER)
             .setTimeout(0)
             .build()
     }
