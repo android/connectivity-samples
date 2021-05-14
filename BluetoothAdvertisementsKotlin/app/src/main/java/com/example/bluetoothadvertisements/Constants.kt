@@ -27,9 +27,11 @@ const val FOREGROUND_NOTIFICATION_ID = 3
 const val ADVERTISING_FAILED = "com.example.android.bluetoothadvertisements.advertising_failed"
 const val REQUEST_ENABLE_BT = 11
 const val PERMISSION_REQUEST_LOCATION = 101
+
 /**
  * Saving the permission type here, under a shorter name, makes calling the permission type
  * from multiple sites more efficient
  */
 const val LOCATION_FINE_PERM = Manifest.permission.ACCESS_FINE_LOCATION
-val ScanFilterService_UUID: ParcelUuid = ParcelUuid.fromString("0000b81d-0000-1000-8000-00805f9b34fb")
+val ScanFilterService_UUID: ParcelUuid =
+    ParcelUuid.fromString("0000b81d-0000-1000-8000-00805f9b34fb")

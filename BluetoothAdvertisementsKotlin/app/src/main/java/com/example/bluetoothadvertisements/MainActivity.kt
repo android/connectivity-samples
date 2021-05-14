@@ -58,8 +58,8 @@ class MainActivity : AppCompatActivity() {
             !bluetoothAdapter.isEnabled ->
                 // Prompt the use to allow the app to turn on Bluetooth
                 startActivityForResult(
-                        Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE),
-                        REQUEST_ENABLE_BT
+                    Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE),
+                    REQUEST_ENABLE_BT
                 )
         }
     }

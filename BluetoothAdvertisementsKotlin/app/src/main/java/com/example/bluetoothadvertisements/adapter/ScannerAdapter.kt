@@ -55,7 +55,8 @@ class ScannerAdapter : RecyclerView.Adapter<ScannerAdapter.ScanResultVh>() {
 
     override fun getItemCount() = itemsList.size
 
-    private fun getItem(position: Int): ScanResult? = if (itemsList.isEmpty()) null else itemsList[position]
+    private fun getItem(position: Int): ScanResult? =
+        if (itemsList.isEmpty()) null else itemsList[position]
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ScanResultVh {
         val binding =
