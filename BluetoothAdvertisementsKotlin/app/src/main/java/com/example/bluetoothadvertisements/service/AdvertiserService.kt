@@ -143,7 +143,7 @@ class AdvertiserService : Service() {
     }
 
     private fun setTimeout() {
-        handler = Handler(Looper.myLooper()!!)
+        handler = Handler(Looper.myLooper() ?: return)
         val runnable = Runnable {
             Log.d(
                 TAG,

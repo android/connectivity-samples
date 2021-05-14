@@ -53,7 +53,7 @@ class ScannerAdapter : RecyclerView.Adapter<ScannerAdapter.ScanResultVh>() {
         notifyDataSetChanged()
     }
 
-    override fun getItemCount() = itemsList.size
+    override fun getItemCount(): Int = itemsList.size
 
     private fun getItem(position: Int): ScanResult? =
         if (itemsList.isEmpty()) null else itemsList[position]
