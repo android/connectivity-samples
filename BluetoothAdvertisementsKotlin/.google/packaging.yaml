@@ -27,20 +27,19 @@ status:       PUBLISHED
 # See http://go/sample-categories
 technologies: [Android]
 categories:   [Connectivity]
-languages:    [Java]
+languages:    [Kotlin]
 solutions:    [Mobile]
 
 # May be omitted if unpublished
 github:       android/connectivity
 
 # Values: BEGINNER | INTERMEDIATE | ADVANCED | EXPERT
-level:        INTERMEDIATE
+level:        ADVANCED
 
 icon:         screenshots/icon-web.png
 apiRefs:
-    - android:android.os.AsyncTask
-    - android:android.net.ConnectivityManager
-    - android:android.net.NetworkInfo
+    - android:android.bluetooth.le.BluetoothLeAdvertiser
+    - android:android.bluetooth.le.BluetoothLeScanner
 # Default: apache2. May be omitted for most samples.
 # Alternatives: apache2-android (for AOSP)
 license: apache2
