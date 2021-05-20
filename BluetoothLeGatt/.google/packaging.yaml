@@ -18,28 +18,15 @@
 # This file is used by Google as part of our samples packaging process.
 # End users may safely ignore this file. It has no relevance to other systems.
 ---
-# Values: {DRAFT | PUBLISHED | INTERNAL | DEPRECATED | SUPERCEDED}
 status:       PUBLISHED
-
-# Optional, put additional explanation here for DEPRECATED or SUPERCEDED.
-# statusNote:
-
-# See http://go/sample-categories
 technologies: [Android]
 categories:   [Connectivity]
 languages:    [Java]
 solutions:    [Mobile]
-
-# May be omitted if unpublished
 github:       android/connectivity
-
-# Values: BEGINNER | INTERMEDIATE | ADVANCED | EXPERT
 level:        INTERMEDIATE
-
 icon:         screenshots/icon-web.png
 apiRefs:
     - android:android.app.Service
     - android:android.bluetooth.BluetoothGattService
-# Default: apache2. May be omitted for most samples.
-# Alternatives: apache2-android (for AOSP)
 license: apache2
