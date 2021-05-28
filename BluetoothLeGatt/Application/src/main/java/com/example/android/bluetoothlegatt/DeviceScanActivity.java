@@ -35,6 +35,9 @@ import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
+import android.Manifest;
 
 import java.util.ArrayList;
 
@@ -63,6 +66,9 @@ public class DeviceScanActivity extends ListActivity {
             Toast.makeText(this, R.string.ble_not_supported, Toast.LENGTH_SHORT).show();
             finish();
         }
+        
+        // Ask user to allow needed permissions to use the BLE-related features.
+        GetPermissions();
 
         // Initializes a Bluetooth adapter.  For API level 18 and above, get a reference to
         // BluetoothAdapter through BluetoothManager.
@@ -262,5 +268,24 @@ public class DeviceScanActivity extends ListActivity {
     static class ViewHolder {
         TextView deviceName;
         TextView deviceAddress;
+    }
+    
+    private void GetPermissions(){
+        String[] perms = {
+                // Allows app to access precise location
+                // and scanning for bluetooth devices.
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                // Allows app to connect to paired bluetooth devices.
+                Manifest.permission.BLUETOOTH,
+                // Allows app to discover and pair bluetooth devices.
+                Manifest.permission.BLUETOOTH_ADMIN
+        };
+
+        for (String perm : perms) {
+            if (ContextCompat.checkSelfPermission(this, perm) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, perms, 2);
+                break;
+            }
+        }
     }
 }
