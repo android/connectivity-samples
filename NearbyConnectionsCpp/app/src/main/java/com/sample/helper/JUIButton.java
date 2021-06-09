@@ -18,7 +18,7 @@ package com.sample.helper;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
-import android.support.v7.widget.AppCompatButton;
+import androidx.appcompat.widget.AppCompatButton;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
