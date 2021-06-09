@@ -23,6 +23,7 @@ import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.gms.nearby.Nearby;
@@ -35,6 +36,8 @@ import com.google.android.gms.nearby.messages.Strategy;
 import com.google.android.gms.nearby.messages.SubscribeCallback;
 import com.google.android.gms.nearby.messages.SubscribeOptions;
 import com.google.android.gms.nearby.messages.samples.nearbydevices.databinding.ActivityMainBinding;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.material.snackbar.Snackbar;
 
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -72,6 +75,9 @@ public class MainActivity extends AppCompatActivity {
      */
     private static final Strategy PUB_SUB_STRATEGY = new Strategy.Builder()
             .setTtlSeconds(TTL_IN_SECONDS).build();
+    private static final String MISSING_API_KEY = "It's possible that you haven't added your" +
+            " API-KEY. See  " +
+            "https://developers.google.com/nearby/messages/android/get-started#step_4_configure_your_project";
 
     /**
      * The {@link Message} object used to broadcast information about the device to nearby devices.
@@ -116,7 +122,6 @@ public class MainActivity extends AppCompatActivity {
         };
 
         binding.subscribeSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            Log.d(TAG, "onCreate: subscribeSwitch clicked");
             if (isChecked) {
                 subscribe();
             } else {
@@ -181,7 +186,10 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }).build();
 
-        Nearby.getMessagesClient(this).publish(mMessage, options);
+        Nearby.getMessagesClient(this).publish(mMessage, options)
+                .addOnFailureListener(e -> {
+                    logAndShowSnackbar(MISSING_API_KEY);
+                });
     }
 
     /**
@@ -198,5 +206,12 @@ public class MainActivity extends AppCompatActivity {
     private void unpublish() {
         Log.i(TAG, "Unpublishing.");
         Nearby.getMessagesClient(this).unpublish(mMessage);
+    }
+
+    private void logAndShowSnackbar(final String text) {
+        Log.w(TAG, text);
+        if (binding.activityMainContainer != null) {
+            Snackbar.make(binding.activityMainContainer, text, Snackbar.LENGTH_LONG).show();
+        }
     }
 }
