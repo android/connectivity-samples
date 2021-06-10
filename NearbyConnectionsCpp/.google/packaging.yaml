@@ -37,7 +37,7 @@ github:       android/connectivity
 level:        ADVANCED
 
 apiRefs:
-    - google:com.google.android.gms.nearby.Nearby
+    - gms:google:com.google.android.gms.nearby.Nearby
 # Default: apache2. May be omitted for most samples.
 # Alternatives: apache2-android (for AOSP)
 license: apache2
