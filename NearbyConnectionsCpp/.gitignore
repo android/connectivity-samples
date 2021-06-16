@@ -11,6 +11,7 @@ obj/
 .gradle/
 build/
 .externalNativeBuild/
+**/.cxx
 
 *.iml
 
