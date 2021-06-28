@@ -36,6 +36,7 @@ object ChatServer {
     // hold reference to app context to run the chat server
     private var app: Application? = null
     private lateinit var bluetoothManager: BluetoothManager
+
     // BluetoothAdapter should never be null if the app is installed from the Play store
     // since BLE is required per the <uses-feature> tag in the AndroidManifest.xml.
     // If the app is installed on an emulator without bluetooth then the app will crash
@@ -258,7 +259,15 @@ object ChatServer {
             offset: Int,
             value: ByteArray?
         ) {
-            super.onCharacteristicWriteRequest(device, requestId, characteristic, preparedWrite, responseNeeded, offset, value)
+            super.onCharacteristicWriteRequest(
+                device,
+                requestId,
+                characteristic,
+                preparedWrite,
+                responseNeeded,
+                offset,
+                value
+            )
             if (characteristic.uuid == MESSAGE_UUID) {
                 gattServer?.sendResponse(device, requestId, BluetoothGatt.GATT_SUCCESS, 0, null)
                 val message = value?.toString(Charsets.UTF_8)
@@ -275,7 +284,10 @@ object ChatServer {
             super.onConnectionStateChange(gatt, status, newState)
             val isSuccess = status == BluetoothGatt.GATT_SUCCESS
             val isConnected = newState == BluetoothProfile.STATE_CONNECTED
-            Log.d(TAG, "onConnectionStateChange: Client $gatt  success: $isSuccess connected: $isConnected")
+            Log.d(
+                TAG,
+                "onConnectionStateChange: Client $gatt  success: $isSuccess connected: $isConnected"
+            )
             // try to send a message to the other device as a test
             if (isSuccess && isConnected) {
                 // discover services

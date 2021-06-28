@@ -23,8 +23,6 @@
     <string name="active_scan_message">Scanning for devices</string>
     <string name="bt_not_enabled">Please enable Bluetooth in order to scan for devices</string>
     <string name="enable_bluetooth_prompt">Enable Bluetooth</string>
-    <string name="bt_ads_not_supported">Bluetooth Advertisements are not supported on this device</string>
-    <string name="chat_confirm_message">Would you like to chat with %1$s</string>
     <string name="chat_deny_button">No</string>
     <string name="chat_confirm_button">Yes</string>
     <string name="no_connected_device_message">Not connected to a device</string>

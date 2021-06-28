@@ -18,8 +18,8 @@ package com.example.bluetoothlechat.chat
 import android.view.View
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.example.bluetoothlechat.bluetooth.Message
 import com.example.bluetoothlechat.R
+import com.example.bluetoothlechat.bluetooth.Message
 
 class RemoteMessageViewHolder(view: View) : RecyclerView.ViewHolder(view) {
 

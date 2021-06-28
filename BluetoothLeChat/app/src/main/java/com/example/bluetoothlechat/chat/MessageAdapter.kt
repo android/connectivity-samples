@@ -19,9 +19,8 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.example.bluetoothlechat.bluetooth.Message
 import com.example.bluetoothlechat.R
-import java.lang.IllegalArgumentException
+import com.example.bluetoothlechat.bluetooth.Message
 
 private const val TAG = "MessageAdapter"
 private const val REMOTE_MESSAGE = 0
@@ -33,7 +32,7 @@ class MessageAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         Log.d(TAG, "onCreateViewHolder: ")
         val inflater = LayoutInflater.from(parent.context)
-        return when(viewType) {
+        return when (viewType) {
             REMOTE_MESSAGE -> {
                 val view = inflater.inflate(R.layout.item_remote_message, parent, false)
                 RemoteMessageViewHolder(view)
@@ -50,8 +49,7 @@ class MessageAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         Log.d(TAG, "onBindViewHolder: ")
-        val message = messages[position]
-        when(message) {
+        when (val message = messages[position]) {
             is Message.RemoteMessage -> {
                 (holder as RemoteMessageViewHolder).bind(message)
             }
@@ -68,7 +66,7 @@ class MessageAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     override fun getItemViewType(position: Int): Int {
         Log.d(TAG, "getItemViewType: ")
-        return when(messages[position]) {
+        return when (messages[position]) {
             is Message.RemoteMessage -> REMOTE_MESSAGE
             is Message.LocalMessage -> LOCAL_MESSAGE
         }
