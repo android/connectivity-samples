@@ -13,6 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+@file:Suppress("ObjectPropertyName")
+
 package com.example.bluetoothlechat.bluetooth
 
 import android.app.Application
@@ -315,7 +317,7 @@ object ChatServer {
             super.onStartFailure(errorCode)
             // Send error state to display
             val errorMessage = "Advertise failed with error: $errorCode"
-            Log.d(TAG, "Advertising failed")
+            Log.d(TAG, errorMessage)
             //_viewState.value = DeviceScanViewState.Error(errorMessage)
         }
 

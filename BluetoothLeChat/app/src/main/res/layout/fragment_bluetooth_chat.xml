@@ -35,7 +35,7 @@
             android:id="@+id/connect_devices"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="@dimen/std_margin"
             android:text="@string/connect_device_prompt" />
     </LinearLayout>
 
@@ -50,8 +50,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:padding="16dp"
-            android:textSize="18sp" />
+            android:padding="@dimen/std_margin"
+            android:textSize="@dimen/txt_size_18" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/messages"
@@ -61,8 +61,11 @@
 
         <EditText
             android:id="@+id/message_text"
+            android:inputType="text"
+            android:hint="@string/enter_message"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:importantForAutofill="no" />
 
         <Button
             android:id="@+id/send_message"
