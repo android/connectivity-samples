@@ -1,3 +1,17 @@
+#
+# Copyright (C) 2021 The Android Open Source Project
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 # GOOGLE SAMPLE PACKAGING DATA
 #
@@ -12,18 +26,18 @@ solutions:    [Mobile]
 github:       android/connectivity
 level:        ADVANCED
 apiRefs:
-    - google:com.google.android.gms.nearby.Nearby
-    - google:com.google.android.gms.nearby.connection.AdvertisingOptions
-    - google:com.google.android.gms.nearby.connection.ConnectionInfo
-    - google:com.google.android.gms.nearby.connection.ConnectionLifecycleCallback
-    - google:com.google.android.gms.nearby.connection.ConnectionResolution
-    - google:com.google.android.gms.nearby.connection.ConnectionsClient
-    - google:com.google.android.gms.nearby.connection.DiscoveredEndpointInfo
-    - google:com.google.android.gms.nearby.connection.DiscoveryOptions
-    - google:com.google.android.gms.nearby.connection.EndpointDiscoveryCallback
-    - google:com.google.android.gms.nearby.connection.Payload
-    - google:com.google.android.gms.nearby.connection.PayloadCallback
-    - google:com.google.android.gms.nearby.connection.PayloadTransferUpdate
-    - google:com.google.android.gms.nearby.connection.PayloadTransferUpdate.Status
-    - google:com.google.android.gms.nearby.connection.Strategy
+    - gms:google:com.google.android.gms.nearby.Nearby
+    - gms:google:com.google.android.gms.nearby.connection.AdvertisingOptions
+    - gms:google:com.google.android.gms.nearby.connection.ConnectionInfo
+    - gms:google:com.google.android.gms.nearby.connection.ConnectionLifecycleCallback
+    - gms:google:com.google.android.gms.nearby.connection.ConnectionResolution
+    - gms:google:com.google.android.gms.nearby.connection.ConnectionsClient
+    - gms:google:com.google.android.gms.nearby.connection.DiscoveredEndpointInfo
+    - gms:google:com.google.android.gms.nearby.connection.DiscoveryOptions
+    - gms:google:com.google.android.gms.nearby.connection.EndpointDiscoveryCallback
+    - gms:google:com.google.android.gms.nearby.connection.Payload
+    - gms:google:com.google.android.gms.nearby.connection.PayloadCallback
+    - gms:google:com.google.android.gms.nearby.connection.PayloadTransferUpdate
+    - gms:google:com.google.android.gms.nearby.connection.PayloadTransferUpdate.Status
+    - gms:google:com.google.android.gms.nearby.connection.Strategy
 license: apache2

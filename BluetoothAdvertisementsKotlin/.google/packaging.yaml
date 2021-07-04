@@ -25,9 +25,8 @@ languages:    [Kotlin]
 solutions:    [Mobile]
 github:       android/connectivity
 level:        ADVANCED
+icon:         screenshots/icon-web.png
 apiRefs:
-    - android:org.chromium.net.CronetEngine
-    - android:org.chromium.net.CronetException
-    - android:org.chromium.net.UrlRequest
-    - android:org.chromium.net.UrlResponseInfo
+    - android:android.bluetooth.le.BluetoothLeAdvertiser
+    - android:android.bluetooth.le.BluetoothLeScanner
 license: apache2
