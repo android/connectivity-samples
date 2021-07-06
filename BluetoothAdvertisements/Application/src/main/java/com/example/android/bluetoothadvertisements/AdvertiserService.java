@@ -1,6 +1,8 @@
 package com.example.android.bluetoothadvertisements;
 
 import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
@@ -11,6 +13,7 @@ import android.bluetooth.le.AdvertiseSettings;
 import android.bluetooth.le.BluetoothLeAdvertiser;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
@@ -28,6 +31,7 @@ public class AdvertiserService extends Service {
     private static final String TAG = AdvertiserService.class.getSimpleName();
 
     private static final int FOREGROUND_NOTIFICATION_ID = 1;
+    private static final String NOTIFICATION_CHANNEL_ID = "advertiser_service_id";
 
     /**
      * A global variable to let AdvertiserFragment check if the Service is running without needing
@@ -152,15 +156,29 @@ public class AdvertiserService extends Service {
      * Callers should call stopForeground(true) when background work is complete.
      */
     private void goForeground() {
+        Notification.Builder builder;
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            ((NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE)).createNotificationChannel(
+                new NotificationChannel(
+                        NOTIFICATION_CHANNEL_ID,
+                        NOTIFICATION_CHANNEL_ID,
+                        NotificationManager.IMPORTANCE_DEFAULT
+                ));
+            builder = new Notification.Builder(this, NOTIFICATION_CHANNEL_ID);
+        } else {
+            builder = new Notification.Builder(this);
+        }
         Intent notificationIntent = new Intent(this, MainActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0,
             notificationIntent, 0);
-        Notification n = new Notification.Builder(this)
-            .setContentTitle("Advertising device via Bluetooth")
-            .setContentText("This device is discoverable to others nearby.")
-            .setSmallIcon(R.drawable.ic_launcher)
-            .setContentIntent(pendingIntent)
-            .build();
+
+        Notification n = builder
+                    .setContentTitle("Advertising device via Bluetooth")
+                    .setContentText("This device is discoverable to others nearby.")
+                    .setSmallIcon(R.drawable.ic_launcher)
+                    .setContentIntent(pendingIntent)
+                    .build();
         startForeground(FOREGROUND_NOTIFICATION_ID, n);
     }
 
