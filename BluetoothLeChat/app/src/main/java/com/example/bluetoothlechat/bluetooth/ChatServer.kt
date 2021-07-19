@@ -13,6 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/**
+ * Allows such property names as '_messages'
+ */
 @file:Suppress("ObjectPropertyName")
 
 package com.example.bluetoothlechat.bluetooth
