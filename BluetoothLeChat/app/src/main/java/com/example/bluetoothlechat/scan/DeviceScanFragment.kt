@@ -35,7 +35,6 @@ import com.example.bluetoothlechat.scan.DeviceScanViewState.*
 import com.example.bluetoothlechat.visible
 
 private const val TAG = "DeviceScanFragment"
-const val GATT_KEY = "gatt_bundle_key"
 
 class DeviceScanFragment : Fragment() {
 
@@ -70,7 +69,7 @@ class DeviceScanFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         _binding = FragmentDeviceScanBinding.inflate(inflater, container, false)
         val devAddr = getString(R.string.your_device_address) + ChatServer.getYourDeviceAddress()
         binding.yourDeviceAddr.text = devAddr

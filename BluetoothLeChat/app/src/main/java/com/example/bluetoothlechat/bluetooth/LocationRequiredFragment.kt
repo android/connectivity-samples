@@ -18,18 +18,15 @@ package com.example.bluetoothlechat.bluetooth
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.example.bluetoothlechat.R
 import com.example.bluetoothlechat.databinding.FragmentLocationRequiredBinding
-
-private const val TAG = "LocationRequiredFrag"
-private const val LOCATION_REQUEST_CODE = 0
 
 // Fragment responsible for checking if the app has the ACCESS_FINE_LOCATION permission.
 // This permission is required when using the BLE APIs so the user must grant permission
@@ -44,7 +41,7 @@ class LocationRequiredFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         _binding = FragmentLocationRequiredBinding.inflate(inflater, container, false)
 
         // hide the error messages while checking the permissions
@@ -64,25 +61,14 @@ class LocationRequiredFragment : Fragment() {
         checkLocationPermission()
     }
 
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        Log.d(TAG, "onRequestPermissionsResult: ")
-        when(requestCode) {
-            LOCATION_REQUEST_CODE -> {
-                if (grantResults.isNotEmpty() &&
-                    grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    // Navigate to the chat fragment
-                    findNavController().navigate(R.id.action_start_chat)
-                } else {
-                    showError()
-                }
+    private val startForResultRequestPermission =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) {
+            if (it) {
+                findNavController().navigate(R.id.action_start_chat)
+            } else {
+                showError()
             }
         }
-    }
 
     private fun showError() {
         binding.locationErrorMessage.visibility = View.VISIBLE
@@ -99,10 +85,7 @@ class LocationRequiredFragment : Fragment() {
             // Navigate to the chat fragment
             findNavController().navigate(R.id.action_start_chat)
         } else {
-            requestPermissions(
-                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
-                LOCATION_REQUEST_CODE
-            )
+            startForResultRequestPermission.launch(Manifest.permission.ACCESS_FINE_LOCATION)
         }
     }
 }

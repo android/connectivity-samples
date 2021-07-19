@@ -37,9 +37,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:paddingTop="16dp"
+            android:paddingTop="@dimen/std_margin"
             android:text="@string/active_scan_message"
-            android:textSize="18sp" />
+            android:textSize="@dimen/txt_size_18" />
     </LinearLayout>
 
     <LinearLayout
