@@ -19,8 +19,6 @@ import android.app.Application
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.le.*
-import android.os.Handler
-import android.os.Looper
 import android.os.ParcelUuid
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
@@ -28,6 +26,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.bluetoothlechat.bluetooth.SERVICE_UUID
 import com.example.bluetoothlechat.scan.DeviceScanViewState.*
+import kotlinx.coroutines.*
 
 
 private const val TAG = "DeviceScanViewModel"
@@ -84,8 +83,10 @@ class DeviceScanViewModel(app: Application) : AndroidViewModel(app) {
             _viewState.value = ActiveScan
 
             // Stop scanning after the scan period
-            Handler(Looper.myLooper()!!).postDelayed({ stopScanning() }, SCAN_PERIOD)
-
+            CoroutineScope(Dispatchers.Main).launch {
+                delay(SCAN_PERIOD)
+                stopScanning()
+            }
             // Kick off a new scan
             scanCallback = DeviceScanCallback()
             scanner?.startScan(scanFilters, scanSettings, scanCallback)
