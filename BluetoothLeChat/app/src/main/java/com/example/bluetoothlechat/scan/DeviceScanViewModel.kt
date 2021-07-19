@@ -26,8 +26,10 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.bluetoothlechat.bluetooth.SERVICE_UUID
 import com.example.bluetoothlechat.scan.DeviceScanViewState.*
-import kotlinx.coroutines.*
-
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 private const val TAG = "DeviceScanViewModel"
 
@@ -155,6 +157,5 @@ class DeviceScanViewModel(app: Application) : AndroidViewModel(app) {
             _viewState.value = Error(errorMessage)
         }
     }
-
 
 }
