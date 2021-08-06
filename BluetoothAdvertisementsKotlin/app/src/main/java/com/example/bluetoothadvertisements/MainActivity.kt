@@ -35,10 +35,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-        setSupportActionBar(findViewById(R.id.toolbar))
-
         binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         if (savedInstanceState == null) {
             verifyBluetoothCapabilities()
