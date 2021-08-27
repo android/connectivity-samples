@@ -94,15 +94,15 @@ class AdvertiserFragment : Fragment() {
         requireActivity().unregisterReceiver(btAdvertisingFailureReceiver)
     }
 
-    private fun startAdvertising() = requireContext().startService(createServiceIntent())
+    private fun startAdvertising() = requireContext().startService(createAdvertisingServiceIntent())
 
     private fun stopAdvertising() {
-        requireContext().stopService(createServiceIntent())
+        requireContext().stopService(createAdvertisingServiceIntent())
         binding.advertiseSwitch.isChecked = false
     }
 
-    private fun createServiceIntent(): Intent =
-            Intent(requireContext(), AdvertiserService::class.java)
+    private fun createAdvertisingServiceIntent(): Intent =
+        Intent(requireContext(), AdvertiserService::class.java)
 }
 
 

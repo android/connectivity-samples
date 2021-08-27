@@ -35,10 +35,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-        setSupportActionBar(findViewById(R.id.toolbar))
-
         binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         if (savedInstanceState == null) {
             verifyBluetoothCapabilities()
@@ -50,17 +48,18 @@ class MainActivity : AppCompatActivity() {
 
         when {
             bluetoothAdapter == null ->
+                // Bluetooth is not supported on this hardware platform
                 showErrorText("onCreate: bluetooth not supported")
-            bluetoothAdapter.isEnabled && bluetoothAdapter.isMultipleAdvertisementSupported ->
-                setupFragments()
-            bluetoothAdapter.isEnabled && !bluetoothAdapter.isMultipleAdvertisementSupported ->
-                showErrorText("Bluetooth Advertisements are not supported.")
-            !bluetoothAdapter.isEnabled ->
+            !bluetoothAdapter.isEnabled -> // Bluetooth is OFF, user should turn it ON
                 // Prompt the use to allow the app to turn on Bluetooth
                 startActivityForResult(
-                        Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE),
-                        REQUEST_ENABLE_BT
+                    Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE),
+                    REQUEST_ENABLE_BT
                 )
+            bluetoothAdapter.isEnabled && !bluetoothAdapter.isMultipleAdvertisementSupported ->
+                showErrorText("Bluetooth Advertisements are not supported.")
+            bluetoothAdapter.isEnabled && bluetoothAdapter.isMultipleAdvertisementSupported ->
+                setupFragments()
         }
     }
 
@@ -73,7 +72,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     /**
-     * Setups up two Fragments in the Activity: one shows the list of nearby devices; one shows the
+     * Setup two Fragments in the Activity: one shows the list of nearby devices; one shows the
      * switch for advertising to nearby devices.
      */
     private fun setupFragments() {

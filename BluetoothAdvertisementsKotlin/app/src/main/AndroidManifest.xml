@@ -19,7 +19,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.bluetoothadvertisements">
 
+    <!-- Allows applications to discover and pair bluetooth devices.-->
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    <!-- Allows applications to connect to paired bluetooth devices.-->
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <!--  Between Android N and R, fine location access is needed for scanning for nearby devices-->
