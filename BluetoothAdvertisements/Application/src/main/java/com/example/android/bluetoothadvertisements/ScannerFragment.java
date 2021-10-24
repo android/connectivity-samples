@@ -155,7 +155,7 @@ public class ScannerFragment extends ListFragment {
                     + getString(R.string.seconds);
             Toast.makeText(getActivity(), toastText, Toast.LENGTH_LONG).show();
         } else {
-            Toast.makeText(getActivity(), R.string.already_scanning, Toast.LENGTH_SHORT);
+            Toast.makeText(getActivity(), R.string.already_scanning, Toast.LENGTH_SHORT).show();
         }
     }
 
