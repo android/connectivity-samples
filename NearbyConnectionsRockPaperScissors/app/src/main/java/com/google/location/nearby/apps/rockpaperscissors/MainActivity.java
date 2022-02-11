@@ -5,6 +5,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import androidx.annotation.CallSuper;
 import androidx.annotation.NonNull;
@@ -36,14 +37,40 @@ public class MainActivity extends AppCompatActivity {
 
   private static final String TAG = "RockPaperScissors";
 
-  private static final String[] REQUIRED_PERMISSIONS =
-      new String[] {
-        Manifest.permission.BLUETOOTH,
-        Manifest.permission.BLUETOOTH_ADMIN,
-        Manifest.permission.ACCESS_WIFI_STATE,
-        Manifest.permission.CHANGE_WIFI_STATE,
-        Manifest.permission.ACCESS_COARSE_LOCATION,
-      };
+  private static final String[] REQUIRED_PERMISSIONS;
+  static {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+      REQUIRED_PERMISSIONS =
+          new String[] {
+            Manifest.permission.BLUETOOTH_SCAN,
+            Manifest.permission.BLUETOOTH_ADVERTISE,
+            Manifest.permission.BLUETOOTH_CONNECT,
+            Manifest.permission.ACCESS_WIFI_STATE,
+            Manifest.permission.CHANGE_WIFI_STATE,
+            Manifest.permission.ACCESS_COARSE_LOCATION,
+            Manifest.permission.ACCESS_FINE_LOCATION,
+          };
+    } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+      REQUIRED_PERMISSIONS =
+          new String[] {
+            Manifest.permission.BLUETOOTH,
+            Manifest.permission.BLUETOOTH_ADMIN,
+            Manifest.permission.ACCESS_WIFI_STATE,
+            Manifest.permission.CHANGE_WIFI_STATE,
+            Manifest.permission.ACCESS_COARSE_LOCATION,
+            Manifest.permission.ACCESS_FINE_LOCATION,
+          };
+    } else {
+      REQUIRED_PERMISSIONS =
+          new String[] {
+            Manifest.permission.BLUETOOTH,
+            Manifest.permission.BLUETOOTH_ADMIN,
+            Manifest.permission.ACCESS_WIFI_STATE,
+            Manifest.permission.CHANGE_WIFI_STATE,
+            Manifest.permission.ACCESS_COARSE_LOCATION,
+          };
+    }
+  }
 
   private static final int REQUEST_CODE_REQUIRED_PERMISSIONS = 1;
 
@@ -210,12 +237,15 @@ public class MainActivity extends AppCompatActivity {
       return;
     }
 
+    int i = 0;
     for (int grantResult : grantResults) {
       if (grantResult == PackageManager.PERMISSION_DENIED) {
+        Log.i(TAG, "Failed to request the permission " + permissions[i]);
         Toast.makeText(this, R.string.error_missing_permissions, Toast.LENGTH_LONG).show();
         finish();
         return;
       }
+      i++;
     }
     recreate();
   }
