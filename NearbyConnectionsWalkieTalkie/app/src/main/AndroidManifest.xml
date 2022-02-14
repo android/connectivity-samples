@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-  package="com.google.location.nearby.apps.walkietalkie">
+    package="com.google.location.nearby.apps.walkietalkie">
 
     <uses-sdk android:targetSdkVersion="31" />
 
