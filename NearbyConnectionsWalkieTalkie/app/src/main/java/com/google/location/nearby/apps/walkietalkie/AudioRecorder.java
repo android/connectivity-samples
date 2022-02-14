@@ -4,6 +4,7 @@ import static android.os.Process.THREAD_PRIORITY_AUDIO;
 import static android.os.Process.setThreadPriority;
 import static com.google.location.nearby.apps.walkietalkie.Constants.TAG;
 
+import android.annotation.SuppressLint;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
@@ -58,7 +59,7 @@ public class AudioRecorder {
             setThreadPriority(THREAD_PRIORITY_AUDIO);
 
             Buffer buffer = new Buffer();
-            AudioRecord record =
+            @SuppressLint("MissingPermission") AudioRecord record =
                 new AudioRecord(
                     MediaRecorder.AudioSource.DEFAULT,
                     buffer.sampleRate,
