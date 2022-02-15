@@ -22,5 +22,6 @@ allprojects {
             url 'https://maven.google.com'
         }
         mavenCentral()
+        google()
     }
 }

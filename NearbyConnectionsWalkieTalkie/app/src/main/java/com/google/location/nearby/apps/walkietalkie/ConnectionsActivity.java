@@ -5,12 +5,12 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.CallSuper;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
+import androidx.annotation.CallSuper;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -45,18 +45,42 @@ import static com.google.location.nearby.apps.walkietalkie.Constants.TAG;
 public abstract class ConnectionsActivity extends AppCompatActivity {
 
   /**
-   * These permissions are required before connecting to Nearby Connections. Only {@link
-   * Manifest.permission#ACCESS_COARSE_LOCATION} is considered dangerous, so the others should be
-   * granted just by having them in our AndroidManfiest.xml
+   * These permissions are required before connecting to Nearby Connections.
    */
-  private static final String[] REQUIRED_PERMISSIONS =
-      new String[] {
-        Manifest.permission.BLUETOOTH,
-        Manifest.permission.BLUETOOTH_ADMIN,
-        Manifest.permission.ACCESS_WIFI_STATE,
-        Manifest.permission.CHANGE_WIFI_STATE,
-        Manifest.permission.ACCESS_COARSE_LOCATION,
-      };
+  private static final String[] REQUIRED_PERMISSIONS;
+  static {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+      REQUIRED_PERMISSIONS =
+          new String[] {
+            Manifest.permission.BLUETOOTH_SCAN,
+            Manifest.permission.BLUETOOTH_ADVERTISE,
+            Manifest.permission.BLUETOOTH_CONNECT,
+            Manifest.permission.ACCESS_WIFI_STATE,
+            Manifest.permission.CHANGE_WIFI_STATE,
+            Manifest.permission.ACCESS_COARSE_LOCATION,
+            Manifest.permission.ACCESS_FINE_LOCATION,
+          };
+    } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+      REQUIRED_PERMISSIONS =
+          new String[] {
+            Manifest.permission.BLUETOOTH,
+            Manifest.permission.BLUETOOTH_ADMIN,
+            Manifest.permission.ACCESS_WIFI_STATE,
+            Manifest.permission.CHANGE_WIFI_STATE,
+            Manifest.permission.ACCESS_COARSE_LOCATION,
+            Manifest.permission.ACCESS_FINE_LOCATION,
+          };
+    } else {
+      REQUIRED_PERMISSIONS =
+          new String[] {
+            Manifest.permission.BLUETOOTH,
+            Manifest.permission.BLUETOOTH_ADMIN,
+            Manifest.permission.ACCESS_WIFI_STATE,
+            Manifest.permission.CHANGE_WIFI_STATE,
+            Manifest.permission.ACCESS_COARSE_LOCATION,
+          };
+    }
+  }
 
   private static final int REQUEST_CODE_REQUIRED_PERMISSIONS = 1;
 
@@ -161,13 +185,11 @@ public abstract class ConnectionsActivity extends AppCompatActivity {
   protected void onStart() {
     super.onStart();
     if (!hasPermissions(this, getRequiredPermissions())) {
-      if (!hasPermissions(this, getRequiredPermissions())) {
-        if (Build.VERSION.SDK_INT < 23) {
-          ActivityCompat.requestPermissions(
-              this, getRequiredPermissions(), REQUEST_CODE_REQUIRED_PERMISSIONS);
-        } else {
-          requestPermissions(getRequiredPermissions(), REQUEST_CODE_REQUIRED_PERMISSIONS);
-        }
+      if (Build.VERSION.SDK_INT < 23) {
+        ActivityCompat.requestPermissions(
+            this, getRequiredPermissions(), REQUEST_CODE_REQUIRED_PERMISSIONS);
+      } else {
+        requestPermissions(getRequiredPermissions(), REQUEST_CODE_REQUIRED_PERMISSIONS);
       }
     }
   }
@@ -178,12 +200,15 @@ public abstract class ConnectionsActivity extends AppCompatActivity {
   public void onRequestPermissionsResult(
       int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
     if (requestCode == REQUEST_CODE_REQUIRED_PERMISSIONS) {
+      int i = 0;
       for (int grantResult : grantResults) {
         if (grantResult == PackageManager.PERMISSION_DENIED) {
+          logW("Failed to request the permission " + permissions[i]);
           Toast.makeText(this, R.string.error_missing_permissions, Toast.LENGTH_LONG).show();
           finish();
           return;
         }
+        i++;
       }
       recreate();
     }
