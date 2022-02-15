@@ -40,15 +40,11 @@ Support
 
 - Stack Overflow: http://stackoverflow.com/questions/tagged/google-play-services
 
-If you've found an error in these samples, please file an issue in this repo.
-
-For providing feedback about Nearby.Connections, use the `SEND FEEDBACK` link on
-the [Nearby Connections API for Android
-page](https://developers.google.com/android/connectivity).
+If you've found an error in this sample, please file an issue: https://github.com/android/connectivity
 
 Patches are encouraged, and may be submitted according to the instructions in
 CONTRIBUTING.md.
 
 
 ## How to make contributions?
-Please read and follow the steps in the [CONTRIBUTING.md](CONTRIBUTING.md)
+Please read and follow the steps in the [CONTRIBUTING.md](https://github.com/android/connectivity-samples/blob/main/CONTRIBUTING.md)
