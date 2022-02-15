@@ -19,5 +19,5 @@ android {
 
 dependencies {
     implementation 'androidx.appcompat:appcompat:1.0.0'
-    implementation 'com.google.android.gms:play-services-nearby:15.0.1'
+    implementation 'com.google.android.gms:play-services-nearby:18.0.1'
 }
