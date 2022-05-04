@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+ Copyright 2022 Google LLC
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+
+<resources>
+    <string name="app_name">Rock Paper Scissors</string>
+
+    <string name="codename">Your codename: %s</string>
+    <string name="opponent_name">Opponent: %s</string>
+    <string name="num_opponents">Opponents: %d</string>
+    <string name="no_opponent">none (yet)</string>
+
+    <string name="status_disconnected">Disconnected</string>
+    <string name="status_searching">Searching</string>
+    <string name="status_connected">Connected</string>
+    <string name="status_transferring">Transferring…</string>
+    <string name="status_session_created">Session created</string>
+    <string name="status_round_complete">Round complete</string>
+
+    <string name="game_choice">You chose %s</string>
+
+    <string name="win_message">%1$s beats %2$s!</string>
+    <string name="tie_message">You both chose %s</string>
+    <string name="loss_message">%1$s loses to %2$s…</string>
+
+    <string name="action_find_opponents">Find opponent</string>
+    <string name="action_add_opponents">Add opponent</string>
+    <string name="action_disconnect">Disconnect</string>
+    <string name="action_find_game">Find a game</string>
+    <string name="action_transfer_game">Transfer game</string>
+    <string name="action_two_player_discovery_api">Two Players (Discovery API)</string>
+    <string name="action_two_player_sessions_api">Two Players (Sessions API)</string>
+    <string name="action_single_player_sessions_api">Single Player (Sessions API)</string>
+    <string name="action_multiplayer_sessions_api">Multiplayer (Coming soon)</string>
+
+    <string name="choice_rock">Rock</string>
+    <string name="choice_paper">Paper</string>
+    <string name="choice_scissors">Scissors</string>
+
+    <string name="game_score">%1$d : %2$d</string>
+    <string name="game_score_labeled">%1$s:\n%2$d</string>
+    <string name="game_score_talk_back">Current score is %1$d to %2$d</string>
+
+    <string name="your_score_text">Your Score</string>
+    <string name="top_score_text">"Top Score - "</string>
+
+    <string name="send_failure">Failed to send choice</string>
+    <string name="transfer_success">Successfully transferred game</string>
+    <string name="transfer_failure">Failed to transfer game</string>
+    <string name="transfer_receive_success">Received game transfer</string>
+
+    <string name="wakeup_reason">Start a game of Rock Paper Scissors</string>
+    <string name="transfer_reason">Transfer a game of Rock Paper Scissors</string>
+</resources>
