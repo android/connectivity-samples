@@ -1,0 +1,20 @@
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        google()
+        maven { url "/Users/pslava/.m2/repository/" }
+        maven { url "${rootDir}/app/libs/ambient" }
+        //mavenCentral()
+    }
+}
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        google()
+        maven { url "/Users/pslava/.m2/repository/" }
+        maven { url "${rootDir}/app/libs/ambient" }
+        mavenCentral()
+    }
+}
+rootProject.name = "RockPaperScissors"
+include ':app'
