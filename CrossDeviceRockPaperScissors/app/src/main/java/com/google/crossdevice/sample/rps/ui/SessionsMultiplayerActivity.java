@@ -34,6 +34,7 @@ import com.google.crossdevice.sample.rps.model.GameChoice;
 import com.google.crossdevice.sample.rps.model.GameData;
 import com.google.crossdevice.sample.rps.service.GameManager;
 import com.google.crossdevice.sample.rps.service.SessionsMultiplayerGameManager;
+import java.util.Arrays;
 
 /**
  * Activity for playing a multiplayer Rock Paper Scissors game with opponents using a "Sessions
@@ -177,6 +178,9 @@ public class SessionsMultiplayerActivity extends AppCompatActivity {
         // Observes game state changes and updates UI accordingly
         final Observer<GameData.GameState> gameStateObserver =
                 gameState -> {
+                    if (!Arrays.asList(GameData.GameState.values()).contains(gameState)) {
+                        throw new RuntimeException("Invalid GameState passed to Observer");
+                    }
                     switch (gameState) {
                         case DISCONNECTED:
                             setButtonStateDisconnected();
@@ -200,6 +204,8 @@ public class SessionsMultiplayerActivity extends AppCompatActivity {
                             break;
                         case ROUND_RESULT:
                             setStatusText(getString(R.string.status_round_complete));
+                        default:
+                            Log.d(TAG, "Ignoring GameState: " + gameState);
                     }
                 };
         gameManager.getGameData().getGameState().observe(this, gameStateObserver);

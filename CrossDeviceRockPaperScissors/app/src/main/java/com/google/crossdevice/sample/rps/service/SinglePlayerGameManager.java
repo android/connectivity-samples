@@ -75,18 +75,20 @@ public final class SinglePlayerGameManager implements GameManager {
     }
 
     /**
-     * Sets the opponent's choice and processes the round.
+     * Resets game data to default values.
      */
-    public void finishRound() {
-        generateOpponentChoice();
-        gameData.processRound();
+    @Override
+    public void resetGame() {
+        gameData.resetGameData();
     }
 
     /**
-     * Resets game data to default values.
+     * Sets the opponent's choice and processes the round.
      */
-    public void resetGame() {
-        gameData.resetGameData();
+    @Override
+    public void finishRound() {
+        generateOpponentChoice();
+        gameData.processRound();
     }
 
     /**

@@ -56,7 +56,7 @@ public final class MultiplayerGameDataViewModel extends ViewModel implements Gam
     private final MutableLiveData<String> topPlayerName = new MutableLiveData<>();
     private final MutableLiveData<Integer> localPlayerScore = new MutableLiveData<>();
     private final MutableLiveData<Integer> topPlayerScore = new MutableLiveData<>();
-    private final MutableLiveData<GameState> gameState = new MutableLiveData<>();
+    private final MutableLiveData<GameState> gameState = new MutableLiveData<>(GameState.DISCONNECTED);
     private final MutableLiveData<Integer> numberOfOpponents = new MutableLiveData<>();
     private GameChoice localPlayerChoice;
     private GameChoice topPlayerChoice;
@@ -161,7 +161,7 @@ public final class MultiplayerGameDataViewModel extends ViewModel implements Gam
     /** Returns the winner for each round or pending if we are still waiting on results. */
     @Override
     public RoundWinner getRoundWinner() {
-        return null;
+        return RoundWinner.PENDING;
     }
 
     /** Gets current number of rounds completed. */

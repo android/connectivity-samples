@@ -140,8 +140,21 @@ class SessionsMultiplayerGameManager(
     }
 
     override fun findOpponent() {
-        gameData.gameState.value = GameData.GameState.SEARCHING
-        sessionId?.let { inviteOpponent(it) }
+        sessionId?.also { sessionId ->
+            gameData.gameState.value = GameData.GameState.SEARCHING
+            scope.launch {
+                primarySession =
+                    sessions.shareSession(
+                        sessionId,
+                        StartComponentRequest.Builder()
+                            .setAction(ACTION_WAKE_UP)
+                            .setReason(context.getString(R.string.wakeup_reason)).build(),
+                        deviceFilters = emptyList(),
+                        primarySessionStateCallback
+                    )
+                Log.d(TAG, "Successfully launched opponent picker")
+            }
+        } ?: Log.d(TAG, "Skipping findOpponent() due to null SessionId")
     }
 
     override fun sendGameChoice(choice: GameChoice, callback: GameManager.Callback) {
@@ -216,22 +229,6 @@ class SessionsMultiplayerGameManager(
                     }
                 )
             }
-    }
-
-    /** Invites an opponent to a created Session. */
-    private fun inviteOpponent(sessionId: SessionId) {
-        scope.launch {
-            primarySession =
-                sessions.shareSession(
-                    sessionId,
-                    StartComponentRequest.Builder()
-                        .setAction(ACTION_WAKE_UP)
-                        .setReason(context.getString(R.string.wakeup_reason)).build(),
-                    deviceFilters = emptyList(),
-                    primarySessionStateCallback
-                )
-            Log.d(TAG, "Successfully launched opponent picker")
-        }
     }
 
     /** Sends the game choice to whichever connection is open. */

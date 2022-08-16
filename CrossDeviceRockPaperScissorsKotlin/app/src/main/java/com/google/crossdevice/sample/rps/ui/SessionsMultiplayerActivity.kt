@@ -164,13 +164,13 @@ class SessionsMultiplayerActivity : AppCompatActivity(R.layout.activity_multipla
 
         // Observes game state changes and updates UI accordingly
         val gameStateObserver = Observer { gameState: GameData.GameState? ->
+            if (!GameData.GameState.values().contains(gameState)) {
+                throw RuntimeException("Invalid GameState passed to Observer")
+            }
             when (gameState) {
                 GameData.GameState.DISCONNECTED -> {
                     setButtonStateDisconnected()
                     statusText.text = getString(R.string.status_disconnected)
-
-                    // TODO: Remove this line when multiplayer sessions is implemented
-                    addOpponentButton.isEnabled = false
                 }
                 GameData.GameState.SEARCHING -> statusText.text = getString(R.string.status_searching)
                 GameData.GameState.WAITING_FOR_PLAYER_INPUT -> {
@@ -186,7 +186,7 @@ class SessionsMultiplayerActivity : AppCompatActivity(R.layout.activity_multipla
                 }
                 GameData.GameState.ROUND_RESULT ->
                     setStatusText(getString(R.string.status_round_complete))
-                else -> {}
+                else -> Log.d(TAG, "Ignoring GameState: $gameState")
             }
         }
         gameManager.gameData.gameState.observe(this, gameStateObserver)

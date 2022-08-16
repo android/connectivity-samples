@@ -23,6 +23,7 @@ import android.content.Intent;
 import android.util.Log;
 
 import androidx.activity.result.ActivityResultCaller;
+import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 
 import com.google.ambient.crossdevice.sessions.PrimarySession;
@@ -60,12 +61,12 @@ public final class SessionsTwoPlayerGameManager implements GameManager {
             new PrimarySessionStateCallback() {
                 @Override
                 public void onShareFailureWithParticipant(
-                        SessionId sessionId, SessionException exception, SessionParticipant participant) {
+                        @NonNull SessionId sessionId, @NonNull SessionException exception, SessionParticipant participant) {
                     Log.e(TAG, "Share failure with participant: " + participant.getDisplayName(), exception);
                 }
 
                 @Override
-                public void onParticipantDeparted(SessionId sessionId, SessionParticipant participant) {
+                public void onParticipantDeparted(@NonNull SessionId sessionId, SessionParticipant participant) {
                     Log.d(TAG, "SessionParticipant departed: " + participant.getDisplayName());
                     /* The PrimarySession will only be destroyed if done explicitly. Since the only
                      * participant has departed, the PrimarySession should now be destroyed. */
@@ -73,7 +74,7 @@ public final class SessionsTwoPlayerGameManager implements GameManager {
                 }
 
                 @Override
-                public void onParticipantJoined(SessionId sessionId, SessionParticipant participant) {
+                public void onParticipantJoined(@NonNull SessionId sessionId, SessionParticipant participant) {
                     Log.d(TAG, "New Participant joined: " + participant.getDisplayName());
                     gameData.getGameState().setValue(GameData.GameState.WAITING_FOR_PLAYER_INPUT);
                     gameData.getOpponentPlayerName().setValue(participant.getDisplayName().toString());
@@ -81,19 +82,18 @@ public final class SessionsTwoPlayerGameManager implements GameManager {
                         Log.d(TAG, "Cannot add callback to joined participant since PrimarySession is null");
                         return;
                     }
-                    // TODO: change when new api is available for listening
                     addRemoteConnectionCallback(primarySession, participant);
                 }
 
                 @Override
-                public void onPrimarySessionCleanup(SessionId sessionId) {
+                public void onPrimarySessionCleanup(@NonNull SessionId sessionId) {
                     Log.d(TAG, "PrimarySession cleanup");
                     primarySession = null;
                     resetGame();
                 }
 
                 @Override
-                public void onShareInitiated(SessionId sessionId, int numPotentialParticipants) {
+                public void onShareInitiated(@NonNull SessionId sessionId, int numPotentialParticipants) {
                     if (numPotentialParticipants == 0) {
                         Log.d(TAG, "No participants joining Session, destroying PrimarySession");
                         destroyPrimarySession();
@@ -112,7 +112,7 @@ public final class SessionsTwoPlayerGameManager implements GameManager {
     private final SecondarySessionStateCallback secondarySessionStateCallback =
             new SecondarySessionStateCallback() {
                 @Override
-                public void onSecondarySessionCleanup(SessionId sessionId) {
+                public void onSecondarySessionCleanup(@NonNull SessionId sessionId) {
                     secondarySession = null;
                     secondaryConnection = null;
                     resetGame();
@@ -163,7 +163,29 @@ public final class SessionsTwoPlayerGameManager implements GameManager {
         gameData.getGameState().setValue(GameData.GameState.SEARCHING);
 
         SessionId sessionId = sessions.createSession(/* applicationSessionTag */ null);
-        inviteOpponent(sessionId);
+        Futures.addCallback(
+            sessions.shareSessionFuture(
+                sessionId,
+                new StartComponentRequest.Builder()
+                    .setAction(ACTION_WAKE_UP)
+                    .setReason(context.getString(R.string.wakeup_reason))
+                    .build(),
+                Collections.emptyList(),
+                primarySessionStateCallback),
+            new FutureCallback<PrimarySession>() {
+              @Override
+              public void onSuccess(PrimarySession result) {
+                Log.d(TAG, "Successfully launched opponent picker");
+                primarySession = result;
+              }
+
+              @Override
+              public void onFailure(Throwable t) {
+                Log.e(TAG, "Failed to launch opponent picker", t);
+                resetGame();
+              }
+            },
+            mainExecutor);
     }
 
     /**
@@ -245,35 +267,6 @@ public final class SessionsTwoPlayerGameManager implements GameManager {
         gameData
                 .getOpponentPlayerName()
                 .setValue(secondaryConnection.getParticipant().getDisplayName().toString());
-    }
-
-    /**
-     * Invites an opponent to a created Session.
-     */
-    public void inviteOpponent(SessionId sessionId) {
-        Futures.addCallback(
-                sessions.shareSessionFuture(
-                        sessionId,
-                        new StartComponentRequest.Builder()
-                                .setAction(ACTION_WAKE_UP)
-                                .setReason(context.getString(R.string.wakeup_reason))
-                                .build(),
-                        Collections.emptyList(),
-                        primarySessionStateCallback),
-                new FutureCallback<PrimarySession>() {
-                    @Override
-                    public void onSuccess(PrimarySession result) {
-                        Log.d(TAG, "Successfully launched opponent picker");
-                        primarySession = result;
-                    }
-
-                    @Override
-                    public void onFailure(Throwable t) {
-                        Log.e(TAG, "Failed to launch opponent picker", t);
-                        resetGame();
-                    }
-                },
-                mainExecutor);
     }
 
     /**

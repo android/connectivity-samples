@@ -118,7 +118,7 @@ class SessionsSinglePlayerActivity : AppCompatActivity(R.layout.activity_single_
         // Creates a GameManager object for a Single Player game
         gameManager = SinglePlayerGameManager(this)
         addObservers()
-        setupDtdi(this)
+        setupSessions(this)
         handleIntent(intent)
     }
 
@@ -177,35 +177,43 @@ class SessionsSinglePlayerActivity : AppCompatActivity(R.layout.activity_single_
 
         // Observes game state changes and updates UI accordingly
         val gameStateObserver = Observer { gameState: GameData.GameState? ->
+            if (!GameData.GameState.values().contains(gameState)) {
+                throw RuntimeException("Invalid GameState passed to Observer")
+            }
             when (gameState) {
                 GameData.GameState.WAITING_FOR_PLAYER_INPUT ->
                     if (gameManager.gameData.roundsCompleted == 0) {
                         setStatusText(getString(R.string.status_session_created))
                     }
+                GameData.GameState.WAITING_FOR_ROUND_RESULT -> {}
                 GameData.GameState.ROUND_RESULT ->
-                    when (gameManager.gameData.roundWinner) {
-                        GameData.RoundWinner.LOCAL_PLAYER ->
-                            setStatusText(
-                                getString(
-                                    R.string.win_message,
-                                    gameManager.gameData.localPlayerChoice,
-                                    gameManager.gameData.opponentPlayerChoice
+                    gameManager.gameData.roundWinner.let { winner ->
+                        if (!GameData.RoundWinner.values().contains(winner)) {
+                            throw RuntimeException("Invalid RoundWinner in RoundResult")
+                        }
+                        when (winner) {
+                            GameData.RoundWinner.LOCAL_PLAYER ->
+                                setStatusText(
+                                    getString(
+                                        R.string.win_message,
+                                        gameManager.gameData.localPlayerChoice,
+                                        gameManager.gameData.opponentPlayerChoice
+                                    )
                                 )
-                            )
-                        GameData.RoundWinner.OPPONENT ->
-                            setStatusText(
-                                getString(
-                                    R.string.loss_message,
-                                    gameManager.gameData.localPlayerChoice,
-                                    gameManager.gameData.opponentPlayerChoice
+                            GameData.RoundWinner.OPPONENT ->
+                                setStatusText(
+                                    getString(
+                                        R.string.loss_message,
+                                        gameManager.gameData.localPlayerChoice,
+                                        gameManager.gameData.opponentPlayerChoice
+                                    )
                                 )
-                            )
-                        GameData.RoundWinner.TIE ->
-                            setStatusText(getString(R.string.tie_message, gameManager.gameData.localPlayerChoice))
-                        GameData.RoundWinner.PENDING -> {}
-                        else -> {}
+                            GameData.RoundWinner.TIE ->
+                                setStatusText(getString(R.string.tie_message, gameManager.gameData.localPlayerChoice))
+                            else -> Log.d(TAG, "Ignoring RoundWinner: $winner")
+                        }
                     }
-                else -> {}
+                else -> Log.d(TAG, "Ignoring GameState: $gameState")
             }
         }
         gameManager.gameData.gameState.observe(this, gameStateObserver)
@@ -217,7 +225,7 @@ class SessionsSinglePlayerActivity : AppCompatActivity(R.layout.activity_single_
     }
 
     /** Sets up Dtdi components required to run Sessions */
-    private fun setupDtdi(activity: AppCompatActivity) {
+    private fun setupSessions(activity: AppCompatActivity) {
         sessions = Sessions.create(activity)
         sessions.registerActivityResultCaller(activity)
     }
@@ -230,7 +238,7 @@ class SessionsSinglePlayerActivity : AppCompatActivity(R.layout.activity_single_
         // Note that we are using launchMode="singleTop" for this activity, as registered in the
         // AndroidManifest.
         Log.d(TAG, "onNewIntent() called with action: " + intent.action)
-        if (SESSIONS_TRANSFER == intent.action) {
+        if (ACTION_SESSIONS_TRANSFER == intent.action) {
             // This will be the case when the intent that starts this Activity is initiated via Session
             // transfer. Instead of creating a new Session, accept the transfer.
             completeAcceptTransferFlow(intent)
@@ -324,7 +332,7 @@ class SessionsSinglePlayerActivity : AppCompatActivity(R.layout.activity_single_
                     sessions.transferSession(
                         it,
                         StartComponentRequest.Builder()
-                            .setAction(SESSIONS_TRANSFER)
+                            .setAction(ACTION_SESSIONS_TRANSFER)
                             .setReason(getString(R.string.transfer_reason)).build(),
                         emptyList(),
                         originatingSessionStateCallback
@@ -398,6 +406,6 @@ class SessionsSinglePlayerActivity : AppCompatActivity(R.layout.activity_single_
 
     companion object {
         private const val TAG = "SessionsSinglePlayerActivity"
-        private const val SESSIONS_TRANSFER = "com.google.crossdevice.samples.rockpaperscissors.SESSIONS_TRANSFER"
+        private const val ACTION_SESSIONS_TRANSFER = "com.google.crossdevice.samples.rockpaperscissors.SESSIONS_TRANSFER"
     }
 }

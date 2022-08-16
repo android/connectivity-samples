@@ -56,15 +56,15 @@ class SinglePlayerGameManager(context: Context?) : GameManager {
         return true
     }
 
+    /** Resets game data to default values. */
+    override fun resetGame() {
+        gameData.resetGameData()
+    }
+
     /** Sets the opponent's choice and processes the round. */
     override fun finishRound() {
         generateOpponentChoice()
         gameData.processRound()
-    }
-
-    /** Resets game data to default values. */
-    override fun resetGame() {
-        gameData.resetGameData()
     }
 
     /** Generates a choice for the opponent. */

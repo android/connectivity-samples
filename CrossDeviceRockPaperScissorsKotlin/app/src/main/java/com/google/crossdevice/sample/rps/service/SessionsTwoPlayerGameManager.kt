@@ -57,7 +57,6 @@ class SessionsTwoPlayerGameManager(
                 gameData.gameState.value = GameData.GameState.WAITING_FOR_PLAYER_INPUT
                 gameData.opponentPlayerName.value = participant.displayName.toString()
                 primarySession?.also {
-                    // TODO: change when new api is available for listening
                     addRemoteConnectionCallback(it, participant)
                 }
                     ?: Log.d(TAG, "Cannot add callback to joined participant since PrimarySession is null")
@@ -122,7 +121,21 @@ class SessionsTwoPlayerGameManager(
      */
     override fun findOpponent() {
         gameData.gameState.value = GameData.GameState.SEARCHING
-        createAndShareSession()
+        scope.launch {
+            val sessionId = sessions.createSession()
+            Log.d(TAG, "Successfully created: $sessionId")
+
+            primarySession =
+                sessions.shareSession(
+                    sessionId,
+                    StartComponentRequest.Builder()
+                        .setAction(ACTION_WAKE_UP)
+                        .setReason(context.getString(R.string.wakeup_reason)).build(),
+                    emptyList(),
+                    primarySessionStateCallback
+                )
+            Log.d(TAG, "Successfully launched opponent picker")
+        }
     }
 
     /** Sends the local player's game choice to the other remote player. */
@@ -177,25 +190,6 @@ class SessionsTwoPlayerGameManager(
             resetGame()
             gameData.gameState.value = GameData.GameState.WAITING_FOR_PLAYER_INPUT
             gameData.opponentPlayerName.value = secondaryConnection?.participant?.displayName.toString()
-        }
-    }
-
-    /** Creates a Session and invites an opponent to it. */
-    private fun createAndShareSession() {
-        scope.launch {
-            val sessionId = sessions.createSession()
-            Log.d(TAG, "Successfully created: $sessionId")
-
-            primarySession =
-                sessions.shareSession(
-                    sessionId,
-                    StartComponentRequest.Builder()
-                        .setAction(ACTION_WAKE_UP)
-                        .setReason(context.getString(R.string.wakeup_reason)).build(),
-                    emptyList(),
-                    primarySessionStateCallback
-                )
-            Log.d(TAG, "Successfully launched opponent picker")
         }
     }
 

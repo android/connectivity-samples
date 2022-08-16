@@ -51,6 +51,7 @@ import com.google.crossdevice.sample.rps.model.TransferableGameState;
 import com.google.crossdevice.sample.rps.service.GameManager;
 import com.google.crossdevice.sample.rps.service.SinglePlayerGameManager;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.concurrent.Executor;
 
@@ -61,7 +62,7 @@ import java.util.concurrent.Executor;
 public class SessionsSinglePlayerActivity extends AppCompatActivity {
     private static final String TAG = "SessionsSinglePlayerActivity";
 
-    public static final String SESSIONS_TRANSFER =
+    public static final String ACTION_SESSIONS_TRANSFER =
             "com.google.ambient.crossdevice.samples.rockpaperscissors.SESSIONS_TRANSFER";
 
     private OriginatingSession originatingSession;
@@ -107,7 +108,6 @@ public class SessionsSinglePlayerActivity extends AppCompatActivity {
 
     private final ReceivingSessionStateCallback receivingSessionStateCallback =
             new ReceivingSessionStateCallback() {
-
                 @Override
                 public void onTransferFailure(SessionId sessionId, SessionException exception) {
                     Log.d(TAG, "Failed to transfer: " + sessionId, exception);
@@ -155,7 +155,7 @@ public class SessionsSinglePlayerActivity extends AppCompatActivity {
         gameManager = new SinglePlayerGameManager(this);
 
         addObservers();
-        setupDtdi(this);
+        setupSessions(this);
         handleIntent(getIntent());
     }
 
@@ -216,6 +216,9 @@ public class SessionsSinglePlayerActivity extends AppCompatActivity {
         // Observes game state changes and updates UI accordingly
         final Observer<GameData.GameState> gameStateObserver =
                 gameState -> {
+                    if (!Arrays.asList(GameData.GameState.values()).contains(gameState)) {
+                      throw new RuntimeException("Invalid GameState passed to Observer");
+                    }
                     switch (gameState) {
                         case WAITING_FOR_PLAYER_INPUT:
                             if (gameManager.getGameData().getRoundsCompleted() == 0) {
@@ -223,6 +226,10 @@ public class SessionsSinglePlayerActivity extends AppCompatActivity {
                             }
                             break;
                         case ROUND_RESULT:
+                            if (!Arrays.asList(GameData.RoundWinner.values())
+                                  .contains(gameManager.getGameData().getRoundWinner())) {
+                                throw new RuntimeException("Invalid RoundWinner in RoundResult");
+                            }
                             switch (gameManager.getGameData().getRoundWinner()) {
                                 case LOCAL_PLAYER:
                                     setStatusText(
@@ -243,11 +250,12 @@ public class SessionsSinglePlayerActivity extends AppCompatActivity {
                                             getString(
                                                     R.string.tie_message, gameManager.getGameData().getLocalPlayerChoice()));
                                     break;
-                                case PENDING:
-                                    // no-op, waiting to see outcome of round
+                                default:
+                                  Log.d(TAG, "Ignoring RoundWinner: " + gameState);
                             }
                             break;
                         default:
+                          Log.d(TAG, "Ignoring GameState: " + gameState);
                     }
                 };
         gameManager.getGameData().getGameState().observe(this, gameStateObserver);
@@ -261,7 +269,7 @@ public class SessionsSinglePlayerActivity extends AppCompatActivity {
     }
 
     /** Sets up Dtdi components required to run Sessions */
-    private void setupDtdi(AppCompatActivity activity) {
+    private void setupSessions(AppCompatActivity activity) {
         sessions = Sessions.create(activity);
         sessions.registerActivityResultCaller(activity);
         mainExecutor = ContextCompat.getMainExecutor(activity);
@@ -275,7 +283,7 @@ public class SessionsSinglePlayerActivity extends AppCompatActivity {
         // Note that we are using launchMode="singleTop" for this activity, as registered in the
         // AndroidManifest.
         Log.d(TAG, "onNewIntent() called with action: " + intent.getAction());
-        if (SESSIONS_TRANSFER.equals(intent.getAction())) {
+        if (ACTION_SESSIONS_TRANSFER.equals(intent.getAction())) {
             // This will be the case when the intent that starts this Activity is initiated via Session
             // transfer. Instead of creating a new Session, accept the transfer.
             startAcceptTransferFlow(intent);
@@ -374,7 +382,7 @@ public class SessionsSinglePlayerActivity extends AppCompatActivity {
                 sessions.transferSessionFuture(
                         sessionId.getValue(),
                         new StartComponentRequest.Builder()
-                                .setAction(SESSIONS_TRANSFER)
+                                .setAction(ACTION_SESSIONS_TRANSFER)
                                 .setReason(getString(R.string.transfer_reason))
                                 .build(),
                         Collections.emptyList(),

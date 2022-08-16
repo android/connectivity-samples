@@ -16,6 +16,7 @@
 
 package com.google.crossdevice.sample.rps.model;
 
+import androidx.annotation.NonNull;
 import androidx.lifecycle.MutableLiveData;
 import org.json.JSONObject;
 

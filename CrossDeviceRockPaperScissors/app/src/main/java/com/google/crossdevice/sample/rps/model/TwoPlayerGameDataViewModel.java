@@ -19,6 +19,7 @@ package com.google.crossdevice.sample.rps.model;
 import android.content.Context;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
@@ -47,11 +48,11 @@ public final class TwoPlayerGameDataViewModel extends ViewModel implements GameD
     private final MutableLiveData<String> opponentPlayerName = new MutableLiveData<>();
     private final MutableLiveData<Integer> localPlayerScore = new MutableLiveData<>();
     private final MutableLiveData<Integer> opponentPlayerScore = new MutableLiveData<>();
-    private final MutableLiveData<GameState> gameState = new MutableLiveData<>();
+    private final MutableLiveData<GameState> gameState = new MutableLiveData<>(GameState.DISCONNECTED);
     private GameChoice localPlayerChoice;
     private GameChoice opponentPlayerChoice;
     private boolean localPlayerChoiceConfirmed;
-    private RoundWinner roundWinner;
+    private RoundWinner roundWinner = RoundWinner.PENDING;
     private int roundsCompleted;
     private final Random randomGenerator = new Random();
 

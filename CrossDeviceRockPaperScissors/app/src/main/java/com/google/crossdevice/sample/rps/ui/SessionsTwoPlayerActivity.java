@@ -34,6 +34,7 @@ import com.google.crossdevice.sample.rps.model.GameChoice;
 import com.google.crossdevice.sample.rps.model.GameData;
 import com.google.crossdevice.sample.rps.service.GameManager;
 import com.google.crossdevice.sample.rps.service.SessionsTwoPlayerGameManager;
+import java.util.Arrays;
 
 /**
  * Activity for playing a two-player Rock Paper Scissors game with opponent using a "Sessions
@@ -171,6 +172,9 @@ public class SessionsTwoPlayerActivity extends AppCompatActivity {
         // Observes game state changes and updates UI accordingly
         final Observer<GameData.GameState> gameStateObserver =
                 gameState -> {
+                    if (!Arrays.asList(GameData.GameState.values()).contains(gameState)) {
+                        throw new RuntimeException("Invalid GameState passed to Observer");
+                    }
                     switch (gameState) {
                         case DISCONNECTED:
                             setButtonState(false);
@@ -198,6 +202,10 @@ public class SessionsTwoPlayerActivity extends AppCompatActivity {
                             setGameChoicesEnabled(false);
                             break;
                         case ROUND_RESULT:
+                            if (!Arrays.asList(GameData.RoundWinner.values())
+                                .contains(gameManager.getGameData().getRoundWinner())) {
+                                throw new RuntimeException("Invalid RoundWinner in RoundResult");
+                            }
                             switch (gameManager.getGameData().getRoundWinner()) {
                                 case LOCAL_PLAYER:
                                     setStatusText(
@@ -218,9 +226,11 @@ public class SessionsTwoPlayerActivity extends AppCompatActivity {
                                             getString(
                                                     R.string.tie_message, gameManager.getGameData().getLocalPlayerChoice()));
                                     break;
-                                case PENDING:
-                                    // no-op, waiting to see outcome of round
+                                default:
+                                    Log.d(TAG, "Ignoring RoundWinner: " + gameState);
                             }
+                        default:
+                            Log.d(TAG, "Ignoring GameState: " + gameState);
                     }
                 };
         gameManager.getGameData().getGameState().observe(this, gameStateObserver);

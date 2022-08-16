@@ -159,6 +159,9 @@ class DiscoveryTwoPlayerActivity : AppCompatActivity(R.layout.activity_two_playe
 
         // Observes game state changes and updates UI accordingly
         val gameStateObserver = Observer { gameState: GameData.GameState? ->
+            if (!GameData.GameState.values().contains(gameState)) {
+                throw RuntimeException("Invalid GameState passed to Observer")
+            }
             when (gameState) {
                 GameData.GameState.DISCONNECTED -> {
                     setButtonState(false)
@@ -189,37 +192,38 @@ class DiscoveryTwoPlayerActivity : AppCompatActivity(R.layout.activity_two_playe
                     setGameChoicesEnabled(false)
                 }
                 GameData.GameState.ROUND_RESULT ->
-                    when (gameManager.gameData.roundWinner) {
-                        GameData.RoundWinner.LOCAL_PLAYER ->
-                            setStatusText(
-                                getString(
-                                    R.string.win_message,
-                                    gameManager.gameData.localPlayerChoice,
-                                    gameManager.gameData.opponentPlayerChoice
+                    gameManager.gameData.roundWinner.let { winner ->
+                        if (!GameData.RoundWinner.values().contains(winner)) {
+                            throw RuntimeException("Invalid RoundWinner in RoundResult")
+                        }
+                        when (winner) {
+                            GameData.RoundWinner.LOCAL_PLAYER ->
+                                setStatusText(
+                                    getString(
+                                        R.string.win_message,
+                                        gameManager.gameData.localPlayerChoice,
+                                        gameManager.gameData.opponentPlayerChoice
+                                    )
                                 )
-                            )
-                        GameData.RoundWinner.OPPONENT ->
-                            setStatusText(
-                                getString(
-                                    R.string.loss_message,
-                                    gameManager.gameData.localPlayerChoice,
-                                    gameManager.gameData.opponentPlayerChoice
+                            GameData.RoundWinner.OPPONENT ->
+                                setStatusText(
+                                    getString(
+                                        R.string.loss_message,
+                                        gameManager.gameData.localPlayerChoice,
+                                        gameManager.gameData.opponentPlayerChoice
+                                    )
                                 )
-                            )
-                        GameData.RoundWinner.TIE ->
-                            setStatusText(
-                                getString(
-                                    R.string.tie_message,
-                                    gameManager.gameData.localPlayerChoice
+                            GameData.RoundWinner.TIE ->
+                                setStatusText(
+                                    getString(
+                                        R.string.tie_message,
+                                        gameManager.gameData.localPlayerChoice
+                                    )
                                 )
-                            )
-                        GameData.RoundWinner.PENDING -> {}
-                        else -> Log.e(
-                            TAG,
-                            "Unexpected Game Result Status: ${gameManager.gameData.roundWinner}"
-                        )
+                            else -> Log.d(TAG, "Ignoring RoundWinner: $winner")
+                        }
                     }
-                else -> Log.e(TAG, "Unexpected GameState: ${gameState.toString()}")
+                else -> Log.d(TAG, "Ignoring GameState: $gameState")
             }
         }
         gameManager.gameData.gameState.observe(this, gameStateObserver)

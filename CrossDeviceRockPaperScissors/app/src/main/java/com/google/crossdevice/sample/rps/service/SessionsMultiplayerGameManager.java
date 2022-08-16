@@ -178,11 +178,35 @@ public final class SessionsMultiplayerGameManager implements GameManager {
 
     @Override
     public void findOpponent() {
-        gameData.getGameState().setValue(GameData.GameState.SEARCHING);
-
-        if (sessionId != null) {
-            inviteOpponent(sessionId);
+        if (sessionId == null) {
+          Log.d(TAG, "Skipping findOpponent() due to null SessionId");
+          return;
         }
+
+        gameData.getGameState().setValue(GameData.GameState.SEARCHING);
+        Futures.addCallback(
+            sessions.shareSessionFuture(
+                sessionId,
+                new StartComponentRequest.Builder()
+                    .setAction(ACTION_WAKE_UP)
+                    .setReason(context.getString(R.string.wakeup_reason))
+                    .build(),
+                Collections.emptyList(),
+                primarySessionStateCallback),
+            new FutureCallback<PrimarySession>() {
+                @Override
+                public void onSuccess(PrimarySession result) {
+                    Log.d(TAG, "Successfully launched opponent picker");
+                    primarySession = result;
+                }
+
+                @Override
+                public void onFailure(Throwable t) {
+                    Log.e(TAG, "Failed to launch opponent picker", t);
+                    resetGame();
+                }
+            },
+            mainExecutor);
     }
 
     @Override
@@ -263,33 +287,6 @@ public final class SessionsMultiplayerGameManager implements GameManager {
                     finishRound();
                     gameData.getGameState().setValue(GameData.GameState.WAITING_FOR_PLAYER_INPUT);
                 });
-    }
-
-    /** Invites an opponent to a created Session. */
-    private void inviteOpponent(SessionId sessionId) {
-        Futures.addCallback(
-                sessions.shareSessionFuture(
-                        sessionId,
-                        new StartComponentRequest.Builder()
-                                .setAction(ACTION_WAKE_UP)
-                                .setReason(context.getString(R.string.wakeup_reason))
-                                .build(),
-                        Collections.emptyList(),
-                        primarySessionStateCallback),
-                new FutureCallback<PrimarySession>() {
-                    @Override
-                    public void onSuccess(PrimarySession result) {
-                        Log.d(TAG, "Successfully launched opponent picker");
-                        primarySession = result;
-                    }
-
-                    @Override
-                    public void onFailure(Throwable t) {
-                        Log.e(TAG, "Failed to launch opponent picker", t);
-                        resetGame();
-                    }
-                },
-                mainExecutor);
     }
 
     /** Sends the game choice to whichever connection is open. */
