@@ -34,7 +34,7 @@ dependencies {
     implementation 'com.google.android.material:material:1.4.0'
     implementation 'com.google.guava:guava:31.1-android'
 
-    implementation ('com.google.ambient.crossdevice:crossdevice:0.1.0-preview01') {transitive=true}
-//    implementation fileTree(dir: 'libs', include: ['*.aar', '*.jar'])
+    // Cross device SDK:
+    implementation 'com.google.ambient.crossdevice:crossdevice:0.1.0-preview01'
 
 }
