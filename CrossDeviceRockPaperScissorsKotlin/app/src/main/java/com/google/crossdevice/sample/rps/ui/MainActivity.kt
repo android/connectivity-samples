@@ -32,7 +32,6 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
             R.id.two_player_discovery_api -> Intent(this, DiscoveryTwoPlayerActivity::class.java)
             R.id.two_player_sessions_api -> Intent(this, SessionsTwoPlayerActivity::class.java)
             R.id.single_player_sessions_api -> Intent(this, SessionsSinglePlayerActivity::class.java)
-            R.id.multiplayer_sessions_api -> Intent(this, SessionsMultiplayerActivity::class.java)
             else -> null
         }
     }

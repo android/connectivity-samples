@@ -44,7 +44,7 @@
     <string name="action_two_player_discovery_api">Two Players (Discovery API)</string>
     <string name="action_two_player_sessions_api">Two Players (Sessions API)</string>
     <string name="action_single_player_sessions_api">Single Player (Sessions API)</string>
-    <string name="action_multiplayer_sessions_api">Multiplayer (Sessions API)</string>
+    <string name="action_multiplayer_sessions_api">Multiplayer (Coming soon)</string>
 
     <string name="choice_rock">Rock</string>
     <string name="choice_paper">Paper</string>

@@ -51,8 +51,6 @@ public final class MainActivity extends AppCompatActivity {
             return new Intent(this, SessionsTwoPlayerActivity.class);
         } else if (id == R.id.single_player_sessions_api) {
             return new Intent(this, SessionsSinglePlayerActivity.class);
-        } else if (id == R.id.multiplayer_sessions_api) {
-            return new Intent(this, SessionsMultiplayerActivity.class);
         }
         return null;
     }

@@ -50,6 +50,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:onClick="onModeSelected"
+        android:enabled="false"
         android:text="@string/action_multiplayer_sessions_api"
         style="@style/Widget.AppCompat.Button.Colored"/>
 
