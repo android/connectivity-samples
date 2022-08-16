@@ -38,9 +38,11 @@ dependencies {
     implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.5.0'
     implementation 'com.google.android.material:material:1.6.1'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.1'
-     implementation 'com.google.ambient.crossdevice:crossdevice:0.1.0-preview01'
-
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-guava:1.4.3'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.4.3'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.4.3'
+
+    // Cross device SDK:
+    implementation 'com.google.ambient.crossdevice:crossdevice:0.1.0-preview01'
+
 }
