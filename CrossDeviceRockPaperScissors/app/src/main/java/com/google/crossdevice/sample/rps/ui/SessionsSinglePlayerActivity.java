@@ -194,22 +194,16 @@ public class SessionsSinglePlayerActivity extends AppCompatActivity {
         // Observes changes to the Local Player's score
         final Observer<Integer> localPlayerScoreObserver =
                 newLocalPlayerScore -> {
-                    scoreText.setText(
-                            getString(
-                                    R.string.game_score,
-                                    newLocalPlayerScore,
-                                    gameManager.getGameData().getOpponentPlayerScore().getValue()));
+                    updateScore(newLocalPlayerScore,
+                            gameManager.getGameData().getOpponentPlayerScore().getValue());
                 };
         gameManager.getGameData().getLocalPlayerScore().observe(this, localPlayerScoreObserver);
 
         // Observes changes to the Opponent Player's score
         final Observer<Integer> opponentPlayerScoreObserver =
                 newOpponentPlayerScore -> {
-                    scoreText.setText(
-                            getString(
-                                    R.string.game_score,
-                                    gameManager.getGameData().getLocalPlayerScore().getValue(),
-                                    newOpponentPlayerScore));
+                    updateScore(gameManager.getGameData().getLocalPlayerScore().getValue(),
+                            newOpponentPlayerScore);
                 };
         gameManager.getGameData().getOpponentPlayerScore().observe(this, opponentPlayerScoreObserver);
 
@@ -217,7 +211,7 @@ public class SessionsSinglePlayerActivity extends AppCompatActivity {
         final Observer<GameData.GameState> gameStateObserver =
                 gameState -> {
                     if (!Arrays.asList(GameData.GameState.values()).contains(gameState)) {
-                      throw new RuntimeException("Invalid GameState passed to Observer");
+                        throw new RuntimeException("Invalid GameState passed to Observer");
                     }
                     switch (gameState) {
                         case WAITING_FOR_PLAYER_INPUT:
@@ -227,7 +221,7 @@ public class SessionsSinglePlayerActivity extends AppCompatActivity {
                             break;
                         case ROUND_RESULT:
                             if (!Arrays.asList(GameData.RoundWinner.values())
-                                  .contains(gameManager.getGameData().getRoundWinner())) {
+                                    .contains(gameManager.getGameData().getRoundWinner())) {
                                 throw new RuntimeException("Invalid RoundWinner in RoundResult");
                             }
                             switch (gameManager.getGameData().getRoundWinner()) {
@@ -251,11 +245,11 @@ public class SessionsSinglePlayerActivity extends AppCompatActivity {
                                                     R.string.tie_message, gameManager.getGameData().getLocalPlayerChoice()));
                                     break;
                                 default:
-                                  Log.d(TAG, "Ignoring RoundWinner: " + gameState);
+                                    Log.d(TAG, "Ignoring RoundWinner: " + gameState);
                             }
                             break;
                         default:
-                          Log.d(TAG, "Ignoring GameState: " + gameState);
+                            Log.d(TAG, "Ignoring GameState: " + gameState);
                     }
                 };
         gameManager.getGameData().getGameState().observe(this, gameStateObserver);
@@ -268,7 +262,9 @@ public class SessionsSinglePlayerActivity extends AppCompatActivity {
         sessionId.observe(this, sessionIdObserver);
     }
 
-    /** Sets up Dtdi components required to run Sessions */
+    /**
+     * Sets up Dtdi components required to run Sessions
+     */
     private void setupSessions(AppCompatActivity activity) {
         sessions = Sessions.create(activity);
         sessions.registerActivityResultCaller(activity);
@@ -294,7 +290,9 @@ public class SessionsSinglePlayerActivity extends AppCompatActivity {
         }
     }
 
-    /** Sends a {@link GameChoice} to the GameManager. */
+    /**
+     * Sends a {@link GameChoice} to the GameManager.
+     */
     public void makeMove(View view) {
         if (view.getId() == R.id.rock) {
             setGameChoice(GameChoice.ROCK);
@@ -305,24 +303,33 @@ public class SessionsSinglePlayerActivity extends AppCompatActivity {
         }
     }
 
-    /** Initiates a transfer of the Session to another device. */
+    /**
+     * Initiates a transfer of the Session to another device.
+     */
     public void transferGame(View view) {
         saveState();
         setStatusText(getString(R.string.status_transferring));
         transfer();
     }
 
-    /** Shows a status message to the user. */
+    /**
+     * Shows a status message to the user.
+     */
     private void setStatusText(String text) {
         statusText.setText(text);
+        statusText.setContentDescription(text);
     }
 
-    /** Sends the user's selection of rock, paper, or scissors to the opponent. */
+    /**
+     * Sends the user's selection of rock, paper, or scissors to the opponent.
+     */
     private void setGameChoice(GameChoice choice) {
         gameManager.sendGameChoice(choice, null);
     }
 
-    /** Wipes all game state and updates the UI accordingly. */
+    /**
+     * Wipes all game state and updates the UI accordingly.
+     */
     private void resetGame() {
         gameManager.resetGame();
     }
@@ -343,19 +350,25 @@ public class SessionsSinglePlayerActivity extends AppCompatActivity {
         transferableState.statusText = statusText.getText().toString();
     }
 
-    /** Parses the UI state for items that it can load. */
+    /**
+     * Parses the UI state for items that it can load.
+     */
     private void loadState(TransferableGameState state) {
         gameManager.getGameData().loadSerializableState(state.gameData);
         setStatusText(state.statusText);
     }
 
-    /** Parses the initialization message, then loads state */
+    /**
+     * Parses the initialization message, then loads state
+     */
     private void loadStateFromInitMessage(byte[] initMessage) {
         transferableState.loadBytes(initMessage);
         loadState(transferableState);
     }
 
-    /** Creates a Session if it does not already own a SessionId. */
+    /**
+     * Creates a Session if it does not already own a SessionId.
+     */
     private void createSession() {
         if (sessionId.getValue() != null) {
             Log.d(TAG, "Session already exists, not creating new Session");
@@ -404,12 +417,16 @@ public class SessionsSinglePlayerActivity extends AppCompatActivity {
         SessionsSinglePlayerActivity.this.sessionId.setValue(null);
     }
 
-    /** Starts a chain of events which eventually lead to a complete transfer. */
+    /**
+     * Starts a chain of events which eventually lead to a complete transfer.
+     */
     private void startAcceptTransferFlow(Intent intent) {
         getReceivingSessionAndRemoteConnection(intent);
     }
 
-    /** Gets the Receiving Session in order to get the RemoteConnection. */
+    /**
+     * Gets the Receiving Session in order to get the RemoteConnection.
+     */
     private void getReceivingSessionAndRemoteConnection(Intent intent) {
         Futures.addCallback(
                 sessions.getReceivingSessionFuture(intent, receivingSessionStateCallback),
@@ -428,7 +445,9 @@ public class SessionsSinglePlayerActivity extends AppCompatActivity {
                 mainExecutor);
     }
 
-    /** Receives the initialization message in order to initialize the application. */
+    /**
+     * Receives the initialization message in order to initialize the application.
+     */
     private void receiveAndProcessInitializationMessage(ReceivingSession receivingSession) {
         receivingSession.getStartupRemoteConnection().registerReceiver(
                 new SessionConnectionReceiver() {
@@ -440,7 +459,9 @@ public class SessionsSinglePlayerActivity extends AppCompatActivity {
                 });
     }
 
-    /** Initializes the application. */
+    /**
+     * Initializes the application.
+     */
     private void applicationInitialization(ReceivingSession sessionHandle, byte[] initMessage) {
         Futures.addCallback(
                 sessionHandle.onCompleteFuture(),
@@ -488,7 +509,9 @@ public class SessionsSinglePlayerActivity extends AppCompatActivity {
         Toast.makeText(this, getString(R.string.transfer_failure), Toast.LENGTH_SHORT).show();
     }
 
-    /** Disconnects from the SessionId held by this Activity. */
+    /**
+     * Disconnects from the SessionId held by this Activity.
+     */
     private void disconnect() {
         disconnectFromSession(
                 sessionId.getValue(),
@@ -507,7 +530,9 @@ public class SessionsSinglePlayerActivity extends AppCompatActivity {
                 });
     }
 
-    /** Disconnects from the provided session. */
+    /**
+     * Disconnects from the provided session.
+     */
     private void disconnectFromSession(SessionId id, FutureCallback<Void> callback) {
         if (id == null) {
             Log.d(TAG, "Skipping disconnect, sessionId is null");
@@ -516,5 +541,18 @@ public class SessionsSinglePlayerActivity extends AppCompatActivity {
 
         Log.d(TAG, "Disconnecting from: " + id);
         Futures.addCallback(sessions.removeSessionFuture(id), callback, mainExecutor);
+    }
+
+    /**
+     * Updates the current score based on the latest score data.
+     *
+     * @param newSelfScore           The value for new score of the local player.
+     * @param newOpponentPlayerScore The value for new score of the opponent.
+     */
+    private void updateScore(int newSelfScore, int newOpponentPlayerScore) {
+        scoreText.setText(getString(R.string.game_score, newSelfScore, newOpponentPlayerScore));
+        scoreText.setContentDescription(getString(R.string.game_score_talk_back,
+                newSelfScore,
+                newOpponentPlayerScore));
     }
 }

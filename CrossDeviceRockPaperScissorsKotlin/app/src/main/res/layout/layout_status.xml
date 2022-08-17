@@ -27,6 +27,7 @@
 
     <TextView
         android:id="@+id/status"
+        android:accessibilityLiveRegion="polite"
         style="@style/StatusText"/>
 
 </merge>

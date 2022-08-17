@@ -34,6 +34,7 @@ import com.google.crossdevice.sample.rps.model.GameChoice;
 import com.google.crossdevice.sample.rps.model.GameData;
 import com.google.crossdevice.sample.rps.service.DiscoveryTwoPlayerGameManager;
 import com.google.crossdevice.sample.rps.service.GameManager;
+
 import java.util.Arrays;
 
 /**
@@ -159,22 +160,18 @@ public class DiscoveryTwoPlayerActivity extends AppCompatActivity {
         // Observes changes to the Local Player's score
         final Observer<Integer> localPlayerScoreObserver =
                 newLocalPlayerScore -> {
-                    scoreText.setText(
-                            getString(
-                                    R.string.game_score,
-                                    newLocalPlayerScore,
-                                    gameManager.getGameData().getOpponentPlayerScore().getValue()));
+                    updateScore(
+                            newLocalPlayerScore,
+                            gameManager.getGameData().getOpponentPlayerScore().getValue());
                 };
         gameManager.getGameData().getLocalPlayerScore().observe(this, localPlayerScoreObserver);
 
         // Observes changes to the Opponent Player's score
         final Observer<Integer> opponentPlayerScoreObserver =
                 newOpponentPlayerScore -> {
-                    scoreText.setText(
-                            getString(
-                                    R.string.game_score,
-                                    gameManager.getGameData().getLocalPlayerScore().getValue(),
-                                    newOpponentPlayerScore));
+                    updateScore(
+                            gameManager.getGameData().getLocalPlayerScore().getValue(),
+                            newOpponentPlayerScore);
                 };
         gameManager.getGameData().getOpponentPlayerScore().observe(this, opponentPlayerScoreObserver);
 
@@ -187,15 +184,13 @@ public class DiscoveryTwoPlayerActivity extends AppCompatActivity {
                     switch (gameState) {
                         case DISCONNECTED:
                             setButtonState(false);
-                            statusText.setText(getString(R.string.status_disconnected));
-                            scoreText.setText(
-                                    getString(
-                                            R.string.game_score,
-                                            gameManager.getGameData().getLocalPlayerScore().getValue(),
-                                            gameManager.getGameData().getOpponentPlayerScore().getValue()));
+                            setStatusText(getString(R.string.status_disconnected));
+                            updateScore(
+                                    gameManager.getGameData().getLocalPlayerScore().getValue(),
+                                    gameManager.getGameData().getOpponentPlayerScore().getValue());
                             break;
                         case SEARCHING:
-                            statusText.setText(getString(R.string.status_searching));
+                            setStatusText(getString(R.string.status_searching));
                             break;
                         case WAITING_FOR_PLAYER_INPUT:
                             setButtonState(true);
@@ -285,6 +280,19 @@ public class DiscoveryTwoPlayerActivity extends AppCompatActivity {
      */
     private void setStatusText(String text) {
         statusText.setText(text);
+        statusText.setContentDescription(text);
     }
 
+    /**
+     * Updates the current score based on the latest score data.
+     *
+     * @param newSelfScore           The value for new score of the local player.
+     * @param newOpponentPlayerScore The value for new score of the opponent.
+     */
+    private void updateScore(int newSelfScore, int newOpponentPlayerScore) {
+        scoreText.setText(getString(R.string.game_score, newSelfScore, newOpponentPlayerScore));
+        scoreText.setContentDescription(getString(R.string.game_score_talk_back,
+                newSelfScore,
+                newOpponentPlayerScore));
+    }
 }

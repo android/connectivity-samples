@@ -155,23 +155,13 @@ class SessionsSinglePlayerActivity : AppCompatActivity(R.layout.activity_single_
 
         // Observes changes to the Local Player's score
         val localPlayerScoreObserver = Observer { newLocalPlayerScore: Int? ->
-            scoreText.text =
-                getString(
-                    R.string.game_score,
-                    newLocalPlayerScore,
-                    gameManager.gameData.opponentPlayerScore.value
-                )
+            updateScore(newLocalPlayerScore, gameManager.gameData.opponentPlayerScore.value)
         }
         gameManager.gameData.localPlayerScore.observe(this, localPlayerScoreObserver)
 
         // Observes changes to the Opponent Player's score
         val opponentPlayerScoreObserver = Observer { newOpponentPlayerScore: Int? ->
-            scoreText.text =
-                getString(
-                    R.string.game_score,
-                    gameManager.gameData.localPlayerScore.value,
-                    newOpponentPlayerScore
-                )
+            updateScore(gameManager.gameData.localPlayerScore.value, newOpponentPlayerScore)
         }
         gameManager.gameData.opponentPlayerScore.observe(this, opponentPlayerScoreObserver)
 
@@ -209,7 +199,12 @@ class SessionsSinglePlayerActivity : AppCompatActivity(R.layout.activity_single_
                                     )
                                 )
                             GameData.RoundWinner.TIE ->
-                                setStatusText(getString(R.string.tie_message, gameManager.gameData.localPlayerChoice))
+                                setStatusText(
+                                    getString(
+                                        R.string.tie_message,
+                                        gameManager.gameData.localPlayerChoice
+                                    )
+                                )
                             else -> Log.d(TAG, "Ignoring RoundWinner: $winner")
                         }
                     }
@@ -268,6 +263,7 @@ class SessionsSinglePlayerActivity : AppCompatActivity(R.layout.activity_single_
     /** Shows a status message to the user. */
     private fun setStatusText(text: String) {
         statusText.text = text
+        statusText.contentDescription = text
     }
 
     /** Sends the user's selection of rock, paper, or scissors to the opponent. */
@@ -345,18 +341,25 @@ class SessionsSinglePlayerActivity : AppCompatActivity(R.layout.activity_single_
     /** Starts a chain of events which eventually lead to a complete transfer. */
     private fun completeAcceptTransferFlow(intent: Intent) {
         lifecycleScope.launch {
-            sessions.getReceivingSession(intent, receivingSessionStateCallback).let { receivingSession ->
-                receivingSession
-                    .getStartupRemoteConnection()
-                    .registerReceiver(
-                        object : SessionConnectionReceiver {
-                            override fun onMessageReceived(participant: SessionParticipant, payload: ByteArray) {
-                                Log.d(TAG, "Success to receive initialization message of size: " + payload.size)
-                                applicationInitialization(receivingSession, payload)
+            sessions.getReceivingSession(intent, receivingSessionStateCallback)
+                .let { receivingSession ->
+                    receivingSession
+                        .getStartupRemoteConnection()
+                        .registerReceiver(
+                            object : SessionConnectionReceiver {
+                                override fun onMessageReceived(
+                                    participant: SessionParticipant,
+                                    payload: ByteArray
+                                ) {
+                                    Log.d(
+                                        TAG,
+                                        "Success to receive initialization message of size: " + payload.size
+                                    )
+                                    applicationInitialization(receivingSession, payload)
+                                }
                             }
-                        }
-                    )
-            }
+                        )
+                }
         }
     }
 
@@ -378,7 +381,8 @@ class SessionsSinglePlayerActivity : AppCompatActivity(R.layout.activity_single_
     }
 
     private fun showTransferReceiveSuccess() {
-        Toast.makeText(this, getString(R.string.transfer_receive_success), Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, getString(R.string.transfer_receive_success), Toast.LENGTH_SHORT)
+            .show()
     }
 
     private fun showTransferSuccess() {
@@ -401,11 +405,34 @@ class SessionsSinglePlayerActivity : AppCompatActivity(R.layout.activity_single_
 
     /** Disconnects from the provided session. */
     private suspend fun disconnectFromSession(id: SessionId?) {
-        id?.also { sessions.removeSession(it) } ?: Log.d(TAG, "Skipping disconnect, sessionId is null")
+        id?.also { sessions.removeSession(it) } ?: Log.d(
+            TAG,
+            "Skipping disconnect, sessionId is null"
+        )
+    }
+
+    /**
+     * Updates the current score based on the latest score data.
+     *
+     * @param newSelfScore           The value for new score of the local player.
+     * @param newOpponentPlayerScore The value for new score of the opponent.
+     */
+    private fun updateScore(newSelfScore: Int?, newOpponentPlayerScore: Int?) {
+        if (newSelfScore == null || newOpponentPlayerScore === null) {
+            return
+        }
+
+        scoreText.text = getString(R.string.game_score, newSelfScore, newOpponentPlayerScore)
+        scoreText.contentDescription = getString(
+            R.string.game_score_talk_back,
+            newSelfScore,
+            newOpponentPlayerScore
+        )
     }
 
     companion object {
         private const val TAG = "SessionsSinglePlayerActivity"
-        private const val ACTION_SESSIONS_TRANSFER = "com.google.crossdevice.samples.rockpaperscissors.SESSIONS_TRANSFER"
+        private const val ACTION_SESSIONS_TRANSFER =
+            "com.google.crossdevice.samples.rockpaperscissors.SESSIONS_TRANSFER"
     }
 }

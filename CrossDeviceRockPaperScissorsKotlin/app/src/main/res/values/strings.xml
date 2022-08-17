@@ -52,6 +52,7 @@
 
     <string name="game_score">%1$d : %2$d</string>
     <string name="game_score_labeled">%1$s:\n%2$d</string>
+    <string name="game_score_talk_back">Current score is %1$d to %2$d</string>
 
     <string name="your_score_text">Your Score</string>
     <string name="top_score_text">"Top Score - "</string>

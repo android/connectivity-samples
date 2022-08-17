@@ -21,6 +21,8 @@ import android.os.Bundle
 import android.text.TextUtils
 import android.util.Log
 import android.view.View
+import android.view.accessibility.AccessibilityEvent
+import android.view.accessibility.AccessibilityManager
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
@@ -137,23 +139,13 @@ class DiscoveryTwoPlayerActivity : AppCompatActivity(R.layout.activity_two_playe
 
         // Observes changes to the Local Player's score
         val localPlayerScoreObserver = Observer { newLocalPlayerScore: Int? ->
-            scoreText.text =
-                getString(
-                    R.string.game_score,
-                    newLocalPlayerScore,
-                    gameManager.gameData.opponentPlayerScore.value
-                )
+            updateScore(newLocalPlayerScore, gameManager.gameData.opponentPlayerScore.value)
         }
         gameManager.gameData.localPlayerScore.observe(this, localPlayerScoreObserver)
 
         // Observes changes to the Opponent Player's score
         val opponentPlayerScoreObserver = Observer { newOpponentPlayerScore: Int? ->
-            scoreText.text =
-                getString(
-                    R.string.game_score,
-                    gameManager.gameData.localPlayerScore.value,
-                    newOpponentPlayerScore
-                )
+            updateScore(gameManager.gameData.localPlayerScore.value, newOpponentPlayerScore)
         }
         gameManager.gameData.opponentPlayerScore.observe(this, opponentPlayerScoreObserver)
 
@@ -166,12 +158,10 @@ class DiscoveryTwoPlayerActivity : AppCompatActivity(R.layout.activity_two_playe
                 GameData.GameState.DISCONNECTED -> {
                     setButtonState(false)
                     statusText.text = getString(R.string.status_disconnected)
-                    scoreText.text =
-                        getString(
-                            R.string.game_score,
-                            gameManager.gameData.localPlayerScore.value,
-                            gameManager.gameData.opponentPlayerScore.value
-                        )
+                    updateScore(
+                        gameManager.gameData.localPlayerScore.value,
+                        gameManager.gameData.opponentPlayerScore.value
+                    )
                 }
                 GameData.GameState.SEARCHING -> statusText.text =
                     getString(R.string.status_searching)
@@ -264,6 +254,26 @@ class DiscoveryTwoPlayerActivity : AppCompatActivity(R.layout.activity_two_playe
     /** Shows a status message to the user. */
     private fun setStatusText(text: String) {
         statusText.text = text
+        statusText.contentDescription = text
+    }
+
+    /**
+     * Updates the current score based on the latest score data.
+     *
+     * @param newSelfScore           The value for new score of the local player.
+     * @param newOpponentPlayerScore The value for new score of the opponent.
+     */
+    private fun updateScore(newSelfScore: Int?, newOpponentPlayerScore: Int?) {
+        if (newSelfScore == null || newOpponentPlayerScore === null) {
+            return
+        }
+
+        scoreText.text = getString(R.string.game_score, newSelfScore, newOpponentPlayerScore)
+        scoreText.contentDescription = getString(
+            R.string.game_score_talk_back,
+            newSelfScore,
+            newOpponentPlayerScore
+        )
     }
 
     companion object {

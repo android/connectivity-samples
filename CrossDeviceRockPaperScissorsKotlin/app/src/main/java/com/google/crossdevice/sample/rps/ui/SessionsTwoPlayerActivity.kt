@@ -137,23 +137,13 @@ class SessionsTwoPlayerActivity : AppCompatActivity(R.layout.activity_two_player
 
         // Observes changes to the Local Player's score
         val localPlayerScoreObserver = Observer { newLocalPlayerScore: Int? ->
-            scoreText.text =
-                getString(
-                    R.string.game_score,
-                    newLocalPlayerScore,
-                    gameManager.gameData.opponentPlayerScore.value
-                )
+            updateScore(newLocalPlayerScore, gameManager.gameData.opponentPlayerScore.value)
         }
         gameManager.gameData.localPlayerScore.observe(this, localPlayerScoreObserver)
 
         // Observes changes to the Opponent Player's score
         val opponentPlayerScoreObserver = Observer { newOpponentPlayerScore: Int? ->
-            scoreText.text =
-                getString(
-                    R.string.game_score,
-                    gameManager.gameData.localPlayerScore.value,
-                    newOpponentPlayerScore
-                )
+            updateScore(gameManager.gameData.localPlayerScore.value, newOpponentPlayerScore)
         }
         gameManager.gameData.opponentPlayerScore.observe(this, opponentPlayerScoreObserver)
 
@@ -165,15 +155,13 @@ class SessionsTwoPlayerActivity : AppCompatActivity(R.layout.activity_two_player
             when (gameState) {
                 GameData.GameState.DISCONNECTED -> {
                     setButtonState(false)
-                    statusText.text = getString(R.string.status_disconnected)
-                    scoreText.text =
-                        getString(
-                            R.string.game_score,
-                            gameManager.gameData.localPlayerScore.value,
-                            gameManager.gameData.opponentPlayerScore.value
-                        )
+                    setStatusText(getString(R.string.status_disconnected))
+                    updateScore(
+                        gameManager.gameData.localPlayerScore.value,
+                        gameManager.gameData.opponentPlayerScore.value
+                    )
                 }
-                GameData.GameState.SEARCHING -> statusText.text = getString(R.string.status_searching)
+                GameData.GameState.SEARCHING -> setStatusText(getString(R.string.status_searching))
                 GameData.GameState.WAITING_FOR_PLAYER_INPUT -> {
                     setButtonState(true)
                     // Only set show status connected if no rounds have been completed
@@ -182,7 +170,12 @@ class SessionsTwoPlayerActivity : AppCompatActivity(R.layout.activity_two_player
                     }
                 }
                 GameData.GameState.WAITING_FOR_ROUND_RESULT -> {
-                    setStatusText(getString(R.string.game_choice, gameManager.gameData.localPlayerChoice))
+                    setStatusText(
+                        getString(
+                            R.string.game_choice,
+                            gameManager.gameData.localPlayerChoice
+                        )
+                    )
                     setGameChoicesEnabled(false)
                 }
                 GameData.GameState.ROUND_RESULT ->
@@ -208,7 +201,12 @@ class SessionsTwoPlayerActivity : AppCompatActivity(R.layout.activity_two_player
                                     )
                                 )
                             GameData.RoundWinner.TIE ->
-                                setStatusText(getString(R.string.tie_message, gameManager.gameData.localPlayerChoice))
+                                setStatusText(
+                                    getString(
+                                        R.string.tie_message,
+                                        gameManager.gameData.localPlayerChoice
+                                    )
+                                )
                             else -> Log.d(TAG, "Ignoring RoundWinner: $winner")
                         }
                     }
@@ -224,7 +222,11 @@ class SessionsTwoPlayerActivity : AppCompatActivity(R.layout.activity_two_player
             choice,
             object : GameManager.Callback() {
                 override fun onFailure() {
-                    Toast.makeText(this@SessionsTwoPlayerActivity, R.string.send_failure, Toast.LENGTH_SHORT)
+                    Toast.makeText(
+                        this@SessionsTwoPlayerActivity,
+                        R.string.send_failure,
+                        Toast.LENGTH_SHORT
+                    )
                         .show()
                 }
             }
@@ -249,6 +251,26 @@ class SessionsTwoPlayerActivity : AppCompatActivity(R.layout.activity_two_player
     /** Shows a status message to the user. */
     private fun setStatusText(text: String) {
         statusText.text = text
+        statusText.contentDescription = text
+    }
+
+    /**
+     * Updates the current score based on the latest score data.
+     *
+     * @param newSelfScore           The value for new score of the local player.
+     * @param newOpponentPlayerScore The value for new score of the opponent.
+     */
+    private fun updateScore(newSelfScore: Int?, newOpponentPlayerScore: Int?) {
+        if (newSelfScore == null || newOpponentPlayerScore === null) {
+            return
+        }
+
+        scoreText.text = getString(R.string.game_score, newSelfScore, newOpponentPlayerScore)
+        scoreText.contentDescription = getString(
+            R.string.game_score_talk_back,
+            newSelfScore,
+            newOpponentPlayerScore
+        )
     }
 
     companion object {

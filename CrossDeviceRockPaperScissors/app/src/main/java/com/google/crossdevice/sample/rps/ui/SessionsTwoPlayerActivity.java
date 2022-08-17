@@ -34,6 +34,7 @@ import com.google.crossdevice.sample.rps.model.GameChoice;
 import com.google.crossdevice.sample.rps.model.GameData;
 import com.google.crossdevice.sample.rps.service.GameManager;
 import com.google.crossdevice.sample.rps.service.SessionsTwoPlayerGameManager;
+
 import java.util.Arrays;
 
 /**
@@ -92,7 +93,9 @@ public class SessionsTwoPlayerActivity extends AppCompatActivity {
         handleIntent(intent);
     }
 
-    /** Handles incoming requests to this activity. */
+    /**
+     * Handles incoming requests to this activity.
+     */
     private void handleIntent(Intent intent) {
         // Handle incoming requests to this application.
         // Note that we are using launchMode="singleTop" for this activity, as registered in the
@@ -104,19 +107,25 @@ public class SessionsTwoPlayerActivity extends AppCompatActivity {
         }
     }
 
-    /** Initializes discovery of other devices. */
+    /**
+     * Initializes discovery of other devices.
+     */
     public void findOpponent(View view) {
         gameManager.findOpponent();
         setStatusText(getString(R.string.status_searching));
         findOpponentButton.setEnabled(false);
     }
 
-    /** Disconnects from the opponent and reset the UI. */
+    /**
+     * Disconnects from the opponent and reset the UI.
+     */
     public void disconnect(View view) {
         gameManager.disconnect();
     }
 
-    /** Sends a {@link GameChoice} to the other player. */
+    /**
+     * Sends a {@link GameChoice} to the other player.
+     */
     public void makeMove(View view) {
         if (view.getId() == R.id.rock) {
             sendGameChoice(GameChoice.ROCK);
@@ -150,22 +159,16 @@ public class SessionsTwoPlayerActivity extends AppCompatActivity {
         // Observes changes to the Local Player's score
         final Observer<Integer> localPlayerScoreObserver =
                 newLocalPlayerScore -> {
-                    scoreText.setText(
-                            getString(
-                                    R.string.game_score,
-                                    newLocalPlayerScore,
-                                    gameManager.getGameData().getOpponentPlayerScore().getValue()));
+                    updateScore(newLocalPlayerScore,
+                            gameManager.getGameData().getOpponentPlayerScore().getValue());
                 };
         gameManager.getGameData().getLocalPlayerScore().observe(this, localPlayerScoreObserver);
 
         // Observes changes to the Opponent Player's score
         final Observer<Integer> opponentPlayerScoreObserver =
                 newOpponentPlayerScore -> {
-                    scoreText.setText(
-                            getString(
-                                    R.string.game_score,
-                                    gameManager.getGameData().getLocalPlayerScore().getValue(),
-                                    newOpponentPlayerScore));
+                    updateScore(gameManager.getGameData().getLocalPlayerScore().getValue(),
+                            newOpponentPlayerScore);
                 };
         gameManager.getGameData().getOpponentPlayerScore().observe(this, opponentPlayerScoreObserver);
 
@@ -179,11 +182,9 @@ public class SessionsTwoPlayerActivity extends AppCompatActivity {
                         case DISCONNECTED:
                             setButtonState(false);
                             statusText.setText(getString(R.string.status_disconnected));
-                            scoreText.setText(
-                                    getString(
-                                            R.string.game_score,
-                                            gameManager.getGameData().getLocalPlayerScore().getValue(),
-                                            gameManager.getGameData().getOpponentPlayerScore().getValue()));
+                            updateScore(
+                                    gameManager.getGameData().getLocalPlayerScore().getValue(),
+                                    gameManager.getGameData().getOpponentPlayerScore().getValue());
                             break;
                         case SEARCHING:
                             statusText.setText(getString(R.string.status_searching));
@@ -203,7 +204,7 @@ public class SessionsTwoPlayerActivity extends AppCompatActivity {
                             break;
                         case ROUND_RESULT:
                             if (!Arrays.asList(GameData.RoundWinner.values())
-                                .contains(gameManager.getGameData().getRoundWinner())) {
+                                    .contains(gameManager.getGameData().getRoundWinner())) {
                                 throw new RuntimeException("Invalid RoundWinner in RoundResult");
                             }
                             switch (gameManager.getGameData().getRoundWinner()) {
@@ -236,7 +237,9 @@ public class SessionsTwoPlayerActivity extends AppCompatActivity {
         gameManager.getGameData().getGameState().observe(this, gameStateObserver);
     }
 
-    /** Sends the user's selection of rock, paper, or scissors to the opponent. */
+    /**
+     * Sends the user's selection of rock, paper, or scissors to the opponent.
+     */
     private void sendGameChoice(GameChoice choice) {
         gameManager.sendGameChoice(
                 choice,
@@ -250,7 +253,9 @@ public class SessionsTwoPlayerActivity extends AppCompatActivity {
                 });
     }
 
-    /** Enables/disables buttons depending on the connection status. */
+    /**
+     * Enables/disables buttons depending on the connection status.
+     */
     private void setButtonState(boolean connected) {
         findOpponentButton.setEnabled(!connected);
         findOpponentButton.setVisibility(connected ? View.GONE : View.VISIBLE);
@@ -258,15 +263,33 @@ public class SessionsTwoPlayerActivity extends AppCompatActivity {
         setGameChoicesEnabled(connected);
     }
 
-    /** Enables/disables the rock, paper, and scissors buttons. */
+    /**
+     * Enables/disables the rock, paper, and scissors buttons.
+     */
     private void setGameChoicesEnabled(boolean enabled) {
         rockButton.setEnabled(enabled);
         paperButton.setEnabled(enabled);
         scissorsButton.setEnabled(enabled);
     }
 
-    /** Shows a status message to the user. */
+    /**
+     * Shows a status message to the user.
+     */
     private void setStatusText(String text) {
         statusText.setText(text);
+        statusText.setContentDescription(text);
+    }
+
+    /**
+     * Updates the current score based on the latest score data.
+     *
+     * @param newSelfScore           The value for new score of the local player.
+     * @param newOpponentPlayerScore The value for new score of the opponent.
+     */
+    private void updateScore(int newSelfScore, int newOpponentPlayerScore) {
+        scoreText.setText(getString(R.string.game_score, newSelfScore, newOpponentPlayerScore));
+        scoreText.setContentDescription(getString(R.string.game_score_talk_back,
+                newSelfScore,
+                newOpponentPlayerScore));
     }
 }
