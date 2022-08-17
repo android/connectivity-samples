@@ -74,16 +74,5 @@
             </intent-filter>
         </activity>
 
-        <activity
-            android:name=".ui.SessionsMultiplayerActivity"
-            android:screenOrientation="portrait"
-            android:exported="true"
-            android:launchMode="singleTop">
-            <intent-filter>
-                <action android:name="com.google.crossdevice.samples.rockpaperscissors.SESSIONS_MULTIPLAYER_WAKEUP"/>
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
-
     </application>
 </manifest>
