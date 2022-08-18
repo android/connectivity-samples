@@ -48,7 +48,7 @@ public final class DiscoveryTwoPlayerGameManager implements GameManager {
 
     private static final String TAG = "DiscoveryTPGameManager";
     public static final String ACTION_WAKE_UP =
-            "com.google.crossdevice.samples.rockpaperscissors.DISCOVERY_TWO_PLAYER_WAKEUP";
+            "com.google.crossdevice.sample.rps.DISCOVERY_TWO_PLAYER_WAKEUP";
     private static final String GAME_CHANNEL_NAME = "rock_paper_scissors_channel";
 
     private final Context context;

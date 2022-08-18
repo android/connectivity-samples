@@ -55,7 +55,7 @@ public final class SessionsTwoPlayerGameManager implements GameManager {
 
     private static final String TAG = "SessionsTPGameManager";
     public static final String ACTION_WAKE_UP =
-            "com.google.crossdevice.samples.rockpaperscissors.SESSIONS_TWO_PLAYER_WAKEUP";
+            "com.google.crossdevice.sample.rps.SESSIONS_TWO_PLAYER_WAKEUP";
 
     private final PrimarySessionStateCallback primarySessionStateCallback =
             new PrimarySessionStateCallback() {

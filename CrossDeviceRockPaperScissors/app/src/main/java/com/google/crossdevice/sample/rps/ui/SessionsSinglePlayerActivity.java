@@ -63,7 +63,7 @@ public class SessionsSinglePlayerActivity extends AppCompatActivity {
     private static final String TAG = "SessionsSinglePlayerActivity";
 
     public static final String ACTION_SESSIONS_TRANSFER =
-            "com.google.ambient.crossdevice.samples.rockpaperscissors.SESSIONS_TRANSFER";
+            "com.google.crossdevice.sample.rps.SESSIONS_TRANSFER";
 
     private OriginatingSession originatingSession;
 

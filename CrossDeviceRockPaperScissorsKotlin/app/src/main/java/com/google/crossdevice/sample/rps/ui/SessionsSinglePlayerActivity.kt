@@ -432,7 +432,6 @@ class SessionsSinglePlayerActivity : AppCompatActivity(R.layout.activity_single_
 
     companion object {
         private const val TAG = "SessionsSinglePlayerActivity"
-        private const val ACTION_SESSIONS_TRANSFER =
-            "com.google.crossdevice.samples.rockpaperscissors.SESSIONS_TRANSFER"
+        private const val ACTION_SESSIONS_TRANSFER = "com.google.crossdevice.sample.rps.SESSIONS_TRANSFER"
     }
 }

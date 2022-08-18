@@ -47,7 +47,7 @@
             android:exported="true"
             android:launchMode="singleTop">
             <intent-filter>
-                <action android:name="com.google.crossdevice.samples.rockpaperscissors.DISCOVERY_TWO_PLAYER_WAKEUP" />
+                <action android:name="com.google.crossdevice.sample.rps.DISCOVERY_TWO_PLAYER_WAKEUP" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
@@ -58,7 +58,7 @@
             android:exported="true"
             android:launchMode="singleTop">
             <intent-filter>
-                <action android:name="com.google.crossdevice.samples.rockpaperscissors.SESSIONS_TWO_PLAYER_WAKEUP" />
+                <action android:name="com.google.crossdevice.sample.rps.SESSIONS_TWO_PLAYER_WAKEUP" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
@@ -69,7 +69,7 @@
             android:exported="true"
             android:launchMode="singleTop">
             <intent-filter>
-                <action android:name="com.google.ambient.crossdevice.samples.rockpaperscissors.SESSIONS_TRANSFER" />
+                <action android:name="com.google.crossdevice.sample.rps.SESSIONS_TRANSFER" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
