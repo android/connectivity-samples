@@ -18,10 +18,12 @@ package com.google.crossdevice.sample.rps.model;
 
 import java.util.Random;
 
-/** Utility class to generate random Android names */
+/**
+ * Utility class to generate random Android names
+ */
 public final class CodenameGenerator {
     private static final String[] COLORS =
-            new String[] {
+            new String[]{
                     "Red",
                     "Orange",
                     "Yellow",
@@ -38,7 +40,7 @@ public final class CodenameGenerator {
             };
 
     private static final String[] TREATS =
-            new String[] {
+            new String[]{
                     "Alpha",
                     "Beta",
                     "Cupcake",
@@ -59,9 +61,12 @@ public final class CodenameGenerator {
 
     private static final Random generator = new Random();
 
-    private CodenameGenerator() {}
+    private CodenameGenerator() {
+    }
 
-    /** Generate a random Android agent codename */
+    /**
+     * Generate a random Android agent codename
+     */
     public static String generate() {
         String color = COLORS[generator.nextInt(COLORS.length)];
         String treat = TREATS[generator.nextInt(TREATS.length)];

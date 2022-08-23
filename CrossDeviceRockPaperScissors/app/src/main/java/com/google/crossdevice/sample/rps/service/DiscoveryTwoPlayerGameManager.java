@@ -43,7 +43,9 @@ import com.google.crossdevice.sample.rps.model.TwoPlayerGameDataViewModel;
 
 import java.util.concurrent.Executor;
 
-/** Implementation of GameManager using Discovery APIs. */
+/**
+ * Implementation of GameManager using Discovery APIs.
+ */
 public final class DiscoveryTwoPlayerGameManager implements GameManager {
 
     private static final String TAG = "DiscoveryTPGameManager";
@@ -84,13 +86,17 @@ public final class DiscoveryTwoPlayerGameManager implements GameManager {
         resetGame();
     }
 
-    /** Getter for the managed GameDataViewModel object. */
+    /**
+     * Getter for the managed GameDataViewModel object.
+     */
     @Override
     public TwoPlayerGameDataViewModel getGameData() {
         return this.gameData;
     }
 
-    /** Disconnects from a connected endpoint. */
+    /**
+     * Disconnects from a connected endpoint.
+     */
     @Override
     public void disconnect() {
         closeConnections();
@@ -125,7 +131,9 @@ public final class DiscoveryTwoPlayerGameManager implements GameManager {
                 mainExecutor);
     }
 
-    /** Sends the local player's game choice to the other remote player. */
+    /**
+     * Sends the local player's game choice to the other remote player.
+     */
     @Override
     public void sendGameChoice(GameChoice choice, Callback callback) {
         gameData.setLocalPlayerChoice(choice);
@@ -133,13 +141,17 @@ public final class DiscoveryTwoPlayerGameManager implements GameManager {
         sendPayloadToRemoteConnection(remotePlayer, callback);
     }
 
-    /** Resets game data to default values. */
+    /**
+     * Resets game data to default values.
+     */
     @Override
     public void resetGame() {
         gameData.resetGameData();
     }
 
-    /** Finishes and processes the round after all players have entered their choices. */
+    /**
+     * Finishes and processes the round after all players have entered their choices.
+     */
     @Override
     public void finishRound() {
         // if both players have entered their choices, process the round and receive the next payload
@@ -149,7 +161,9 @@ public final class DiscoveryTwoPlayerGameManager implements GameManager {
         }
     }
 
-    /** Determines whether the invitation is valid, then opens a connection */
+    /**
+     * Determines whether the invitation is valid, then opens a connection
+     */
     @Override
     public void acceptGameInvitation(Intent intent) {
         // Extract participant information from the incoming intent.
@@ -162,13 +176,17 @@ public final class DiscoveryTwoPlayerGameManager implements GameManager {
         acceptRemoteConnection(participant);
     }
 
-    /** Returns true if there is a connection, since Discovery based connections are equal peers. */
+    /**
+     * Returns true if there is a connection, since Discovery based connections are equal peers.
+     */
     @Override
     public boolean isHost() {
         return remotePlayer != null;
     }
 
-    /** Accept the incoming remote connection explicitly and begins communication. */
+    /**
+     * Accept the incoming remote connection explicitly and begins communication.
+     */
     private void acceptRemoteConnection(Participant participant) {
         Log.d(TAG, "acceptRemoteConnection() for participant: " + participant.getDisplayName());
 
@@ -257,7 +275,9 @@ public final class DiscoveryTwoPlayerGameManager implements GameManager {
                 mainExecutor);
     }
 
-    /** Closes the given remote connection. */
+    /**
+     * Closes the given remote connection.
+     */
     private void closeRemoteConnection(
             RemoteConnection remoteConnection, FutureCallback<Void> callback) {
         if (remoteConnection != null) {
@@ -265,7 +285,9 @@ public final class DiscoveryTwoPlayerGameManager implements GameManager {
         }
     }
 
-    /** Creates a call back to receive payload data from peer remote connections */
+    /**
+     * Creates a call back to receive payload data from peer remote connections
+     */
     private void receivePayloadFromRemoteConnection(RemoteConnection remoteConnection) {
         if (remoteConnection == null) {
             Log.d(TAG, "receiveRemoteConnectionPayload() called with a null connection");
@@ -319,7 +341,9 @@ public final class DiscoveryTwoPlayerGameManager implements GameManager {
         this.remotePlayer = remotePlayer;
     }
 
-    /** Clears remote connection */
+    /**
+     * Clears remote connection
+     */
     private void closeConnections() {
         closeRemoteConnection(
                 remotePlayer,

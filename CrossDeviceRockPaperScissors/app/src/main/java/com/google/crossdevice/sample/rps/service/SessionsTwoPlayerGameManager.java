@@ -164,28 +164,28 @@ public final class SessionsTwoPlayerGameManager implements GameManager {
 
         SessionId sessionId = sessions.createSession(/* applicationSessionTag */ null);
         Futures.addCallback(
-            sessions.shareSessionFuture(
-                sessionId,
-                new StartComponentRequest.Builder()
-                    .setAction(ACTION_WAKE_UP)
-                    .setReason(context.getString(R.string.wakeup_reason))
-                    .build(),
-                Collections.emptyList(),
-                primarySessionStateCallback),
-            new FutureCallback<PrimarySession>() {
-              @Override
-              public void onSuccess(PrimarySession result) {
-                Log.d(TAG, "Successfully launched opponent picker");
-                primarySession = result;
-              }
+                sessions.shareSessionFuture(
+                        sessionId,
+                        new StartComponentRequest.Builder()
+                                .setAction(ACTION_WAKE_UP)
+                                .setReason(context.getString(R.string.wakeup_reason))
+                                .build(),
+                        Collections.emptyList(),
+                        primarySessionStateCallback),
+                new FutureCallback<PrimarySession>() {
+                    @Override
+                    public void onSuccess(PrimarySession result) {
+                        Log.d(TAG, "Successfully launched opponent picker");
+                        primarySession = result;
+                    }
 
-              @Override
-              public void onFailure(Throwable t) {
-                Log.e(TAG, "Failed to launch opponent picker", t);
-                resetGame();
-              }
-            },
-            mainExecutor);
+                    @Override
+                    public void onFailure(Throwable t) {
+                        Log.e(TAG, "Failed to launch opponent picker", t);
+                        resetGame();
+                    }
+                },
+                mainExecutor);
     }
 
     /**

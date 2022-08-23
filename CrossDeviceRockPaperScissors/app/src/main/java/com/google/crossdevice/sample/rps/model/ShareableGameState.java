@@ -22,7 +22,9 @@ import android.util.Log;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-/** Contains the data needed when sharing a game data with another device */
+/**
+ * Contains the data needed when sharing a game data with another device
+ */
 public final class ShareableGameState {
     private static final String TAG = "ShareableGameState";
 

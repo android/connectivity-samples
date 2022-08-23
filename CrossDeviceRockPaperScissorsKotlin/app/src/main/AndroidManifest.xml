@@ -10,10 +10,11 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
-        <activity android:name=".ui.MainActivity"
-            android:screenOrientation="portrait"
+        <activity
+            android:name=".ui.MainActivity"
             android:exported="true"
-            android:launchMode="singleTop">
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -22,9 +23,9 @@
 
         <activity
             android:name=".ui.DiscoveryTwoPlayerActivity"
-            android:screenOrientation="portrait"
             android:exported="true"
-            android:launchMode="singleTop">
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="com.google.crossdevice.sample.rps.DISCOVERY_TWO_PLAYER_WAKEUP" />
                 <category android:name="android.intent.category.DEFAULT" />
@@ -33,9 +34,9 @@
 
         <activity
             android:name=".ui.SessionsTwoPlayerActivity"
-            android:screenOrientation="portrait"
             android:exported="true"
-            android:launchMode="singleTop">
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="com.google.crossdevice.sample.rps.SESSIONS_TWO_PLAYER_WAKEUP" />
                 <category android:name="android.intent.category.DEFAULT" />
@@ -44,9 +45,9 @@
 
         <activity
             android:name=".ui.SessionsSinglePlayerActivity"
-            android:screenOrientation="portrait"
             android:exported="true"
-            android:launchMode="singleTop">
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="com.google.crossdevice.sample.rps.SESSIONS_TRANSFER" />
                 <category android:name="android.intent.category.DEFAULT" />

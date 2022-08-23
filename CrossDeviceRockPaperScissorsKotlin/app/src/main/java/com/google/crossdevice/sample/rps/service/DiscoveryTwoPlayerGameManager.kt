@@ -30,10 +30,9 @@ import com.google.crossdevice.sample.rps.R
 import com.google.crossdevice.sample.rps.model.GameChoice
 import com.google.crossdevice.sample.rps.model.GameData
 import com.google.crossdevice.sample.rps.model.TwoPlayerGameDataViewModel
-
-import java.nio.charset.StandardCharsets
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import java.nio.charset.StandardCharsets
 
 /** Implementation of GameManager using Discovery APIs. */
 class DiscoveryTwoPlayerGameManager(
@@ -50,8 +49,7 @@ class DiscoveryTwoPlayerGameManager(
         // Register the callback for selected devices. It will provides a list of Participant,
         // available for connections.
         devicePickerLauncher =
-            discovery.registerForResult(context as ActivityResultCaller) {
-                    participants: Collection<Participant> ->
+            discovery.registerForResult(context as ActivityResultCaller) { participants: Collection<Participant> ->
                 for (participant in participants) {
                     Log.d(TAG, "selected participant=$participant")
                     openRemoteConnection(participant)
@@ -203,7 +201,10 @@ class DiscoveryTwoPlayerGameManager(
         remoteConnection?.also {
             it.registerReceiver(
                 object : ConnectionReceiver {
-                    override fun onMessageReceived(remoteConnection: RemoteConnection, payload: ByteArray) {
+                    override fun onMessageReceived(
+                        remoteConnection: RemoteConnection,
+                        payload: ByteArray
+                    ) {
                         Log.i(TAG, "receivePayloadFromRemoteConnection() success")
                         // we set the game choice for player 2
                         gameData.opponentPlayerChoice =

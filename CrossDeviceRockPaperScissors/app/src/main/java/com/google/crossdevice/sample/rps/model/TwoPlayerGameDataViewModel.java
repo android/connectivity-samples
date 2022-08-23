@@ -19,7 +19,6 @@ package com.google.crossdevice.sample.rps.model;
 import android.content.Context;
 import android.util.Log;
 
-import androidx.annotation.NonNull;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
@@ -61,7 +60,9 @@ public final class TwoPlayerGameDataViewModel extends ViewModel implements GameD
                 .get(TwoPlayerGameDataViewModel.class);
     }
 
-    /** Resets all variables to default values prior to starting a game. */
+    /**
+     * Resets all variables to default values prior to starting a game.
+     */
     public void resetGameData() {
         localPlayerName.setValue(CodenameGenerator.generate());
         opponentPlayerName.setValue(null);
@@ -75,75 +76,101 @@ public final class TwoPlayerGameDataViewModel extends ViewModel implements GameD
         roundsCompleted = 0;
     }
 
-    /** Retrieves Local Player's name */
+    /**
+     * Retrieves Local Player's name
+     */
     @Override
     public MutableLiveData<String> getLocalPlayerName() {
         return localPlayerName;
     }
 
-    /** Retrieves Opponent Player's name */
+    /**
+     * Retrieves Opponent Player's name
+     */
     @Override
     public MutableLiveData<String> getOpponentPlayerName() {
         return opponentPlayerName;
     }
 
-    /** Retrieves Local Player's game choice. */
+    /**
+     * Retrieves Local Player's game choice.
+     */
     @Override
     public GameChoice getLocalPlayerChoice() {
         return localPlayerChoice;
     }
 
-    /** Sets Local Player's game choice. */
+    /**
+     * Sets Local Player's game choice.
+     */
     public void setLocalPlayerChoice(GameChoice choice) {
         this.localPlayerChoice = choice;
     }
 
-    /** Retrieves Opponent Player's game choice. */
+    /**
+     * Retrieves Opponent Player's game choice.
+     */
     @Override
     public GameChoice getOpponentPlayerChoice() {
         return opponentPlayerChoice;
     }
 
-    /** Sets Opponent Player's game choice. */
+    /**
+     * Sets Opponent Player's game choice.
+     */
     public void setOpponentPlayerChoice(GameChoice choice) {
         this.opponentPlayerChoice = choice;
     }
 
-    /** Gets Local Player's game choice confirmation state. */
+    /**
+     * Gets Local Player's game choice confirmation state.
+     */
     public boolean isLocalPlayerChoiceConfirmed() {
         return localPlayerChoiceConfirmed;
     }
 
-    /** Sets Local Player's game choice confirmation state. */
+    /**
+     * Sets Local Player's game choice confirmation state.
+     */
     public void setLocalPlayerChoiceConfirmed(boolean confirmed) {
         this.localPlayerChoiceConfirmed = confirmed;
     }
 
-    /** Gets Local Player's score. */
+    /**
+     * Gets Local Player's score.
+     */
     @Override
     public MutableLiveData<Integer> getLocalPlayerScore() {
         return localPlayerScore;
     }
 
-    /** Gets Local Player's score, accounting for null case. */
+    /**
+     * Gets Local Player's score, accounting for null case.
+     */
     public int getLocalPlayerScoreValue() {
         Integer value = localPlayerScore.getValue();
         return value == null ? 0 : value;
     }
 
-    /** Gets Opponent Player's score. */
+    /**
+     * Gets Opponent Player's score.
+     */
     @Override
     public MutableLiveData<Integer> getOpponentPlayerScore() {
         return opponentPlayerScore;
     }
 
-    /** Gets Opponent Player's score, accounting for null case. */
+    /**
+     * Gets Opponent Player's score, accounting for null case.
+     */
     public int getOpponentPlayerScoreValue() {
         Integer value = opponentPlayerScore.getValue();
         return value == null ? 0 : value;
     }
 
-    /** Gets current Game State */
+    /**
+     * Gets current Game State
+     */
     @Override
     public MutableLiveData<GameState> getGameState() {
         return gameState;
@@ -154,19 +181,25 @@ public final class TwoPlayerGameDataViewModel extends ViewModel implements GameD
         return null;
     }
 
-    /** Returns the winner for each round or pending if we are still waiting on results */
+    /**
+     * Returns the winner for each round or pending if we are still waiting on results
+     */
     @Override
     public RoundWinner getRoundWinner() {
         return roundWinner;
     }
 
-    /** Gets current number of rounds completed. */
+    /**
+     * Gets current number of rounds completed.
+     */
     @Override
     public int getRoundsCompleted() {
         return roundsCompleted;
     }
 
-    /** Processes the round to determine who wins and auto-increment the winner's score. */
+    /**
+     * Processes the round to determine who wins and auto-increment the winner's score.
+     */
     public void processRound() {
         if (localPlayerChoice.beats(opponentPlayerChoice)) {
             incrementLocalPlayerScore();
@@ -182,7 +215,9 @@ public final class TwoPlayerGameDataViewModel extends ViewModel implements GameD
         resetRound();
     }
 
-    /** Reset's player choices and game state after each round. */
+    /**
+     * Reset's player choices and game state after each round.
+     */
     private void resetRound() {
         localPlayerChoice = null;
         opponentPlayerChoice = null;

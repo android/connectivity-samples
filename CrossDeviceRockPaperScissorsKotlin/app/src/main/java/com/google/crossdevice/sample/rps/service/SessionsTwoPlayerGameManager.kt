@@ -45,21 +45,30 @@ class SessionsTwoPlayerGameManager(
                 Log.e(TAG, "Share failure with participant: " + participant.displayName, exception)
             }
 
-            override fun onParticipantDeparted(sessionId: SessionId, participant: SessionParticipant) {
+            override fun onParticipantDeparted(
+                sessionId: SessionId,
+                participant: SessionParticipant
+            ) {
                 Log.d(TAG, "SessionParticipant departed: " + participant.displayName)
                 /* The PrimarySession will only be destroyed if done explicitly. Since the only
                  * participant has departed, the PrimarySession should now be destroyed. */
                 destroyPrimarySession()
             }
 
-            override fun onParticipantJoined(sessionId: SessionId, participant: SessionParticipant) {
+            override fun onParticipantJoined(
+                sessionId: SessionId,
+                participant: SessionParticipant
+            ) {
                 Log.d(TAG, "New Participant joined: " + participant.displayName)
                 gameData.gameState.value = GameData.GameState.WAITING_FOR_PLAYER_INPUT
                 gameData.opponentPlayerName.value = participant.displayName.toString()
                 primarySession?.also {
                     addRemoteConnectionCallback(it, participant)
                 }
-                    ?: Log.d(TAG, "Cannot add callback to joined participant since PrimarySession is null")
+                    ?: Log.d(
+                        TAG,
+                        "Cannot add callback to joined participant since PrimarySession is null"
+                    )
             }
 
             override fun onPrimarySessionCleanup(sessionId: SessionId) {
@@ -84,7 +93,10 @@ class SessionsTwoPlayerGameManager(
                     .getSecondaryRemoteConnectionForParticipant(participant)
                     .registerReceiver(
                         object : SessionConnectionReceiver {
-                            override fun onMessageReceived(participant: SessionParticipant, payload: ByteArray) {
+                            override fun onMessageReceived(
+                                participant: SessionParticipant,
+                                payload: ByteArray
+                            ) {
                                 handleMessageReceived(payload)
                             }
                         }
@@ -172,7 +184,8 @@ class SessionsTwoPlayerGameManager(
     /** Completes the flow required to accept a shared Session. */
     private fun acceptShareSession(intent: Intent) {
         scope.launch {
-            val secondarySession = sessions.getSecondarySession(intent, secondarySessionStateCallback)
+            val secondarySession =
+                sessions.getSecondarySession(intent, secondarySessionStateCallback)
             Log.d(TAG, "Got SecondarySession")
             updateSecondarySession(secondarySession)
 
@@ -180,7 +193,10 @@ class SessionsTwoPlayerGameManager(
                 secondarySession.getDefaultRemoteConnection().apply {
                     registerReceiver(
                         object : SessionConnectionReceiver {
-                            override fun onMessageReceived(participant: SessionParticipant, payload: ByteArray) {
+                            override fun onMessageReceived(
+                                participant: SessionParticipant,
+                                payload: ByteArray
+                            ) {
                                 handleMessageReceived(payload)
                             }
                         }
@@ -189,14 +205,16 @@ class SessionsTwoPlayerGameManager(
 
             resetGame()
             gameData.gameState.value = GameData.GameState.WAITING_FOR_PLAYER_INPUT
-            gameData.opponentPlayerName.value = secondaryConnection?.participant?.displayName.toString()
+            gameData.opponentPlayerName.value =
+                secondaryConnection?.participant?.displayName.toString()
         }
     }
 
     /** Sends the game choice to whichever connection is open. */
     private fun broadcastGameChoice(callback: GameManager.Callback) {
         Log.i(TAG, "Sending game choice")
-        val message: ByteArray = gameData.localPlayerChoice!!.name.toByteArray(StandardCharsets.UTF_8)
+        val message: ByteArray =
+            gameData.localPlayerChoice!!.name.toByteArray(StandardCharsets.UTF_8)
 
         scope.launch {
             primarySession?.also {

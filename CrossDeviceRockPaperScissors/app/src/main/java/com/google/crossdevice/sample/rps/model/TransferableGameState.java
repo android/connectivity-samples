@@ -21,7 +21,9 @@ import android.util.Log;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-/** Contains the data needed when transferring a game to another device */
+/**
+ * Contains the data needed when transferring a game to another device
+ */
 public final class TransferableGameState {
     private static final String TAG = "TransferableGameState";
 

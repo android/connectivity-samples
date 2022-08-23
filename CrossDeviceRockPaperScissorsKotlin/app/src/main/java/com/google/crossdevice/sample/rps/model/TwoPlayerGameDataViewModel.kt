@@ -22,9 +22,9 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelStoreOwner
-import java.util.Random
 import org.json.JSONException
 import org.json.JSONObject
+import java.util.Random
 
 /**
  * GameData object used to store information about a Game and to communicate those changes to

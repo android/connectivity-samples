@@ -16,7 +16,9 @@
 
 package com.google.crossdevice.sample.rps.model;
 
-/** Class to enumerate game choices and rules */
+/**
+ * Class to enumerate game choices and rules
+ */
 public enum GameChoice {
     ROCK,
     PAPER,

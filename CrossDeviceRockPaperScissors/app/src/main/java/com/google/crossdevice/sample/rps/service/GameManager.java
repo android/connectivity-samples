@@ -21,16 +21,24 @@ import android.content.Intent;
 import com.google.crossdevice.sample.rps.model.GameChoice;
 import com.google.crossdevice.sample.rps.model.GameData;
 
-/** Interface for defining GameManager APIs */
+/**
+ * Interface for defining GameManager APIs
+ */
 public interface GameManager {
 
-    /** Gets the managed GameData object. */
+    /**
+     * Gets the managed GameData object.
+     */
     GameData getGameData();
 
-    /** Disconnects from connection endpoint when connected to a session. */
+    /**
+     * Disconnects from connection endpoint when connected to a session.
+     */
     void disconnect();
 
-    /** Initializes discovery of other devices in order to find an opponent. */
+    /**
+     * Initializes discovery of other devices in order to find an opponent.
+     */
     void findOpponent();
 
     /**
@@ -39,28 +47,40 @@ public interface GameManager {
      */
     void sendGameChoice(GameChoice choice, Callback callback);
 
-    /** Resets the game to default values. */
+    /**
+     * Resets the game to default values.
+     */
     void resetGame();
 
-    /** Processes the round after all players have made their move. */
+    /**
+     * Processes the round after all players have made their move.
+     */
     void finishRound();
 
-    /** Accepts incoming invitation from a remote participant */
+    /**
+     * Accepts incoming invitation from a remote participant
+     */
     void acceptGameInvitation(Intent intent);
 
-    /** Returns whether the GameManager is the game host or not */
+    /**
+     * Returns whether the GameManager is the game host or not
+     */
     boolean isHost();
 
-    /** Can be passed to methods in GameManager when notification of success or failure is desired. */
+    /**
+     * Can be passed to methods in GameManager when notification of success or failure is desired.
+     */
     abstract class Callback {
         /**
          * Called when the desired operation succeeds.
          */
-        public void onSuccess() {}
+        public void onSuccess() {
+        }
 
         /**
          * Called when the desired operation fails.
          */
-        public void onFailure() {}
+        public void onFailure() {
+        }
     }
 }
