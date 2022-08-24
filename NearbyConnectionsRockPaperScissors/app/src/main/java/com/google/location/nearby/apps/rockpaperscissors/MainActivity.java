@@ -39,7 +39,17 @@ public class MainActivity extends AppCompatActivity {
 
   private static final String[] REQUIRED_PERMISSIONS;
   static {
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+      REQUIRED_PERMISSIONS =
+              new String[] {
+                      Manifest.permission.BLUETOOTH_SCAN,
+                      Manifest.permission.BLUETOOTH_ADVERTISE,
+                      Manifest.permission.BLUETOOTH_CONNECT,
+                      Manifest.permission.ACCESS_WIFI_STATE,
+                      Manifest.permission.CHANGE_WIFI_STATE,
+                      Manifest.permission.NEARBY_WIFI_DEVICES,
+              };
+    } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
       REQUIRED_PERMISSIONS =
           new String[] {
             Manifest.permission.BLUETOOTH_SCAN,
