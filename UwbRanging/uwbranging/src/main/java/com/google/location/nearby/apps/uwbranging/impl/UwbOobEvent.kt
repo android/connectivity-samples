@@ -12,15 +12,19 @@ internal abstract class UwbOobEvent private constructor() {
 
   /** An event that notifies an endpoint is found through OOB. */
   data class UwbEndpointFound(
-      override val endpoint: UwbEndpoint,
-      val configId: Int,
-      val endpointAddress: UwbAddress,
-      val complexChannel: UwbComplexChannel,
-      val sessionId: Int,
-      val sessionKeyInfo: ByteArray,
-      val sessionScope: UwbClientSessionScope
+    override val endpoint: UwbEndpoint,
+    val configId: Int,
+    val endpointAddress: UwbAddress,
+    val complexChannel: UwbComplexChannel,
+    val sessionId: Int,
+    val sessionKeyInfo: ByteArray,
+    val sessionScope: UwbClientSessionScope
   ) : UwbOobEvent()
 
   /** An event that notifies a UWB endpoint is lost. */
   data class UwbEndpointLost(override val endpoint: UwbEndpoint) : UwbOobEvent()
+
+  /** Notifies that a message is received. */
+  data class MessageReceived(override val endpoint: UwbEndpoint, val message: ByteArray) :
+    UwbOobEvent()
 }

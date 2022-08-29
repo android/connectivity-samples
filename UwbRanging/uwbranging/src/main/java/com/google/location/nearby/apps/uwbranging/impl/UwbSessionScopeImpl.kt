@@ -4,20 +4,19 @@ import androidx.core.uwb.RangingParameters
 import androidx.core.uwb.RangingResult
 import androidx.core.uwb.UwbAddress
 import androidx.core.uwb.UwbDevice
+import com.google.location.nearby.apps.uwbranging.EndpointEvents
 import com.google.location.nearby.apps.uwbranging.UwbEndpoint
-import com.google.location.nearby.apps.uwbranging.UwbRangingResult
 import com.google.location.nearby.apps.uwbranging.UwbSessionScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.ProducerScope
 import kotlinx.coroutines.channels.awaitClose
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.launch
 
 internal class UwbSessionScopeImpl(
-    private val localEndpoint: UwbEndpoint,
-    private val startOob: () -> Flow<UwbOobEvent>
+  private val localEndpoint: UwbEndpoint,
+  private val connector: NearbyConnector
 ) : UwbSessionScope {
 
   private val localAddresses = mutableSetOf<UwbAddress>()
@@ -26,51 +25,59 @@ internal class UwbSessionScopeImpl(
 
   private val activeJobs = mutableMapOf<UwbEndpoint, Job>()
 
-  override fun prepareSession(configId: Int) = channelFlow {
+  override fun prepareSession() = channelFlow {
     val job = launch {
-      startOob().collect { event ->
+      connector.start().collect { event ->
         when (event) {
-          is UwbOobEvent.UwbEndpointFound -> processEndpointFound(event)
+          is UwbOobEvent.UwbEndpointFound -> {
+            val rangingEvents = processEndpointFound(event)
+            activeJobs[event.endpoint] = launch { rangingEvents.collect { sendResult(it) } }
+          }
           is UwbOobEvent.UwbEndpointLost -> processEndpointLost(event.endpoint)
+          is UwbOobEvent.MessageReceived ->
+            trySend(EndpointEvents.EndpointMessage(event.endpoint, event.message))
         }
       }
     }
     awaitClose { job.cancel() }
   }
 
-  private fun processEndpointLost(endpoint: UwbEndpoint) {
+  override fun sendMessage(endpoint: UwbEndpoint, message: ByteArray) {
+    connector.sendMessage(endpoint, message)
+  }
+
+  private fun ProducerScope<EndpointEvents>.processEndpointLost(endpoint: UwbEndpoint) {
+    trySend(EndpointEvents.EndpointLost(endpoint))
     activeJobs[endpoint]?.cancel()
   }
 
-  private suspend fun ProducerScope<UwbRangingResult>.processEndpointFound(
-      event: UwbOobEvent.UwbEndpointFound
-  ) {
+  private fun ProducerScope<EndpointEvents>.processEndpointFound(
+    event: UwbOobEvent.UwbEndpointFound
+  ): Flow<RangingResult> {
     remoteDeviceMap[event.endpointAddress] = event.endpoint
     localAddresses.add(event.sessionScope.localAddress)
     val rangingParameters =
-        RangingParameters(
-            event.configId,
-            event.sessionId,
-            event.sessionKeyInfo,
-            event.complexChannel,
-            listOf(UwbDevice(event.endpointAddress)),
-            RangingParameters.RANGING_UPDATE_RATE_FREQUENT)
-
-    val rangingEvents = event.sessionScope.prepareSession(rangingParameters)
-    activeJobs[event.endpoint] = coroutineScope {
-      launch { rangingEvents.collect { sendResult(it) } }
-    }
+      RangingParameters(
+        event.configId,
+        event.sessionId,
+        event.sessionKeyInfo,
+        event.complexChannel,
+        listOf(UwbDevice(event.endpointAddress)),
+        RangingParameters.RANGING_UPDATE_RATE_FREQUENT
+      )
+    trySend(EndpointEvents.EndpointFound(event.endpoint))
+    return event.sessionScope.prepareSession(rangingParameters)
   }
 
-  private fun ProducerScope<UwbRangingResult>.sendResult(result: RangingResult) {
+  private fun ProducerScope<EndpointEvents>.sendResult(result: RangingResult) {
     val endpoint =
-        if (localAddresses.contains(result.device.address)) localEndpoint
-        else remoteDeviceMap[result.device.address] ?: return
+      if (localAddresses.contains(result.device.address)) localEndpoint
+      else remoteDeviceMap[result.device.address] ?: return
     when (result) {
       is RangingResult.RangingResultPosition ->
-          trySend(UwbRangingResult.RangingResultPosition(endpoint, result.position))
+        trySend(EndpointEvents.PositionUpdated(endpoint, result.position))
       is RangingResult.RangingResultPeerDisconnected ->
-          trySend(UwbRangingResult.RangingResultPeerDisconnected(endpoint))
+        trySend(EndpointEvents.UwbDisconnected(endpoint))
     }
   }
 }

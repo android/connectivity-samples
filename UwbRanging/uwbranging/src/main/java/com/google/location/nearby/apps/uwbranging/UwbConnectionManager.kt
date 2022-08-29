@@ -8,13 +8,13 @@ import com.google.location.nearby.apps.uwbranging.impl.UwbConnectionManagerImpl
  * starts the UWB ranging.
  */
 interface UwbConnectionManager {
-    suspend fun controllerUwbScope(endpoint: UwbEndpoint, configId: Int): UwbSessionScope
+  fun controllerUwbScope(endpoint: UwbEndpoint, configId: Int): UwbSessionScope
 
-    suspend fun controleeUwbScope(endpoint: UwbEndpoint): UwbSessionScope
+  fun controleeUwbScope(endpoint: UwbEndpoint): UwbSessionScope
 
-    companion object {
-        fun getInstance(context: Context): UwbConnectionManager {
-            return UwbConnectionManagerImpl(context)
-        }
+  companion object {
+    fun getInstance(context: Context): UwbConnectionManager {
+      return UwbConnectionManagerImpl(context)
     }
+  }
 }

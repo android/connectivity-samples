@@ -21,169 +21,129 @@ import org.robolectric.RobolectricTestRunner
 @RunWith(RobolectricTestRunner::class)
 class NearbyConnectionsTest {
 
-    private lateinit var connection: NearbyConnections
+  private lateinit var connection: NearbyConnections
 
-    private val connectionsClient = mock<ConnectionsClient>()
+  private val connectionsClient = mock<ConnectionsClient>()
 
-    @Before
-    fun setUp() {
-        val context: Context = ApplicationProvider.getApplicationContext()
-        connection = NearbyConnections(context, Dispatchers.Unconfined, connectionsClient)
-    }
+  @Before
+  fun setUp() {
+    val context: Context = ApplicationProvider.getApplicationContext()
+    connection = NearbyConnections(context, Dispatchers.Unconfined, connectionsClient)
+  }
 
-    @Test
-    fun testDiscovery() = runTest {
-        whenever(connectionsClient.startDiscovery(any(), any(), any())).thenReturn(
-            Tasks.forResult(
-                null
-            )
-        )
-        whenever(
-            connectionsClient.requestConnection(
-                any<String>(),
-                any(),
-                any()
-            )
-        ).thenReturn(Tasks.forResult(null))
-        whenever(
-            connectionsClient.acceptConnection(
-                any(),
-                any()
-            )
-        ).thenReturn(Tasks.forResult(null))
+  @Test
+  fun testDiscovery() = runTest {
+    whenever(connectionsClient.startDiscovery(any(), any(), any()))
+      .thenReturn(Tasks.forResult(null))
+    whenever(connectionsClient.requestConnection(any<String>(), any(), any()))
+      .thenReturn(Tasks.forResult(null))
+    whenever(connectionsClient.acceptConnection(any(), any())).thenReturn(Tasks.forResult(null))
 
+    val flow = connection.startDiscovery()
 
-        val flow = connection.startDiscovery()
+    val events = mutableListOf<NearbyEvent>()
+    val job = launch { flow.collect { events.add(it) } }
 
-        val events = mutableListOf<NearbyEvent>()
-        val job = launch {
-            flow.collect { events.add(it) }
-        }
+    advanceUntilIdle()
+    val discoveryCallbackCaptor = argumentCaptor<EndpointDiscoveryCallback>()
+    verify(connectionsClient).startDiscovery(any(), discoveryCallbackCaptor.capture(), any())
 
-        advanceUntilIdle()
-        val discoveryCallbackCaptor = argumentCaptor<EndpointDiscoveryCallback>()
-        verify(connectionsClient).startDiscovery(any(), discoveryCallbackCaptor.capture(), any())
+    val discoveryCallback = discoveryCallbackCaptor.lastValue
 
-        val discoveryCallback = discoveryCallbackCaptor.lastValue
+    val endpointId = "EP1"
 
-        val endpointId = "EP1"
+    discoveryCallback.onEndpointFound(endpointId, DiscoveredEndpointInfo("b1", "test"))
+    advanceUntilIdle()
 
-        discoveryCallback.onEndpointFound(endpointId, DiscoveredEndpointInfo("b1", "test"))
-        advanceUntilIdle()
+    val connectionCallbackCaptor = argumentCaptor<ConnectionLifecycleCallback>()
+    verify(connectionsClient)
+      .requestConnection(any<String>(), eq(endpointId), connectionCallbackCaptor.capture())
 
-        val connectionCallbackCaptor = argumentCaptor<ConnectionLifecycleCallback>()
-        verify(connectionsClient).requestConnection(
-            any<String>(),
-            eq(endpointId),
-            connectionCallbackCaptor.capture()
-        )
+    val connectionCallback = connectionCallbackCaptor.lastValue
 
-        val connectionCallback = connectionCallbackCaptor.lastValue
+    connectionCallback.onConnectionInitiated(endpointId, ConnectionInfo("test", "token", false))
 
-        connectionCallback.onConnectionInitiated(endpointId, ConnectionInfo("test", "token", false))
+    connectionCallback.onConnectionResult(endpointId, ConnectionResolution(Status.RESULT_SUCCESS))
 
-        connectionCallback.onConnectionResult(
-            endpointId,
-            ConnectionResolution(Status.RESULT_SUCCESS)
-        )
+    advanceUntilIdle()
 
-        advanceUntilIdle()
+    assertThat(events[0]).isInstanceOf(NearbyEvent.EndpointConnected::class.java)
+    assertThat(events[0].endpointId).isEqualTo(endpointId)
 
-        assertThat(events[0]).isInstanceOf(NearbyEvent.EndpointConnected::class.java)
-        assertThat(events[0].endpointId).isEqualTo(endpointId)
+    val payloadCallbackCaptor = argumentCaptor<PayloadCallback>()
+    verify(connectionsClient).acceptConnection(eq(endpointId), payloadCallbackCaptor.capture())
+    val payloadCallback = payloadCallbackCaptor.lastValue
 
-        val payloadCallbackCaptor = argumentCaptor<PayloadCallback>()
-        verify(connectionsClient).acceptConnection(eq(endpointId), payloadCallbackCaptor.capture())
-        val payloadCallback = payloadCallbackCaptor.lastValue
+    payloadCallback.onPayloadReceived(endpointId, Payload.fromBytes(byteArrayOf(1, 2, 3)))
+    advanceUntilIdle()
 
-        payloadCallback.onPayloadReceived(endpointId, Payload.fromBytes(byteArrayOf(1, 2, 3)))
-        advanceUntilIdle()
+    assertThat(events[1]).isInstanceOf(NearbyEvent.PayloadReceived::class.java)
+    val event = events[1] as NearbyEvent.PayloadReceived
+    assertThat(event.endpointId).isEqualTo(endpointId)
+    assertThat(event.payload).isEqualTo(byteArrayOf(1, 2, 3))
 
-        assertThat(events[1]).isInstanceOf(NearbyEvent.PayloadReceived::class.java)
-        val event = events[1] as NearbyEvent.PayloadReceived
-        assertThat(event.endpointId).isEqualTo(endpointId)
-        assertThat(event.payload).isEqualTo(byteArrayOf(1, 2, 3))
+    discoveryCallback.onEndpointLost(endpointId)
+    advanceUntilIdle()
 
-        discoveryCallback.onEndpointLost(endpointId)
-        advanceUntilIdle()
+    assertThat(events[2]).isInstanceOf(NearbyEvent.EndpointLost::class.java)
+    assertThat(events[2].endpointId).isEqualTo(endpointId)
 
-        assertThat(events[2]).isInstanceOf(NearbyEvent.EndpointLost::class.java)
-        assertThat(events[2].endpointId).isEqualTo(endpointId)
+    job.cancel()
+    advanceUntilIdle()
 
-        job.cancel()
-        advanceUntilIdle()
+    verify(connectionsClient).stopDiscovery()
+  }
 
-        verify(connectionsClient).stopDiscovery()
-    }
+  @Test
+  fun testAdvertising() = runTest {
+    whenever(connectionsClient.startAdvertising(any<String>(), any(), any(), any()))
+      .thenReturn(Tasks.forResult(null))
+    whenever(connectionsClient.acceptConnection(any(), any())).thenReturn(Tasks.forResult(null))
 
-    @Test
-    fun testAdvertising() = runTest {
-        whenever(connectionsClient.startAdvertising(any<String>(), any(), any(), any())).thenReturn(
-            Tasks.forResult(
-                null
-            )
-        )
-        whenever(
-            connectionsClient.acceptConnection(
-                any(),
-                any()
-            )
-        ).thenReturn(Tasks.forResult(null))
+    val flow = connection.startAdvertising()
 
+    val events = mutableListOf<NearbyEvent>()
+    val job = launch { flow.collect { events.add(it) } }
 
-        val flow = connection.startAdvertising()
+    advanceUntilIdle()
 
-        val events = mutableListOf<NearbyEvent>()
-        val job = launch {
-            flow.collect { events.add(it) }
-        }
+    val connectionCallbackCaptor = argumentCaptor<ConnectionLifecycleCallback>()
+    verify(connectionsClient)
+      .startAdvertising(any<String>(), any(), connectionCallbackCaptor.capture(), any())
 
-        advanceUntilIdle()
+    val endpointId = "EP1"
+    val connectionCallback = connectionCallbackCaptor.lastValue
 
-        val connectionCallbackCaptor = argumentCaptor<ConnectionLifecycleCallback>()
-        verify(connectionsClient).startAdvertising(
-            any<String>(),
-            any(),
-            connectionCallbackCaptor.capture(),
-            any()
-        )
+    connectionCallback.onConnectionInitiated(endpointId, ConnectionInfo("test", "token", true))
 
-        val endpointId = "EP1"
-        val connectionCallback = connectionCallbackCaptor.lastValue
+    connectionCallback.onConnectionResult(endpointId, ConnectionResolution(Status.RESULT_SUCCESS))
 
-        connectionCallback.onConnectionInitiated(endpointId, ConnectionInfo("test", "token", true))
+    advanceUntilIdle()
 
-        connectionCallback.onConnectionResult(
-            endpointId,
-            ConnectionResolution(Status.RESULT_SUCCESS)
-        )
+    assertThat(events[0]).isInstanceOf(NearbyEvent.EndpointConnected::class.java)
+    assertThat(events[0].endpointId).isEqualTo(endpointId)
 
-        advanceUntilIdle()
+    val payloadCallbackCaptor = argumentCaptor<PayloadCallback>()
+    verify(connectionsClient).acceptConnection(eq(endpointId), payloadCallbackCaptor.capture())
+    val payloadCallback = payloadCallbackCaptor.lastValue
 
-        assertThat(events[0]).isInstanceOf(NearbyEvent.EndpointConnected::class.java)
-        assertThat(events[0].endpointId).isEqualTo(endpointId)
+    payloadCallback.onPayloadReceived(endpointId, Payload.fromBytes(byteArrayOf(1, 2, 3)))
+    advanceUntilIdle()
 
-        val payloadCallbackCaptor = argumentCaptor<PayloadCallback>()
-        verify(connectionsClient).acceptConnection(eq(endpointId), payloadCallbackCaptor.capture())
-        val payloadCallback = payloadCallbackCaptor.lastValue
+    assertThat(events[1]).isInstanceOf(NearbyEvent.PayloadReceived::class.java)
+    val event = events[1] as NearbyEvent.PayloadReceived
+    assertThat(event.endpointId).isEqualTo(endpointId)
+    assertThat(event.payload).isEqualTo(byteArrayOf(1, 2, 3))
 
-        payloadCallback.onPayloadReceived(endpointId, Payload.fromBytes(byteArrayOf(1, 2, 3)))
-        advanceUntilIdle()
+    connectionCallback.onDisconnected(endpointId)
+    advanceUntilIdle()
 
-        assertThat(events[1]).isInstanceOf(NearbyEvent.PayloadReceived::class.java)
-        val event = events[1] as NearbyEvent.PayloadReceived
-        assertThat(event.endpointId).isEqualTo(endpointId)
-        assertThat(event.payload).isEqualTo(byteArrayOf(1, 2, 3))
+    assertThat(events[2]).isInstanceOf(NearbyEvent.EndpointLost::class.java)
+    assertThat(events[2].endpointId).isEqualTo(endpointId)
 
-        connectionCallback.onDisconnected(endpointId)
-        advanceUntilIdle()
+    job.cancel()
+    advanceUntilIdle()
 
-        assertThat(events[2]).isInstanceOf(NearbyEvent.EndpointLost::class.java)
-        assertThat(events[2].endpointId).isEqualTo(endpointId)
-
-        job.cancel()
-        advanceUntilIdle()
-
-        verify(connectionsClient).stopAdvertising()
-    }
+    verify(connectionsClient).stopAdvertising()
+  }
 }

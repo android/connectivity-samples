@@ -11,29 +11,25 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 @OptIn(ExperimentalCoroutinesApi::class)
 internal class UwbConnectionManagerImpl(
-    private val context: Context,
-    private val dispatcher: CoroutineDispatcher = Dispatchers.IO.limitedParallelism(1)
+  private val context: Context,
+  private val dispatcher: CoroutineDispatcher = Dispatchers.IO.limitedParallelism(1)
 ) : UwbConnectionManager {
 
   private val uwbManager = UwbManager.createInstance(context)
 
-  override suspend fun controllerUwbScope(endpoint: UwbEndpoint, configId: Int): UwbSessionScope {
-    return UwbSessionScopeImpl(endpoint) {
-      val connector =
-          NearbyControllerConnector(endpoint, configId, NearbyConnections(context, dispatcher)) {
-            uwbManager.controllerSessionScope()
-          }
-      connector.start()
-    }
+  override fun controllerUwbScope(endpoint: UwbEndpoint, configId: Int): UwbSessionScope {
+    val connector =
+      NearbyControllerConnector(endpoint, configId, NearbyConnections(context, dispatcher)) {
+        uwbManager.controllerSessionScope()
+      }
+    return UwbSessionScopeImpl(endpoint, connector)
   }
 
-  override suspend fun controleeUwbScope(endpoint: UwbEndpoint): UwbSessionScope {
-    return UwbSessionScopeImpl(endpoint) {
-      val connector =
-          NearbyControleeConnector(endpoint, NearbyConnections(context, dispatcher)) {
-            uwbManager.controleeSessionScope()
-          }
-      connector.start()
-    }
+  override fun controleeUwbScope(endpoint: UwbEndpoint): UwbSessionScope {
+    val connector =
+      NearbyControleeConnector(endpoint, NearbyConnections(context, dispatcher)) {
+        uwbManager.controleeSessionScope()
+      }
+    return UwbSessionScopeImpl(endpoint, connector)
   }
 }

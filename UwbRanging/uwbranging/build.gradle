@@ -78,7 +78,7 @@ protobuf {
         }
     }
 
-        // Generates the java Protobuf-lite code for the Protobufs in this project. See
+    // Generates the java Protobuf-lite code for the Protobufs in this project. See
     // https://github.com/google/protobuf-gradle-plugin#customizing-protobuf-compilation
     // for more information.
     generateProtoTasks {
