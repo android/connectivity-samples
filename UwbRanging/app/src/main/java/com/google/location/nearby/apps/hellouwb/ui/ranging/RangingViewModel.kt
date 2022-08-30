@@ -4,7 +4,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.google.location.nearby.apps.hellouwb.data.UwbRangingControlSource
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.update
 
 class RangingViewModel(private val uwbRangingControlSource: UwbRangingControlSource) : ViewModel() {
 
@@ -16,23 +20,23 @@ class RangingViewModel(private val uwbRangingControlSource: UwbRangingControlSou
     uwbRangingControlSource.isRunning.onEach { _uiState.update { it } }.launchIn(viewModelScope)
   }
 
-    fun startRanging() {
-        uwbRangingControlSource.start()
-    }
+  fun startRanging() {
+    uwbRangingControlSource.start()
+  }
 
-    fun stopRanging() {
-        uwbRangingControlSource.stop()
-    }
+  fun stopRanging() {
+    uwbRangingControlSource.stop()
+  }
 
   companion object {
     fun provideFactory(
-        uwbRangingControlSource: UwbRangingControlSource
+      uwbRangingControlSource: UwbRangingControlSource,
     ): ViewModelProvider.Factory =
-        object : ViewModelProvider.Factory {
-          @Suppress("UNCHECKED_CAST")
-          override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return RangingViewModel(uwbRangingControlSource) as T
-          }
+      object : ViewModelProvider.Factory {
+        @Suppress("UNCHECKED_CAST")
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+          return RangingViewModel(uwbRangingControlSource) as T
         }
+      }
   }
 }

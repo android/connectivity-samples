@@ -18,7 +18,7 @@ internal abstract class UwbOobEvent private constructor() {
     val complexChannel: UwbComplexChannel,
     val sessionId: Int,
     val sessionKeyInfo: ByteArray,
-    val sessionScope: UwbClientSessionScope
+    val sessionScope: UwbClientSessionScope,
   ) : UwbOobEvent()
 
   /** An event that notifies a UWB endpoint is lost. */

@@ -9,8 +9,8 @@ import com.google.location.nearby.apps.uwbranging.impl.proto.Oob
 import com.google.location.nearby.apps.uwbranging.impl.proto.UwbConfiguration
 import com.google.location.nearby.apps.uwbranging.impl.proto.UwbConnectionInfo
 import com.google.protobuf.ByteString
-import kotlinx.coroutines.flow.Flow
 import kotlin.random.Random
+import kotlinx.coroutines.flow.Flow
 
 /**
  * UWB OOB connector for a controller device using Nearby Connections.
@@ -24,7 +24,7 @@ internal class NearbyControllerConnector(
   private val localEndpoint: UwbEndpoint,
   private val configId: Int,
   connections: NearbyConnections,
-  private val sessionScopeCreator: suspend () -> UwbControllerSessionScope
+  private val sessionScopeCreator: suspend () -> UwbControllerSessionScope,
 ) : NearbyConnector(connections) {
 
   override fun prepareEventFlow(): Flow<NearbyEvent> {
@@ -35,7 +35,7 @@ internal class NearbyControllerConnector(
 
   override suspend fun processUwbSessionInfo(
     endpointId: String,
-    sessionInfo: Control
+    sessionInfo: Control,
   ): UwbOobEvent.UwbEndpointFound? {
 
     val capabilities =

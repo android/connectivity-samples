@@ -22,35 +22,36 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun RangingControlIcon(
-    modifier: Modifier = Modifier,
-    selected: Boolean,
-    onClick: (Boolean) -> Unit
+  modifier: Modifier = Modifier,
+  selected: Boolean,
+  onClick: (Boolean) -> Unit,
 ) {
   val selectState = remember { mutableStateOf(selected) }
   val icon = if (selectState.value) Icons.Filled.Stop else Icons.Filled.Start
   val iconColor = if (selectState.value) Color.Red else MaterialTheme.colorScheme.scrim
   val borderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f)
   val backgroundColor =
-      if (selectState.value) {
-        MaterialTheme.colorScheme.error
-      } else {
-        MaterialTheme.colorScheme.onPrimary
-      }
+    if (selectState.value) {
+      MaterialTheme.colorScheme.error
+    } else {
+      MaterialTheme.colorScheme.onPrimary
+    }
   Surface(
-      color = backgroundColor,
-      shape = CircleShape,
-      border = BorderStroke(2.dp, borderColor),
-      modifier = modifier.size(36.dp, 36.dp)) {
+    color = backgroundColor,
+    shape = CircleShape,
+    border = BorderStroke(2.dp, borderColor),
+    modifier = modifier.size(36.dp, 36.dp)
+  ) {
     Image(
-        imageVector = icon,
-        colorFilter = ColorFilter.tint(iconColor),
-        modifier =
-            Modifier.padding(4.dp).selectable(selected = selectState.value) {
-              selectState.value = !selectState.value
-              onClick(selectState.value)
-            },
-        contentDescription = null // toggleable at higher level
-        )
+      imageVector = icon,
+      colorFilter = ColorFilter.tint(iconColor),
+      modifier =
+        Modifier.padding(4.dp).selectable(selected = selectState.value) {
+          selectState.value = !selectState.value
+          onClick(selectState.value)
+        },
+      contentDescription = null // toggleable at higher level
+    )
   }
 }
 

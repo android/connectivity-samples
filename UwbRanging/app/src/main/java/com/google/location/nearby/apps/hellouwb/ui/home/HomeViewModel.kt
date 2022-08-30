@@ -7,7 +7,11 @@ import androidx.lifecycle.viewModelScope
 import com.google.location.nearby.apps.hellouwb.data.UwbRangingControlSource
 import com.google.location.nearby.apps.uwbranging.EndpointEvents
 import com.google.location.nearby.apps.uwbranging.UwbEndpoint
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.update
 
 class HomeViewModel(uwbRangingControlSource: UwbRangingControlSource) : ViewModel() {
 
@@ -20,9 +24,10 @@ class HomeViewModel(uwbRangingControlSource: UwbRangingControlSource) : ViewMode
 
   private fun updateUiState(): HomeUiState {
     return HomeUiStateImpl(
-      endpoints.mapNotNull { endpoint ->
-        endpointPositions[endpoint]?.let { position -> ConnectedEndpoint(endpoint, position) }
-      }
+      endpoints
+        .mapNotNull { endpoint ->
+          endpointPositions[endpoint]?.let { position -> ConnectedEndpoint(endpoint, position) }
+        }
         .toList(),
       endpoints.filter { !endpointPositions.containsKey(it) }.toList(),
       isRanging
@@ -52,7 +57,7 @@ class HomeViewModel(uwbRangingControlSource: UwbRangingControlSource) : ViewMode
     uwbRangingControlSource.isRunning
       .onEach { running ->
         isRanging = running
-        if(!running) {
+        if (!running) {
           endpoints.clear()
           endpointPositions.clear()
         }
@@ -64,11 +69,13 @@ class HomeViewModel(uwbRangingControlSource: UwbRangingControlSource) : ViewMode
   private data class HomeUiStateImpl(
     override val connectedEndpoints: List<ConnectedEndpoint>,
     override val disconnectedEndpoints: List<UwbEndpoint>,
-    override val isRanging: Boolean
+    override val isRanging: Boolean,
   ) : HomeUiState
 
   companion object {
-    fun provideFactory(uwbRangingControlSource: UwbRangingControlSource): ViewModelProvider.Factory =
+    fun provideFactory(
+      uwbRangingControlSource: UwbRangingControlSource
+    ): ViewModelProvider.Factory =
       object : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>): T {

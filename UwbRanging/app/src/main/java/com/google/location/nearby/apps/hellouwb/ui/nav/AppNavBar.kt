@@ -3,7 +3,13 @@ package com.google.location.nearby.apps.hellouwb.ui.nav
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.*
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FabPosition
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -19,44 +25,47 @@ import com.google.location.nearby.apps.hellouwb.ui.Screen
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppNavBar(
-    appContainer: AppContainer,
-    isRanging: Boolean,
-    startRanging: () -> Unit,
-    stopRanging: () -> Unit
+  appContainer: AppContainer,
+  isRanging: Boolean,
+  startRanging: () -> Unit,
+  stopRanging: () -> Unit,
 ) {
   val navController = rememberNavController()
   val rangingState = remember { mutableStateOf(isRanging) }
   Scaffold(
-      bottomBar = {
-        NavigationBar {
-          val navBackStackEntry by navController.currentBackStackEntryAsState()
-          val currentDestination = navBackStackEntry?.destination
-          items.forEach { screen ->
-            NavigationBarItem(
-                icon = { Image(imageVector = screen.icon, contentDescription = null) },
-                label = { Text(screen.title) },
-                selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true,
-                onClick = { AppNavigation(navController).navTo(screen.route) })
+    bottomBar = {
+      NavigationBar {
+        val navBackStackEntry by navController.currentBackStackEntryAsState()
+        val currentDestination = navBackStackEntry?.destination
+        items.forEach { screen ->
+          NavigationBarItem(
+            icon = { Image(imageVector = screen.icon, contentDescription = null) },
+            label = { Text(screen.title) },
+            selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true,
+            onClick = { AppNavigation(navController).navTo(screen.route) }
+          )
+        }
+      }
+    },
+    floatingActionButtonPosition = FabPosition.End,
+    floatingActionButton = {
+      FloatingActionButton(shape = CircleShape, onClick = {}, contentColor = White) {
+        RangingControlIcon(selected = rangingState.value) {
+          rangingState.value = it
+          if (it) {
+            startRanging()
+          } else {
+            stopRanging()
           }
         }
-      },
-      floatingActionButtonPosition = FabPosition.End,
-      floatingActionButton = {
-        FloatingActionButton(shape = CircleShape, onClick = {}, contentColor = White) {
-          RangingControlIcon(selected = rangingState.value) {
-            rangingState.value = it
-            if (it) {
-              startRanging()
-            } else {
-              stopRanging()
-            }
-          }
-        }
-      }) { innerPadding ->
+      }
+    }
+  ) { innerPadding ->
     AppNavGraph(
-        appContainer = appContainer,
-        modifier = Modifier.padding(innerPadding),
-        navController = navController)
+      appContainer = appContainer,
+      modifier = Modifier.padding(innerPadding),
+      navController = navController
+    )
   }
 }
 

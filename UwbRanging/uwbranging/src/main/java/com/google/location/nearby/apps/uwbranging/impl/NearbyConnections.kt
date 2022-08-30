@@ -20,71 +20,70 @@ private const val CONNECTION_NAME = "hellouwb"
  * @param connectionsClient a Nearby Connections client. Exposed for unit testing.
  */
 internal class NearbyConnections(
-    context: Context,
-    private val dispatcher: CoroutineDispatcher,
-    private val connectionsClient: ConnectionsClient = Nearby.getConnectionsClient(context)
+  context: Context,
+  private val dispatcher: CoroutineDispatcher,
+  private val connectionsClient: ConnectionsClient = Nearby.getConnectionsClient(context),
 ) {
 
   private val coroutineScope =
-      CoroutineScope(
-          dispatcher +
-              Job() +
-              CoroutineExceptionHandler { _, e ->
-                Log.e("NearbyConnections", "Connection Error", e)
-              })
+    CoroutineScope(
+      dispatcher +
+        Job() +
+        CoroutineExceptionHandler { _, e -> Log.e("NearbyConnections", "Connection Error", e) }
+    )
 
   // Book keeping of active endpoints.
   private val endpoints = mutableSetOf<String>()
 
   // Connection-phase Callbacks used by both controller and controlee
   private val connectionLifecycleCallback =
-      object : ConnectionLifecycleCallback() {
-        override fun onConnectionInitiated(endpointId: String, connectionInfo: ConnectionInfo) {
-          coroutineScope.launch {
-            connectionsClient.acceptConnection(endpointId, payloadCallback).await()
-          }
-        }
-
-        override fun onConnectionResult(endpointId: String, result: ConnectionResolution) {
-          if (result.status.statusCode == ConnectionsStatusCodes.STATUS_OK) {
-            endpoints.add(endpointId)
-            dispatchEvent(NearbyEvent.EndpointConnected(endpointId))
-          }
-        }
-
-        override fun onDisconnected(endpointId: String) {
-          if (endpoints.remove(endpointId)) {
-            dispatchEvent(NearbyEvent.EndpointLost(endpointId))
-          }
+    object : ConnectionLifecycleCallback() {
+      override fun onConnectionInitiated(endpointId: String, connectionInfo: ConnectionInfo) {
+        coroutineScope.launch {
+          connectionsClient.acceptConnection(endpointId, payloadCallback).await()
         }
       }
+
+      override fun onConnectionResult(endpointId: String, result: ConnectionResolution) {
+        if (result.status.statusCode == ConnectionsStatusCodes.STATUS_OK) {
+          endpoints.add(endpointId)
+          dispatchEvent(NearbyEvent.EndpointConnected(endpointId))
+        }
+      }
+
+      override fun onDisconnected(endpointId: String) {
+        if (endpoints.remove(endpointId)) {
+          dispatchEvent(NearbyEvent.EndpointLost(endpointId))
+        }
+      }
+    }
 
   private val payloadCallback =
-      object : PayloadCallback() {
-        override fun onPayloadReceived(endpointId: String, payload: Payload) {
-          val bytes = payload.asBytes() ?: return
-          dispatchEvent(NearbyEvent.PayloadReceived(endpointId, bytes))
-        }
-
-        override fun onPayloadTransferUpdate(endpointId: String, update: PayloadTransferUpdate) {}
+    object : PayloadCallback() {
+      override fun onPayloadReceived(endpointId: String, payload: Payload) {
+        val bytes = payload.asBytes() ?: return
+        dispatchEvent(NearbyEvent.PayloadReceived(endpointId, bytes))
       }
+
+      override fun onPayloadTransferUpdate(endpointId: String, update: PayloadTransferUpdate) {}
+    }
 
   private val endpointDiscoveryCallback =
-      object : EndpointDiscoveryCallback() {
-        override fun onEndpointFound(endpointId: String, info: DiscoveredEndpointInfo) {
-          CoroutineScope(dispatcher).launch {
-            connectionsClient
-                .requestConnection(CONNECTION_NAME, endpointId, connectionLifecycleCallback)
-                .await()
-          }
-        }
-
-        override fun onEndpointLost(endpointId: String) {
-          if (endpoints.remove(endpointId)) {
-            dispatchEvent(NearbyEvent.EndpointLost(endpointId))
-          }
+    object : EndpointDiscoveryCallback() {
+      override fun onEndpointFound(endpointId: String, info: DiscoveredEndpointInfo) {
+        CoroutineScope(dispatcher).launch {
+          connectionsClient
+            .requestConnection(CONNECTION_NAME, endpointId, connectionLifecycleCallback)
+            .await()
         }
       }
+
+      override fun onEndpointLost(endpointId: String) {
+        if (endpoints.remove(endpointId)) {
+          dispatchEvent(NearbyEvent.EndpointLost(endpointId))
+        }
+      }
+    }
 
   fun sendPayload(endpointId: String, bytes: ByteArray) {
     coroutineScope.launch {
@@ -102,11 +101,12 @@ internal class NearbyConnections(
     dispatchEvent = { trySend(it) }
     coroutineScope.launch {
       connectionsClient
-          .startDiscovery(
-              CONNECTION_SERVICE_ID,
-              endpointDiscoveryCallback,
-              DiscoveryOptions.Builder().setStrategy(Strategy.P2P_CLUSTER).build())
-          .await()
+        .startDiscovery(
+          CONNECTION_SERVICE_ID,
+          endpointDiscoveryCallback,
+          DiscoveryOptions.Builder().setStrategy(Strategy.P2P_CLUSTER).build()
+        )
+        .await()
     }
     awaitClose {
       disconnectAll()
@@ -122,12 +122,13 @@ internal class NearbyConnections(
     dispatchEvent = { trySend(it) }
     coroutineScope.launch {
       connectionsClient
-          .startAdvertising(
-              CONNECTION_NAME,
-              CONNECTION_SERVICE_ID,
-              connectionLifecycleCallback,
-              AdvertisingOptions.Builder().setStrategy(Strategy.P2P_CLUSTER).build())
-          .await()
+        .startAdvertising(
+          CONNECTION_NAME,
+          CONNECTION_SERVICE_ID,
+          connectionLifecycleCallback,
+          AdvertisingOptions.Builder().setStrategy(Strategy.P2P_CLUSTER).build()
+        )
+        .await()
     }
     awaitClose {
       disconnectAll()
@@ -154,5 +155,5 @@ abstract class NearbyEvent private constructor() {
 
   /** An event that notifies a UWB device is lost. */
   data class PayloadReceived(override val endpointId: String, val payload: ByteArray) :
-      NearbyEvent()
+    NearbyEvent()
 }

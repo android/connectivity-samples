@@ -8,27 +8,32 @@ import androidx.datastore.dataStore
 import com.google.protobuf.InvalidProtocolBufferException
 import java.io.InputStream
 import java.io.OutputStream
-import java.util.*
+import java.util.UUID
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.shareIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 internal class SettingsStoreImpl(
-    private val context: Context,
-    private val coroutineScope: CoroutineScope
+  private val context: Context,
+  private val coroutineScope: CoroutineScope,
 ) : SettingsStore {
 
   private val Context.settingsDataStore: DataStore<AppSettings> by
-      dataStore(fileName = STORE_FILE_NAME, serializer = SettingsSerializer)
+    dataStore(fileName = STORE_FILE_NAME, serializer = SettingsSerializer)
 
-  private val _appSettings = MutableStateFlow(SettingsSerializer.defaultValue)
-
-  override val appSettings = _appSettings.asStateFlow()
+  override val appSettings: StateFlow<AppSettings> =
+    MutableStateFlow(SettingsSerializer.defaultValue)
 
   init {
+
     context.settingsDataStore.data
-        .onEach { appSettings -> _appSettings.update { appSettings } }
-        .shareIn(coroutineScope, SharingStarted.Eagerly)
+      .onEach { settings -> (appSettings as MutableStateFlow<AppSettings>).update { settings } }
+      .shareIn(coroutineScope, SharingStarted.Eagerly)
   }
 
   override fun updateDeviceType(deviceType: DeviceType) {
@@ -52,11 +57,11 @@ internal class SettingsStoreImpl(
 
     private object SettingsSerializer : Serializer<AppSettings> {
       override val defaultValue: AppSettings =
-          AppSettings.newBuilder()
-              .setDeviceType(DeviceType.CONTROLLER)
-              .setDeviceDisplayName("UWB")
-              .setDeviceUuid(UUID.randomUUID().toString())
-              .build()
+        AppSettings.newBuilder()
+          .setDeviceType(DeviceType.CONTROLLER)
+          .setDeviceDisplayName("UWB")
+          .setDeviceUuid(UUID.randomUUID().toString())
+          .build()
 
       override suspend fun readFrom(input: InputStream): AppSettings {
         try {

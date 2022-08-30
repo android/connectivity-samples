@@ -12,7 +12,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 @OptIn(ExperimentalCoroutinesApi::class)
 internal class UwbConnectionManagerImpl(
   private val context: Context,
-  private val dispatcher: CoroutineDispatcher = Dispatchers.IO.limitedParallelism(1)
+  private val dispatcher: CoroutineDispatcher = Dispatchers.IO.limitedParallelism(1),
 ) : UwbConnectionManager {
 
   private val uwbManager = UwbManager.createInstance(context)

@@ -1,6 +1,10 @@
 package com.google.location.nearby.apps.uwbranging.impl
 
-import androidx.core.uwb.*
+import androidx.core.uwb.RangingParameters
+import androidx.core.uwb.UwbAddress
+import androidx.core.uwb.UwbClientSessionScope
+import androidx.core.uwb.UwbComplexChannel
+import androidx.core.uwb.UwbControleeSessionScope
 import com.google.common.primitives.Shorts
 import com.google.location.nearby.apps.uwbranging.UwbEndpoint
 import com.google.location.nearby.apps.uwbranging.impl.proto.Control
@@ -40,7 +44,7 @@ internal class NearbyControleeConnector(
 
   override suspend fun processUwbSessionInfo(
     endpointId: String,
-    sessionInfo: Control
+    sessionInfo: Control,
   ): UwbOobEvent.UwbEndpointFound? {
     val configuration =
       if (sessionInfo.connectionInfo.hasConfiguration()) sessionInfo.connectionInfo.configuration

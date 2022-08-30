@@ -18,14 +18,14 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 internal class UwbRangingControlSourceImpl(
-    context: Context,
-    deviceDisplayName: String,
-    private val coroutineScope: CoroutineScope,
-    private val uwbConnectionManager: UwbConnectionManager =
-        UwbConnectionManager.getInstance(context)
+  context: Context,
+  endpointId: String,
+  private val coroutineScope: CoroutineScope,
+  private val uwbConnectionManager: UwbConnectionManager =
+    UwbConnectionManager.getInstance(context),
 ) : UwbRangingControlSource {
 
-  private var uwbEndpoint = UwbEndpoint(deviceDisplayName, SecureRandom.getSeed(8))
+  private var uwbEndpoint = UwbEndpoint(endpointId, SecureRandom.getSeed(8))
 
   private var uwbSessionScope: UwbSessionScope = getSessionScope(DeviceType.CONTROLLER)
 
@@ -35,7 +35,7 @@ internal class UwbRangingControlSourceImpl(
     return when (deviceType) {
       DeviceType.CONTROLEE -> uwbConnectionManager.controleeUwbScope(uwbEndpoint)
       DeviceType.CONTROLLER ->
-          uwbConnectionManager.controllerUwbScope(uwbEndpoint, RangingParameters.UWB_CONFIG_ID_1)
+        uwbConnectionManager.controllerUwbScope(uwbEndpoint, RangingParameters.UWB_CONFIG_ID_1)
       else -> throw IllegalStateException()
     }
   }
@@ -47,24 +47,25 @@ internal class UwbRangingControlSourceImpl(
   }
 
   override var deviceType by
-      Delegates.observable(DeviceType.CONTROLLER) { _, oldValue, newValue ->
-        if (oldValue != newValue) {
-          stop()
-          uwbSessionScope = getSessionScope(newValue)
-        }
+    Delegates.observable(DeviceType.CONTROLLER) { _, oldValue, newValue ->
+      if (oldValue != newValue) {
+        stop()
+        uwbSessionScope = getSessionScope(newValue)
       }
+    }
 
   override fun updateEndpointId(id: String) {
     if (id != uwbEndpoint.id) {
       stop()
       uwbEndpoint = UwbEndpoint(id, SecureRandom.getSeed(8))
+      uwbSessionScope = getSessionScope(deviceType)
     }
   }
 
   override fun start() {
     if (rangingJob == null) {
       rangingJob =
-          coroutineScope.launch { uwbSessionScope.prepareSession().collect { dispatchResult(it) } }
+        coroutineScope.launch { uwbSessionScope.prepareSession().collect { dispatchResult(it) } }
       runningStateFlow.update { true }
     }
   }

@@ -6,8 +6,17 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Divider
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.RadioButton
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
@@ -20,10 +29,10 @@ import com.google.location.nearby.apps.hellouwb.data.DeviceType
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
 fun SettingsScreen(
-    uiState: AppSettings,
-    updateDeviceDisplayName: (String) -> Unit,
-    updateDeviceType: (DeviceType) -> Unit,
-    modifier: Modifier = Modifier,
+  uiState: AppSettings,
+  updateDeviceDisplayName: (String) -> Unit,
+  updateDeviceType: (DeviceType) -> Unit,
+  modifier: Modifier = Modifier,
 ) {
   val focusManager = LocalFocusManager.current
   Column {
@@ -32,16 +41,18 @@ fun SettingsScreen(
         Text("Display Name", color = MaterialTheme.colorScheme.outline)
         var fieldValue by remember { mutableStateOf(uiState.deviceDisplayName) }
         OutlinedTextField(
-            fieldValue,
-            onValueChange = { fieldValue = it },
-            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-            keyboardActions =
-                KeyboardActions(
-                    onDone = {
-                      updateDeviceDisplayName(fieldValue)
-                      focusManager.clearFocus(true)
-                    }),
-            singleLine = true)
+          fieldValue,
+          onValueChange = { fieldValue = it },
+          keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+          keyboardActions =
+            KeyboardActions(
+              onDone = {
+                updateDeviceDisplayName(fieldValue)
+                focusManager.clearFocus(true)
+              }
+            ),
+          singleLine = true
+        )
       }
     }
     Divider(thickness = 2.dp)
@@ -52,21 +63,22 @@ fun SettingsScreen(
           val selectedValue = remember { mutableStateOf(uiState.deviceType) }
           Column(Modifier.width(100.dp)) {
             RadioButton(
-                selected = selectedValue.value == DeviceType.CONTROLLER,
-                onClick = {
-                  updateDeviceType(DeviceType.CONTROLLER)
-                  selectedValue.value = DeviceType.CONTROLLER
-                },
+              selected = selectedValue.value == DeviceType.CONTROLLER,
+              onClick = {
+                updateDeviceType(DeviceType.CONTROLLER)
+                selectedValue.value = DeviceType.CONTROLLER
+              },
             )
             Text("Controller")
           }
           Column(Modifier.width(100.dp)) {
             RadioButton(
-                selected = selectedValue.value == DeviceType.CONTROLEE,
-                onClick = {
-                  updateDeviceType(DeviceType.CONTROLEE)
-                  selectedValue.value = DeviceType.CONTROLEE
-                })
+              selected = selectedValue.value == DeviceType.CONTROLEE,
+              onClick = {
+                updateDeviceType(DeviceType.CONTROLEE)
+                selectedValue.value = DeviceType.CONTROLEE
+              }
+            )
             Text("Controlee")
           }
         }
@@ -79,10 +91,11 @@ fun SettingsScreen(
 @Composable
 fun PreviewSettingsScreen() {
   SettingsScreen(
-      AppSettings.newBuilder()
-          .setDeviceDisplayName("qazasx")
-          .setDeviceType(DeviceType.CONTROLEE)
-          .build(),
-      {},
-      {})
+    AppSettings.newBuilder()
+      .setDeviceDisplayName("qazasx")
+      .setDeviceType(DeviceType.CONTROLEE)
+      .build(),
+    {},
+    {}
+  )
 }

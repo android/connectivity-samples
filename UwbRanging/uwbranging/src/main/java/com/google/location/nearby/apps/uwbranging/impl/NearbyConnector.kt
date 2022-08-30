@@ -51,7 +51,7 @@ internal abstract class NearbyConnector(protected val connections: NearbyConnect
 
   protected abstract suspend fun processUwbSessionInfo(
     endpointId: String,
-    sessionInfo: Control
+    sessionInfo: Control,
   ): UwbOobEvent.UwbEndpointFound?
 
   private fun processEndpointLost(event: NearbyEvent.EndpointLost): UwbOobEvent? {

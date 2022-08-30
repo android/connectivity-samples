@@ -20,7 +20,7 @@ fun AppNavGraph(
   appContainer: AppContainer,
   modifier: Modifier = Modifier,
   navController: NavHostController = rememberNavController(),
-  startDestination: String = AppDestination.HOME_ROUTE
+  startDestination: String = AppDestination.HOME_ROUTE,
 ) {
   NavHost(navController = navController, startDestination = startDestination, modifier = modifier) {
     composable(AppDestination.HOME_ROUTE) {
@@ -32,7 +32,14 @@ fun AppNavGraph(
     composable(AppDestination.SEND_ROUTE) { SendRoute() }
     composable(AppDestination.SETTINGS_ROUTE) {
       val settingsViewModel: SettingsViewModel =
-        viewModel(factory = SettingsViewModel.provideFactory(appContainer.rangingResultSource, appContainer.settingsStore))
-      SettingsRoute(settingsViewModel) }
+        viewModel(
+          factory =
+            SettingsViewModel.provideFactory(
+              appContainer.rangingResultSource,
+              appContainer.settingsStore
+            )
+        )
+      SettingsRoute(settingsViewModel)
+    }
   }
 }

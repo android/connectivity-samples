@@ -7,7 +7,12 @@ import androidx.core.uwb.UwbControleeSessionScope
 import com.google.common.primitives.Shorts
 import com.google.common.truth.Truth.assertThat
 import com.google.location.nearby.apps.uwbranging.UwbEndpoint
-import com.google.location.nearby.apps.uwbranging.impl.proto.*
+import com.google.location.nearby.apps.uwbranging.impl.proto.Control
+import com.google.location.nearby.apps.uwbranging.impl.proto.Data
+import com.google.location.nearby.apps.uwbranging.impl.proto.Oob
+import com.google.location.nearby.apps.uwbranging.impl.proto.UwbCapabilities
+import com.google.location.nearby.apps.uwbranging.impl.proto.UwbConfiguration
+import com.google.location.nearby.apps.uwbranging.impl.proto.UwbConnectionInfo
 import com.google.protobuf.ByteString
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.awaitClose
@@ -18,7 +23,11 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.kotlin.*
+import org.mockito.kotlin.argumentCaptor
+import org.mockito.kotlin.eq
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 import org.robolectric.RobolectricTestRunner
 
 @OptIn(ExperimentalCoroutinesApi::class)

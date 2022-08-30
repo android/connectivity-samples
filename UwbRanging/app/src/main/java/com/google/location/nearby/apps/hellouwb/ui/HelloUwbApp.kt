@@ -12,13 +12,14 @@ import com.google.location.nearby.apps.hellouwb.ui.theme.HellouwbTheme
 @Composable
 fun HelloUwbApp(appContainer: AppContainer) {
   val rangingViewModel: RangingViewModel =
-      viewModel(factory = RangingViewModel.provideFactory(appContainer.rangingResultSource))
+    viewModel(factory = RangingViewModel.provideFactory(appContainer.rangingResultSource))
   val uiState by rangingViewModel.uiState.collectAsState()
   HellouwbTheme {
     AppNavBar(
-        appContainer = appContainer,
-        isRanging = uiState,
-        startRanging = { rangingViewModel.startRanging() },
-        stopRanging = { rangingViewModel.stopRanging() })
+      appContainer = appContainer,
+      isRanging = uiState,
+      startRanging = { rangingViewModel.startRanging() },
+      stopRanging = { rangingViewModel.stopRanging() }
+    )
   }
 }

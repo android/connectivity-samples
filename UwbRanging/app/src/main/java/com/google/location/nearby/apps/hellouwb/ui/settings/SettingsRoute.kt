@@ -8,7 +8,8 @@ import androidx.compose.runtime.getValue
 fun SettingsRoute(settingsViewModel: SettingsViewModel) {
   val uiState by settingsViewModel.uiState.collectAsState()
   SettingsScreen(
-      uiState = uiState,
-      updateDeviceDisplayName = { settingsViewModel.updateDeviceDisplayName(it) },
-      updateDeviceType = { settingsViewModel.updateDeviceType(it) })
+    uiState = uiState,
+    updateDeviceDisplayName = { settingsViewModel.updateDeviceDisplayName(it) },
+    updateDeviceType = { settingsViewModel.updateDeviceType(it) }
+  )
 }

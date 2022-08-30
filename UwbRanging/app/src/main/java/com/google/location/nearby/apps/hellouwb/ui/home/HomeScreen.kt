@@ -3,11 +3,24 @@ package com.google.location.nearby.apps.hellouwb.ui.home
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.NearMe
 import androidx.compose.material.icons.filled.NearMeDisabled
-import androidx.compose.material3.*
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.TopAppBarScrollBehavior
+import androidx.compose.material3.TopAppBarState
+import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -64,7 +77,7 @@ fun HomeTopAppBar(
   modifier: Modifier = Modifier,
   topAppBarState: TopAppBarState = rememberTopAppBarState(),
   scrollBehavior: TopAppBarScrollBehavior? =
-    TopAppBarDefaults.enterAlwaysScrollBehavior(topAppBarState)
+    TopAppBarDefaults.enterAlwaysScrollBehavior(topAppBarState),
 ) {
   CenterAlignedTopAppBar(
     title = { Text("Hello UWB") },
@@ -138,7 +151,7 @@ private fun DrawScope.drawPosition(
   azimuth: Float,
   scale: Float,
   centerOffset: Offset,
-  color: Color
+  color: Color,
 ) {
   val angle = azimuth * PI / 180
   val x = distance * sin(angle).toFloat()
@@ -154,7 +167,7 @@ private fun DrawScope.drawPosition(
 fun ConnectStatusBar(
   connectedEndpoints: List<UwbEndpoint>,
   disconnectedEndpoints: List<UwbEndpoint>,
-  modifier: Modifier = Modifier
+  modifier: Modifier = Modifier,
 ) {
   Box(modifier.height(50.dp)) {
     Column {
