@@ -6,34 +6,37 @@ import com.google.location.nearby.apps.uwbranging.EndpointEvents
 import com.google.location.nearby.apps.uwbranging.UwbConnectionManager
 import com.google.location.nearby.apps.uwbranging.UwbEndpoint
 import com.google.location.nearby.apps.uwbranging.UwbSessionScope
-import kotlinx.coroutines.*
+import java.security.SecureRandom
+import kotlin.properties.Delegates
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.update
-import java.security.SecureRandom
-import java.util.*
-import kotlin.properties.Delegates
+import kotlinx.coroutines.launch
 
-class UwbRangingResultSourceImpl(
-  context: Context,
-  private val uwbConnectionManager: UwbConnectionManager = UwbConnectionManager.getInstance(context)
-) : UwbRangingResultSource {
+internal class UwbRangingControlSourceImpl(
+    context: Context,
+    deviceDisplayName: String,
+    private val coroutineScope: CoroutineScope,
+    private val uwbConnectionManager: UwbConnectionManager =
+        UwbConnectionManager.getInstance(context)
+) : UwbRangingControlSource {
 
-  private val uwbEndpoint = UwbEndpoint(UUID.randomUUID().toString(), SecureRandom.getSeed(8))
+  private var uwbEndpoint = UwbEndpoint(deviceDisplayName, SecureRandom.getSeed(8))
 
   private var uwbSessionScope: UwbSessionScope = getSessionScope(DeviceType.CONTROLLER)
 
-  private var flowLaunchingJob: Job? = null
-
-  private val coroutineScope = CoroutineScope(Dispatchers.IO + Job())
+  private var rangingJob: Job? = null
 
   private fun getSessionScope(deviceType: DeviceType): UwbSessionScope {
     return when (deviceType) {
       DeviceType.CONTROLEE -> uwbConnectionManager.controleeUwbScope(uwbEndpoint)
       DeviceType.CONTROLLER ->
-        uwbConnectionManager.controllerUwbScope(uwbEndpoint, RangingParameters.UWB_CONFIG_ID_1)
+          uwbConnectionManager.controllerUwbScope(uwbEndpoint, RangingParameters.UWB_CONFIG_ID_1)
+      else -> throw IllegalStateException()
     }
   }
 
@@ -44,30 +47,33 @@ class UwbRangingResultSourceImpl(
   }
 
   override var deviceType by
-    Delegates.observable(DeviceType.CONTROLLER) { _, oldValue, newValue ->
-      if (oldValue != newValue) {
-        stop()
-        uwbSessionScope = getSessionScope(newValue)
+      Delegates.observable(DeviceType.CONTROLLER) { _, oldValue, newValue ->
+        if (oldValue != newValue) {
+          stop()
+          uwbSessionScope = getSessionScope(newValue)
+        }
       }
+
+  override fun updateEndpointId(id: String) {
+    if (id != uwbEndpoint.id) {
+      stop()
+      uwbEndpoint = UwbEndpoint(id, SecureRandom.getSeed(8))
     }
+  }
 
   override fun start() {
-    if (flowLaunchingJob == null) {
-      flowLaunchingJob =
-        coroutineScope.launch { uwbSessionScope.prepareSession().collect { dispatchResult(it) } }
+    if (rangingJob == null) {
+      rangingJob =
+          coroutineScope.launch { uwbSessionScope.prepareSession().collect { dispatchResult(it) } }
       runningStateFlow.update { true }
     }
   }
 
   override fun stop() {
-    val job = flowLaunchingJob ?: return
+    val job = rangingJob ?: return
     job.cancel()
-    flowLaunchingJob = null
+    rangingJob = null
     runningStateFlow.update { false }
-  }
-
-  override fun cancel() {
-    coroutineScope.cancel()
   }
 
   private val runningStateFlow = MutableStateFlow(false)

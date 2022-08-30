@@ -1,4 +1,4 @@
-package com.google.location.nearby.apps.hellouwb.ui
+package com.google.location.nearby.apps.hellouwb.ui.nav
 
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController

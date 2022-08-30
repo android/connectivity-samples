@@ -2,7 +2,9 @@ package com.google.location.nearby.apps.hellouwb
 
 import android.app.Application
 import com.google.location.nearby.apps.hellouwb.data.AppContainerImpl
-import com.google.location.nearby.apps.hellouwb.data.UwbRangingResultSource
+import com.google.location.nearby.apps.hellouwb.data.SettingsStore
+import com.google.location.nearby.apps.hellouwb.data.UwbRangingControlSource
+import kotlinx.coroutines.flow.launchIn
 
 class HelloUwbApplication : Application() {
 
@@ -15,5 +17,7 @@ class HelloUwbApplication : Application() {
 }
 
 interface AppContainer {
-  val rangingResultSource: UwbRangingResultSource
+  val rangingResultSource: UwbRangingControlSource
+  val settingsStore: SettingsStore
+  fun destroy()
 }

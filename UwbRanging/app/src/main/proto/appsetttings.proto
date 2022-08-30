@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+option java_package = "com.google.location.nearby.apps.hellouwb.data";
+option java_multiple_files = true;
+
+enum DeviceType {
+  CONTROLLER = 0;
+  CONTROLEE = 1;
+}
+
+message AppSettings {
+  DeviceType device_type = 1;
+  string device_display_name = 2;
+  string device_uuid = 3;
+}

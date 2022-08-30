@@ -163,7 +163,7 @@ fun ConnectStatusBar(
         connectedEndpoints.forEachIndexed { index, endpoint ->
           Text(
             modifier = Modifier.width(100.dp),
-            text = endpoint.id,
+            text = endpoint.id.split("|")[0],
             color = ENDPOINT_COLORS[index % ENDPOINT_COLORS.size]
           )
         }

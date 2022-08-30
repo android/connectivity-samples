@@ -1,4 +1,4 @@
-package com.google.location.nearby.apps.hellouwb.ui
+package com.google.location.nearby.apps.hellouwb.ui.nav
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -13,6 +13,7 @@ import com.google.location.nearby.apps.hellouwb.ui.home.HomeRoute
 import com.google.location.nearby.apps.hellouwb.ui.home.HomeViewModel
 import com.google.location.nearby.apps.hellouwb.ui.send.SendRoute
 import com.google.location.nearby.apps.hellouwb.ui.settings.SettingsRoute
+import com.google.location.nearby.apps.hellouwb.ui.settings.SettingsViewModel
 
 @Composable
 fun AppNavGraph(
@@ -29,6 +30,9 @@ fun AppNavGraph(
     }
     composable(AppDestination.CONTROL_ROUTE) { ControlRoute() }
     composable(AppDestination.SEND_ROUTE) { SendRoute() }
-    composable(AppDestination.SETTINGS_ROUTE) { SettingsRoute() }
+    composable(AppDestination.SETTINGS_ROUTE) {
+      val settingsViewModel: SettingsViewModel =
+        viewModel(factory = SettingsViewModel.provideFactory(appContainer.rangingResultSource, appContainer.settingsStore))
+      SettingsRoute(settingsViewModel) }
   }
 }

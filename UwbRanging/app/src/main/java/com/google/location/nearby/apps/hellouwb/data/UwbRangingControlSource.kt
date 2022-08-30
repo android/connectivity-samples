@@ -4,23 +4,17 @@ import com.google.location.nearby.apps.uwbranging.EndpointEvents
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 
-interface UwbRangingResultSource {
+interface UwbRangingControlSource {
 
   fun observeRangingResults(): Flow<EndpointEvents>
 
   var deviceType: DeviceType
 
+  fun updateEndpointId(id: String)
+
   fun start()
 
   fun stop()
 
-  /** Call this when app is destroyed. */
-  fun cancel()
-
   val isRunning: StateFlow<Boolean>
-}
-
-enum class DeviceType {
-  CONTROLLER,
-  CONTROLEE
 }

@@ -4,12 +4,12 @@ import androidx.core.uwb.RangingPosition
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.google.location.nearby.apps.hellouwb.data.UwbRangingResultSource
+import com.google.location.nearby.apps.hellouwb.data.UwbRangingControlSource
 import com.google.location.nearby.apps.uwbranging.EndpointEvents
 import com.google.location.nearby.apps.uwbranging.UwbEndpoint
 import kotlinx.coroutines.flow.*
 
-class HomeViewModel(uwbRangingResultSource: UwbRangingResultSource) : ViewModel() {
+class HomeViewModel(uwbRangingControlSource: UwbRangingControlSource) : ViewModel() {
 
   private val _uiState: MutableStateFlow<HomeUiState> =
     MutableStateFlow(HomeUiStateImpl(listOf(), listOf(), false))
@@ -20,11 +20,9 @@ class HomeViewModel(uwbRangingResultSource: UwbRangingResultSource) : ViewModel(
 
   private fun updateUiState(): HomeUiState {
     return HomeUiStateImpl(
-      endpoints
-        .map { endpoint ->
-          endpointPositions[endpoint]?.let { position -> ConnectedEndpoint(endpoint, position) }
-        }
-        .filterNotNull()
+      endpoints.mapNotNull { endpoint ->
+        endpointPositions[endpoint]?.let { position -> ConnectedEndpoint(endpoint, position) }
+      }
         .toList(),
       endpoints.filter { !endpointPositions.containsKey(it) }.toList(),
       isRanging
@@ -34,14 +32,16 @@ class HomeViewModel(uwbRangingResultSource: UwbRangingResultSource) : ViewModel(
   val uiState = _uiState.asStateFlow()
 
   init {
-    uwbRangingResultSource
+    uwbRangingControlSource
       .observeRangingResults()
       .onEach { result ->
         when (result) {
+          is EndpointEvents.EndpointFound -> endpoints.add(result.endpoint)
           is EndpointEvents.UwbDisconnected -> endpointPositions.remove(result.endpoint)
           is EndpointEvents.PositionUpdated -> endpointPositions[result.endpoint] = result.position
           is EndpointEvents.EndpointLost -> {
             endpoints.remove(result.endpoint)
+
             endpointPositions.remove(result.endpoint)
           }
           else -> return@onEach
@@ -49,10 +49,14 @@ class HomeViewModel(uwbRangingResultSource: UwbRangingResultSource) : ViewModel(
         _uiState.update { updateUiState() }
       }
       .launchIn(viewModelScope)
-    uwbRangingResultSource.isRunning
+    uwbRangingControlSource.isRunning
       .onEach { running ->
         isRanging = running
-        _uiState.update { _uiState.value }
+        if(!running) {
+          endpoints.clear()
+          endpointPositions.clear()
+        }
+        _uiState.update { updateUiState() }
       }
       .launchIn(viewModelScope)
   }
@@ -64,11 +68,11 @@ class HomeViewModel(uwbRangingResultSource: UwbRangingResultSource) : ViewModel(
   ) : HomeUiState
 
   companion object {
-    fun provideFactory(uwbRangingResultSource: UwbRangingResultSource): ViewModelProvider.Factory =
+    fun provideFactory(uwbRangingControlSource: UwbRangingControlSource): ViewModelProvider.Factory =
       object : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
-          return HomeViewModel(uwbRangingResultSource) as T
+          return HomeViewModel(uwbRangingControlSource) as T
         }
       }
   }

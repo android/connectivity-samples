@@ -15,8 +15,8 @@ import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.launch
 
 internal class UwbSessionScopeImpl(
-  private val localEndpoint: UwbEndpoint,
-  private val connector: NearbyConnector
+    private val localEndpoint: UwbEndpoint,
+    private val connector: NearbyConnector
 ) : UwbSessionScope {
 
   private val localAddresses = mutableSetOf<UwbAddress>()
@@ -35,11 +35,14 @@ internal class UwbSessionScopeImpl(
           }
           is UwbOobEvent.UwbEndpointLost -> processEndpointLost(event.endpoint)
           is UwbOobEvent.MessageReceived ->
-            trySend(EndpointEvents.EndpointMessage(event.endpoint, event.message))
+              trySend(EndpointEvents.EndpointMessage(event.endpoint, event.message))
         }
       }
     }
-    awaitClose { job.cancel() }
+    awaitClose {
+      job.cancel()
+      remoteDeviceMap.clear()
+    }
   }
 
   override fun sendMessage(endpoint: UwbEndpoint, message: ByteArray) {
@@ -52,32 +55,31 @@ internal class UwbSessionScopeImpl(
   }
 
   private fun ProducerScope<EndpointEvents>.processEndpointFound(
-    event: UwbOobEvent.UwbEndpointFound
+      event: UwbOobEvent.UwbEndpointFound
   ): Flow<RangingResult> {
     remoteDeviceMap[event.endpointAddress] = event.endpoint
     localAddresses.add(event.sessionScope.localAddress)
     val rangingParameters =
-      RangingParameters(
-        event.configId,
-        event.sessionId,
-        event.sessionKeyInfo,
-        event.complexChannel,
-        listOf(UwbDevice(event.endpointAddress)),
-        RangingParameters.RANGING_UPDATE_RATE_FREQUENT
-      )
+        RangingParameters(
+            event.configId,
+            event.sessionId,
+            event.sessionKeyInfo,
+            event.complexChannel,
+            listOf(UwbDevice(event.endpointAddress)),
+            RangingParameters.RANGING_UPDATE_RATE_FREQUENT)
     trySend(EndpointEvents.EndpointFound(event.endpoint))
     return event.sessionScope.prepareSession(rangingParameters)
   }
 
   private fun ProducerScope<EndpointEvents>.sendResult(result: RangingResult) {
     val endpoint =
-      if (localAddresses.contains(result.device.address)) localEndpoint
-      else remoteDeviceMap[result.device.address] ?: return
+        if (localAddresses.contains(result.device.address)) localEndpoint
+        else remoteDeviceMap[result.device.address] ?: return
     when (result) {
       is RangingResult.RangingResultPosition ->
-        trySend(EndpointEvents.PositionUpdated(endpoint, result.position))
+          trySend(EndpointEvents.PositionUpdated(endpoint, result.position))
       is RangingResult.RangingResultPeerDisconnected ->
-        trySend(EndpointEvents.UwbDisconnected(endpoint))
+          trySend(EndpointEvents.UwbDisconnected(endpoint))
     }
   }
 }
