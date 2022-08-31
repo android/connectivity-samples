@@ -71,7 +71,10 @@ internal class NearbyConnections(
   private val endpointDiscoveryCallback =
     object : EndpointDiscoveryCallback() {
       override fun onEndpointFound(endpointId: String, info: DiscoveredEndpointInfo) {
-        CoroutineScope(dispatcher).launch {
+        if (endpoints.contains(endpointId)) {
+          return
+        }
+        coroutineScope.launch {
           connectionsClient
             .requestConnection(CONNECTION_NAME, endpointId, connectionLifecycleCallback)
             .await()
