@@ -1,12 +1,16 @@
 package com.google.location.nearby.apps.hellouwb.ui
 
 import android.Manifest
+import android.app.Application
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import com.google.location.nearby.apps.hellouwb.HelloUwbApplication
+
 
 private const val PERMISSION_REQUEST_CODE = 1234
 
@@ -17,6 +21,21 @@ class MainActivity : ComponentActivity() {
     requestPermissions()
     (application as HelloUwbApplication).initContainer {
       runOnUiThread { setContent { HelloUwbApp((application as HelloUwbApplication).container) } }
+    }
+
+    /**
+     * Check if device supports Ultra-wideband
+     */
+    val packageManager: PackageManager = applicationContext.packageManager
+    val deviceSupportsUwb = packageManager.hasSystemFeature("android.hardware.uwb")
+
+    if (!deviceSupportsUwb ) {
+      Log.e("UWB Sample", "Device does not support Ultra-wideband")
+      Toast.makeText(applicationContext, "Device does not support UWB", Toast.LENGTH_SHORT).show()
+      finishAndRemoveTask();
+    }
+    else {
+      Toast.makeText(applicationContext, "Device supports UWB", Toast.LENGTH_SHORT).show()
     }
   }
 
