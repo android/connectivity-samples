@@ -2,6 +2,8 @@ plugins {
     id 'com.android.application'
 }
 
+def crossdeviceVersion = findProperty("crossdeviceVersion") ?: "0.1.0-preview01"
+
 android {
     compileSdk 32
 
@@ -35,6 +37,6 @@ dependencies {
     implementation 'com.google.guava:guava:31.1-android'
 
     // Cross device SDK:
-    implementation 'com.google.ambient.crossdevice:crossdevice:0.1.0-preview01'
+    implementation "com.google.ambient.crossdevice:crossdevice:${crossdeviceVersion}"
 
 }
