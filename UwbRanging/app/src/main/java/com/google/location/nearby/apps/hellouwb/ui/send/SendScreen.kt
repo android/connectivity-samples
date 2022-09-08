@@ -13,11 +13,11 @@ import com.google.location.nearby.apps.hellouwb.ui.control.ControlScreen
 @Composable fun SendScreen(modifier: Modifier = Modifier) {
 
     Column(modifier = Modifier.padding(40.dp)) {
-        Text(text = "Point to share file")
+        Text(text = "Secure data transfer")
         Button(onClick = {
             //your onclick code here
         }) {
-            Text(text = "Share file")
+            Text(text = "Send file")
         }
     }
 }

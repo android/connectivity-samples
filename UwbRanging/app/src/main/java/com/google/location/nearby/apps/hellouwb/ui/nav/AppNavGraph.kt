@@ -9,6 +9,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.google.location.nearby.apps.hellouwb.AppContainer
 import com.google.location.nearby.apps.hellouwb.ui.control.ControlRoute
+import com.google.location.nearby.apps.hellouwb.ui.control.ControlViewModel
 import com.google.location.nearby.apps.hellouwb.ui.home.HomeRoute
 import com.google.location.nearby.apps.hellouwb.ui.home.HomeViewModel
 import com.google.location.nearby.apps.hellouwb.ui.send.SendRoute
@@ -28,7 +29,13 @@ fun AppNavGraph(
         viewModel(factory = HomeViewModel.provideFactory(appContainer.rangingResultSource))
       HomeRoute(homeViewModel = homeViewModel)
     }
-    composable(AppDestination.CONTROL_ROUTE) { ControlRoute() }
+    composable(AppDestination.CONTROL_ROUTE) {
+      val controlViewModel: ControlViewModel =
+        viewModel(factory = ControlViewModel.provideFactory(appContainer.rangingResultSource))
+      //ControlRoute()
+      ControlRoute(controlViewModel = controlViewModel)
+
+    }
     composable(AppDestination.SEND_ROUTE) { SendRoute() }
     composable(AppDestination.SETTINGS_ROUTE) {
       val settingsViewModel: SettingsViewModel =

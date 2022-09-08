@@ -3,8 +3,17 @@ package com.google.location.nearby.apps.hellouwb.ui.control
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.google.location.nearby.apps.hellouwb.data.UwbRangingControlSource
+import com.google.location.nearby.apps.hellouwb.ui.home.ConnectedEndpoint
+import com.google.location.nearby.apps.hellouwb.ui.home.HomeUiState
+import com.google.location.nearby.apps.hellouwb.ui.home.HomeViewModel
+import com.google.location.nearby.apps.uwbranging.UwbEndpoint
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 
 class ControlViewModel(uwbRangingControlSource: UwbRangingControlSource) : ViewModel() {
+
+  private val _uiState: MutableStateFlow<ControlUiState> =
+    MutableStateFlow(ControlUiStateImpl(false))
 
   companion object {
     fun provideFactory(
@@ -17,4 +26,16 @@ class ControlViewModel(uwbRangingControlSource: UwbRangingControlSource) : ViewM
         }
       }
   }
+
+  private data class ControlUiStateImpl(
+    override var isDoorLocked: Boolean,
+  ) : ControlUiState
+
+
+  val uiState = _uiState.asStateFlow()
+
+  interface ControlUiState {
+    var isDoorLocked: Boolean
+  }
+
 }

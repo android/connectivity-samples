@@ -1,47 +1,73 @@
-
 package com.google.location.nearby.apps.hellouwb.ui.control
 
-import android.graphics.Color
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.Button
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.*
+import androidx.compose.material.ExtendedFloatingActionButton
+import androidx.compose.material.Icon
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Lock
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.core.uwb.RangingMeasurement
-import androidx.core.uwb.RangingPosition
-import com.google.location.nearby.apps.hellouwb.ui.home.ConnectedEndpoint
-import com.google.location.nearby.apps.hellouwb.ui.home.HomeScreen
-import com.google.location.nearby.apps.hellouwb.ui.home.HomeUiState
-import com.google.location.nearby.apps.uwbranging.UwbEndpoint
+import com.google.location.nearby.apps.hellouwb.R.drawable
 
-@Composable fun ControlScreen(modifier: Modifier = Modifier) {
 
-    Column(modifier = Modifier.padding(40.dp)) {
-        Text(text = "Switch")
-        Button(onClick = {
-            //your onclick code here
-        }) {
-            Text(text = "  On  ")
-        }
+@Composable
+fun ControlScreen(uiState: ControlViewModel.ControlUiState, modifier: Modifier = Modifier) {
 
-        Button(onClick = {
-            //your onclick code here
-        }) {
-            Text(text = "  Off  ")
-        }
+    var buttonModifier = Modifier
+        .padding(5.dp)
+        .width(150.dp)
+    var locked by remember { mutableStateOf(false) }
+
+    Column(
+        modifier = Modifier
+            .padding(100.dp)
+            .fillMaxWidth()
+            .fillMaxHeight(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+
+        Image(
+            painter = painterResource(drawable.lock_close24px),
+            modifier = Modifier
+                .padding(10.dp)
+                // Set image size to 40 dp
+                .size(200.dp),
+            contentDescription = "",
+        )
+        ExtendedFloatingActionButton(
+            modifier = buttonModifier,
+            icon = {
+                Icon(
+                    Icons.Filled.Lock,
+                    contentDescription = "Lock"
+                )
+            },
+            onClick = {
+                locked = !locked
+                uiState.isDoorLocked = locked
+            },
+            text = { Text(if (locked) "Locked" else "Unlocked") }
+        )
     }
 }
+
 
 @Preview
 @Composable
 fun PreviewControlScreen(modifier: Modifier = Modifier) {
     ControlScreen(
-        modifier = modifier
+        uiState =
+        object : ControlViewModel.ControlUiState {
+            override var isDoorLocked = true
+        }
     )
+
 }
 
 

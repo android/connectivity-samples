@@ -32,6 +32,7 @@ class MainActivity : ComponentActivity() {
     if (!deviceSupportsUwb ) {
       Log.e("UWB Sample", "Device does not support Ultra-wideband")
       Toast.makeText(applicationContext, "Device does not support UWB", Toast.LENGTH_SHORT).show()
+      //TODO: Uncomment this if you want to see it running on a non-supported device
       finishAndRemoveTask();
     }
     else {
