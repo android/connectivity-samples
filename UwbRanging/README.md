@@ -18,28 +18,27 @@ via the Settings screen.
 * A single-activity architecture, using **[Navigation Compose](https://developer.android.com/jetpack/compose/navigation)**.
 * A presentation layer that contains a Compose screen (View) and a **ViewModel** per screen (or feature).
 * Reactive UIs using **[Flow](https://developer.android.com/kotlin/flow)** and **[coroutines](https://kotlinlang.org/docs/coroutines-overview.html)** for asynchronous operations.
-* A **data layer** with a repository and two data sources (local using Room and a fake remote).
 
 
 ## What is it not?
   
-* A UI/Material Design sample. The interface of the app is deliberately kept simple to focus on architecture. Check out the [Compose Samples](https://github.com/android/compose-samples) instead.
+* A UI/Material Design sample. The interface of the app is deliberately kept simple to focus on the UWB use cases. Check out the [Compose Samples](https://github.com/android/compose-samples) instead.
 * A complete Jetpack sample covering all libraries. Check out [Android Sunflower](https://github.com/googlesamples/android-sunflower) or the advanced [GitHub Browser Sample](https://github.com/googlesamples/android-architecture-components/tree/master/GithubBrowserSample) instead.
-* A real production app with network access, user authentication, etc. Check out the [Now in Android app](https://github.com/android/nowinandroid) instead.
+* A real production app with network access, app permissions, user authentication, etc. Check out the [Now in Android app](https://github.com/android/nowinandroid) instead.
 
 ## Who is it for?
 
-*   Intermediate developers and beginners looking for a way to structure their app in a testable and maintainable way.
+*   Intermediate developers looking for a simple way to understand how the UWB Jetpack library can be used.
 *   Advanced developers looking for quick reference.
 
-## Opening a sample in Android Studio
+## Opening in Android Studio
 
-To open one of the samples in Android Studio, begin by checking out one of this folder, and then open it in Android Studio.
+To open this app in Android Studio, begin by checking out this folder, and then open it in the IDE.
 
 Clone the repository:
 
 ```
-git clone git@github.com:android/architecture-samples.git
+git clone git@github.com:android/...
 ```
 This step checks out the master branch. If you want to change to a different sample:
 
