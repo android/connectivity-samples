@@ -1,7 +1,6 @@
 package com.google.location.nearby.apps.hellouwb.ui
 
 import android.Manifest
-import android.app.Application
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle

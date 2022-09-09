@@ -3,10 +3,6 @@ package com.google.location.nearby.apps.hellouwb.ui.control
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.google.location.nearby.apps.hellouwb.data.UwbRangingControlSource
-import com.google.location.nearby.apps.hellouwb.ui.home.ConnectedEndpoint
-import com.google.location.nearby.apps.hellouwb.ui.home.HomeUiState
-import com.google.location.nearby.apps.hellouwb.ui.home.HomeViewModel
-import com.google.location.nearby.apps.uwbranging.UwbEndpoint
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 

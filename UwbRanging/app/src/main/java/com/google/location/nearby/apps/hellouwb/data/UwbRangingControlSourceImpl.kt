@@ -6,8 +6,6 @@ import com.google.location.nearby.apps.uwbranging.EndpointEvents
 import com.google.location.nearby.apps.uwbranging.UwbConnectionManager
 import com.google.location.nearby.apps.uwbranging.UwbEndpoint
 import com.google.location.nearby.apps.uwbranging.UwbSessionScope
-import java.security.SecureRandom
-import kotlin.properties.Delegates
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.awaitClose
@@ -16,6 +14,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.security.SecureRandom
+import kotlin.properties.Delegates
 
 internal class UwbRangingControlSourceImpl(
   context: Context,

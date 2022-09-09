@@ -3,24 +3,11 @@ package com.google.location.nearby.apps.hellouwb.ui.home
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.NearMe
 import androidx.compose.material.icons.filled.NearMeDisabled
-import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.TopAppBarScrollBehavior
-import androidx.compose.material3.TopAppBarState
-import androidx.compose.material3.rememberTopAppBarState
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -80,7 +67,7 @@ fun HomeTopAppBar(
     TopAppBarDefaults.enterAlwaysScrollBehavior(topAppBarState),
 ) {
   CenterAlignedTopAppBar(
-    title = { Text("Hello UWB") },
+    title = { Text("UWB Ranging") },
     actions = {
       val icon = if (isRanging) Icons.Filled.NearMe else Icons.Filled.NearMeDisabled
       val iconColor = if (isRanging) Color.Green else Color.DarkGray
