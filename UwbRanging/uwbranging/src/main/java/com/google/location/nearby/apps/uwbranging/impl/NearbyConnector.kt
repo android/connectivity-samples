@@ -29,7 +29,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.launch
 
-internal abstract class NearbyConnector(protected val connections: NearbyConnections) {
+internal abstract class NearbyConnector(protected val connections: NearbyConnections) :
+  OobConnector {
 
   private val peerMap = mutableMapOf<String, UwbEndpoint>()
 
@@ -77,7 +78,7 @@ internal abstract class NearbyConnector(protected val connections: NearbyConnect
     return UwbOobEvent.UwbEndpointLost(endpoint)
   }
 
-  fun start() = channelFlow {
+  override fun start() = channelFlow {
     val events = prepareEventFlow()
     val job = launch {
       events.collect { event ->
@@ -109,7 +110,7 @@ internal abstract class NearbyConnector(protected val connections: NearbyConnect
     return null
   }
 
-  fun sendMessage(endpoint: UwbEndpoint, message: ByteArray) {
+  override fun sendMessage(endpoint: UwbEndpoint, message: ByteArray) {
     val endpointId = lookupEndpointId(endpoint) ?: return
     connections.sendPayload(
       endpointId,

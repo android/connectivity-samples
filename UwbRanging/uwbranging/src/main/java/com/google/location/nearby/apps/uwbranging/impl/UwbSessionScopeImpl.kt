@@ -34,7 +34,7 @@ import kotlinx.coroutines.launch
 
 internal class UwbSessionScopeImpl(
   private val localEndpoint: UwbEndpoint,
-  private val connector: NearbyConnector,
+  private val connector: OobConnector,
 ) : UwbSessionScope {
 
   private val localAddresses = mutableSetOf<UwbAddress>()
