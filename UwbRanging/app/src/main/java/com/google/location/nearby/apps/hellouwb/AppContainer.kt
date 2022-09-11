@@ -18,10 +18,12 @@
 
 package com.google.location.nearby.apps.hellouwb
 
+import android.content.ContentResolver
 import com.google.location.nearby.apps.hellouwb.data.SettingsStore
 import com.google.location.nearby.apps.hellouwb.data.UwbRangingControlSource
 
 interface AppContainer {
   val rangingResultSource: UwbRangingControlSource
-  val settingsStore: SettingsStore
+    val settingsStore: SettingsStore
+    val contentResolver: ContentResolver
 }

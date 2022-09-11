@@ -18,6 +18,7 @@
 
 package com.google.location.nearby.apps.hellouwb.data
 
+import android.content.ContentResolver
 import android.content.Context
 import com.google.location.nearby.apps.hellouwb.AppContainer
 import kotlinx.coroutines.CoroutineScope
@@ -32,24 +33,27 @@ internal class AppContainerImpl(
 
   private val coroutineScope = CoroutineScope(Dispatchers.IO + Job())
 
-  override val rangingResultSource: UwbRangingControlSource
-    get() =
-      _rangingResultSource
-        ?: throw IllegalStateException("rangingResultSource only can be accessed after loading.")
+    override val rangingResultSource: UwbRangingControlSource
+        get() =
+            _rangingResultSource
+                ?: throw IllegalStateException("rangingResultSource only can be accessed after loading.")
 
-  private var _rangingResultSource: UwbRangingControlSource? = null
+    private var _rangingResultSource: UwbRangingControlSource? = null
 
-  override val settingsStore = SettingsStoreImpl(context, coroutineScope)
+    override val settingsStore = SettingsStoreImpl(context, coroutineScope)
 
-  init {
-    coroutineScope.launch {
-      settingsStore.appSettings.collect {
-        val endpointId = it.deviceDisplayName + "|" + it.deviceUuid
-        if (_rangingResultSource == null) {
-          _rangingResultSource = UwbRangingControlSourceImpl(context, endpointId, coroutineScope)
-          afterLoading()
-        } else {
-          rangingResultSource.deviceType = it.deviceType
+    override val contentResolver: ContentResolver = context.contentResolver
+
+    init {
+        coroutineScope.launch {
+            settingsStore.appSettings.collect {
+                val endpointId = it.deviceDisplayName + "|" + it.deviceUuid
+                if (_rangingResultSource == null) {
+                    _rangingResultSource =
+                        UwbRangingControlSourceImpl(context, endpointId, coroutineScope)
+                    afterLoading()
+                } else {
+                    rangingResultSource.deviceType = it.deviceType
           rangingResultSource.updateEndpointId(endpointId)
         }
       }

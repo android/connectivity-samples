@@ -36,11 +36,11 @@ import java.security.SecureRandom
 import kotlin.properties.Delegates
 
 internal class UwbRangingControlSourceImpl(
-  context: Context,
-  endpointId: String,
-  private val coroutineScope: CoroutineScope,
-  private val uwbConnectionManager: UwbConnectionManager =
-    UwbConnectionManager.getInstance(context),
+    context: Context,
+    endpointId: String,
+    private val coroutineScope: CoroutineScope,
+    private val uwbConnectionManager: UwbConnectionManager =
+        UwbConnectionManager.getInstance(context),
 ) : UwbRangingControlSource {
 
   private var uwbEndpoint = UwbEndpoint(endpointId, SecureRandom.getSeed(8))
@@ -53,7 +53,7 @@ internal class UwbRangingControlSourceImpl(
     return when (deviceType) {
       DeviceType.CONTROLEE -> uwbConnectionManager.controleeUwbScope(uwbEndpoint)
       DeviceType.CONTROLLER ->
-        uwbConnectionManager.controllerUwbScope(uwbEndpoint, RangingParameters.UWB_CONFIG_ID_1)
+          uwbConnectionManager.controllerUwbScope(uwbEndpoint, RangingParameters.UWB_CONFIG_ID_1)
       else -> throw IllegalStateException()
     }
   }
@@ -65,12 +65,12 @@ internal class UwbRangingControlSourceImpl(
   }
 
   override var deviceType by
-    Delegates.observable(DeviceType.CONTROLLER) { _, oldValue, newValue ->
+  Delegates.observable(DeviceType.CONTROLLER) { _, oldValue, newValue ->
       if (oldValue != newValue) {
-        stop()
-        uwbSessionScope = getSessionScope(newValue)
+          stop()
+          uwbSessionScope = getSessionScope(newValue)
       }
-    }
+  }
 
   override fun updateEndpointId(id: String) {
     if (id != uwbEndpoint.id) {
@@ -83,19 +83,23 @@ internal class UwbRangingControlSourceImpl(
   override fun start() {
     if (rangingJob == null) {
       rangingJob =
-        coroutineScope.launch { uwbSessionScope.prepareSession().collect { dispatchResult(it) } }
+          coroutineScope.launch { uwbSessionScope.prepareSession().collect { dispatchResult(it) } }
       runningStateFlow.update { true }
     }
   }
 
-  override fun stop() {
-    val job = rangingJob ?: return
-    job.cancel()
-    rangingJob = null
-    runningStateFlow.update { false }
-  }
+    override fun stop() {
+        val job = rangingJob ?: return
+        job.cancel()
+        rangingJob = null
+        runningStateFlow.update { false }
+    }
 
-  private val runningStateFlow = MutableStateFlow(false)
+    override fun sendOobMessage(endpoint: UwbEndpoint, message: ByteArray) {
+        uwbSessionScope.sendMessage(endpoint, message)
+    }
 
-  override val isRunning = runningStateFlow.asStateFlow()
+    private val runningStateFlow = MutableStateFlow(false)
+
+    override val isRunning = runningStateFlow.asStateFlow()
 }

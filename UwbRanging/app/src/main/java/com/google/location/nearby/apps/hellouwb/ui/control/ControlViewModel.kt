@@ -20,36 +20,87 @@ package com.google.location.nearby.apps.hellouwb.ui.control
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
+import com.google.location.nearby.apps.hellouwb.data.DeviceType
+import com.google.location.nearby.apps.hellouwb.data.SettingsStore
 import com.google.location.nearby.apps.hellouwb.data.UwbRangingControlSource
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import com.google.location.nearby.apps.uwbranging.EndpointEvents
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 
-class ControlViewModel(uwbRangingControlSource: UwbRangingControlSource) : ViewModel() {
+private const val LOCK_DISTANCE = 2.0f
+private const val UNLOCK_DISTANCE = 0.25f
 
-  private val _uiState: MutableStateFlow<ControlUiState> =
-    MutableStateFlow(ControlUiStateImpl(false))
+class ControlViewModel(
+    private val uwbRangingControlSource: UwbRangingControlSource,
+    settingsStore: SettingsStore
+) : ViewModel() {
 
-  companion object {
-    fun provideFactory(
-      uwbRangingControlSource: UwbRangingControlSource
-    ): ViewModelProvider.Factory =
-      object : ViewModelProvider.Factory {
-        @Suppress("UNCHECKED_CAST")
-        override fun <T : ViewModel> create(modelClass: Class<T>): T {
-          return ControlViewModel(uwbRangingControlSource) as T
+    private val _uiState: MutableStateFlow<ControlUiState> =
+        MutableStateFlow(ControlUiState.KeyState)
+
+    val uiState = _uiState.asStateFlow()
+
+    private var lockJob: Job? = null
+
+    private fun startLockObserving(): Job {
+        return CoroutineScope(Dispatchers.IO).launch {
+            uwbRangingControlSource
+                .observeRangingResults()
+                .filterIsInstance<EndpointEvents.PositionUpdated>()
+                .collect {
+                    it.position.distance?.let {
+                        val state = _uiState.value as ControlUiState.LockState
+                        if (!state.isLocked && it.value > LOCK_DISTANCE) {
+                            _uiState.update { ControlUiState.LockState(isLocked = true) }
+                        }
+                        if (state.isLocked && it.value < UNLOCK_DISTANCE) {
+                            _uiState.update { ControlUiState.LockState(isLocked = false) }
+                        }
+                    }
+                }
         }
-      }
-  }
+    }
 
-  private data class ControlUiStateImpl(
-    override var isDoorLocked: Boolean,
-  ) : ControlUiState
+    init {
+        settingsStore.appSettings
+            .onEach {
+                lockJob?.cancel()
+                lockJob = null
+                when (it.deviceType) {
+                    DeviceType.CONTROLLER -> _uiState.update { ControlUiState.KeyState }
+                    DeviceType.CONTROLEE -> {
+                        if (_uiState.value !is ControlUiState.LockState) {
+                            _uiState.update { ControlUiState.LockState(isLocked = true) }
+                            lockJob = startLockObserving()
+                        }
+                    }
+                    else -> {}
+                }
+            }
+            .launchIn(viewModelScope)
+    }
 
+    companion object {
+        fun provideFactory(
+            uwbRangingControlSource: UwbRangingControlSource,
+            settingsStore: SettingsStore
+        ): ViewModelProvider.Factory =
+            object : ViewModelProvider.Factory {
+                @Suppress("UNCHECKED_CAST")
+                override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                    return ControlViewModel(uwbRangingControlSource, settingsStore) as T
+                }
+            }
+    }
+}
 
-  val uiState = _uiState.asStateFlow()
+sealed class ControlUiState {
 
-  interface ControlUiState {
-    var isDoorLocked: Boolean
-  }
+    data class LockState(val isLocked: Boolean) : ControlUiState()
 
+    object KeyState : ControlUiState()
 }

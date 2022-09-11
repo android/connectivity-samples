@@ -31,6 +31,7 @@ import com.google.location.nearby.apps.hellouwb.ui.control.ControlViewModel
 import com.google.location.nearby.apps.hellouwb.ui.home.HomeRoute
 import com.google.location.nearby.apps.hellouwb.ui.home.HomeViewModel
 import com.google.location.nearby.apps.hellouwb.ui.send.SendRoute
+import com.google.location.nearby.apps.hellouwb.ui.send.SendViewModel
 import com.google.location.nearby.apps.hellouwb.ui.settings.SettingsRoute
 import com.google.location.nearby.apps.hellouwb.ui.settings.SettingsViewModel
 
@@ -49,20 +50,35 @@ fun AppNavGraph(
     }
     composable(AppDestination.CONTROL_ROUTE) {
       val controlViewModel: ControlViewModel =
-        viewModel(factory = ControlViewModel.provideFactory(appContainer.rangingResultSource))
+        viewModel(
+          factory = ControlViewModel.provideFactory(
+            appContainer.rangingResultSource,
+            appContainer.settingsStore
+          )
+        )
       //ControlRoute()
       ControlRoute(controlViewModel = controlViewModel)
 
     }
-    composable(AppDestination.SEND_ROUTE) { SendRoute() }
+    composable(AppDestination.SEND_ROUTE) {
+      val sendViewModel: SendViewModel =
+        viewModel(
+          factory =
+          SendViewModel.provideFactory(
+            appContainer.rangingResultSource,
+            appContainer.contentResolver
+          )
+        )
+      SendRoute(sendViewModel = sendViewModel)
+    }
     composable(AppDestination.SETTINGS_ROUTE) {
       val settingsViewModel: SettingsViewModel =
         viewModel(
           factory =
-            SettingsViewModel.provideFactory(
-              appContainer.rangingResultSource,
-              appContainer.settingsStore
-            )
+          SettingsViewModel.provideFactory(
+            appContainer.rangingResultSource,
+            appContainer.settingsStore
+          )
         )
       SettingsRoute(settingsViewModel)
     }

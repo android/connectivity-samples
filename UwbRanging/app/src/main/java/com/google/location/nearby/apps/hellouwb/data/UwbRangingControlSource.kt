@@ -19,20 +19,23 @@
 package com.google.location.nearby.apps.hellouwb.data
 
 import com.google.location.nearby.apps.uwbranging.EndpointEvents
+import com.google.location.nearby.apps.uwbranging.UwbEndpoint
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 
 interface UwbRangingControlSource {
 
-  fun observeRangingResults(): Flow<EndpointEvents>
+    fun observeRangingResults(): Flow<EndpointEvents>
 
-  var deviceType: DeviceType
+    var deviceType: DeviceType
 
-  fun updateEndpointId(id: String)
+    fun updateEndpointId(id: String)
 
-  fun start()
+    fun start()
 
-  fun stop()
+    fun stop()
 
-  val isRunning: StateFlow<Boolean>
+    fun sendOobMessage(endpoint: UwbEndpoint, message: ByteArray)
+
+    val isRunning: StateFlow<Boolean>
 }
