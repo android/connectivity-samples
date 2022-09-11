@@ -35,6 +35,8 @@ import kotlinx.coroutines.launch
 import java.security.SecureRandom
 import kotlin.properties.Delegates
 
+typealias EventHandler = (EndpointEvents) -> Unit
+
 internal class UwbRangingControlSourceImpl(
     context: Context,
     endpointId: String,
@@ -43,48 +45,56 @@ internal class UwbRangingControlSourceImpl(
         UwbConnectionManager.getInstance(context),
 ) : UwbRangingControlSource {
 
-  private var uwbEndpoint = UwbEndpoint(endpointId, SecureRandom.getSeed(8))
+    private var uwbEndpoint = UwbEndpoint(endpointId, SecureRandom.getSeed(8))
 
-  private var uwbSessionScope: UwbSessionScope = getSessionScope(DeviceType.CONTROLLER)
+    private var uwbSessionScope: UwbSessionScope = getSessionScope(DeviceType.CONTROLLER)
 
-  private var rangingJob: Job? = null
+    private var rangingJob: Job? = null
 
-  private fun getSessionScope(deviceType: DeviceType): UwbSessionScope {
-    return when (deviceType) {
-      DeviceType.CONTROLEE -> uwbConnectionManager.controleeUwbScope(uwbEndpoint)
-      DeviceType.CONTROLLER ->
-          uwbConnectionManager.controllerUwbScope(uwbEndpoint, RangingParameters.UWB_CONFIG_ID_1)
-      else -> throw IllegalStateException()
+    private fun getSessionScope(deviceType: DeviceType): UwbSessionScope {
+        return when (deviceType) {
+            DeviceType.CONTROLEE -> uwbConnectionManager.controleeUwbScope(uwbEndpoint)
+            DeviceType.CONTROLLER ->
+                uwbConnectionManager.controllerUwbScope(
+                    uwbEndpoint,
+                    RangingParameters.UWB_CONFIG_ID_1
+                )
+            else -> throw IllegalStateException()
+        }
     }
-  }
 
-  private var dispatchResult: (result: EndpointEvents) -> Unit = {}
-  override fun observeRangingResults() = channelFlow {
-    dispatchResult = { trySend(it) }
-    awaitClose { dispatchResult = {} }
-  }
-
-  override var deviceType by
-  Delegates.observable(DeviceType.CONTROLLER) { _, oldValue, newValue ->
-      if (oldValue != newValue) {
-          stop()
-          uwbSessionScope = getSessionScope(newValue)
-      }
-  }
-
-  override fun updateEndpointId(id: String) {
-    if (id != uwbEndpoint.id) {
-      stop()
-      uwbEndpoint = UwbEndpoint(id, SecureRandom.getSeed(8))
-      uwbSessionScope = getSessionScope(deviceType)
+    private val resultDispatchers = mutableListOf<EventHandler>()
+    override fun observeRangingResults() = channelFlow {
+        val dispatcher: EventHandler = { result -> trySend(result) }
+        resultDispatchers.add(dispatcher)
+        awaitClose { resultDispatchers.remove(dispatcher) }
     }
+
+    override var deviceType by
+    Delegates.observable(DeviceType.CONTROLLER) { _, oldValue, newValue ->
+        if (oldValue != newValue) {
+            stop()
+            uwbSessionScope = getSessionScope(newValue)
+        }
+    }
+
+    override fun updateEndpointId(id: String) {
+        if (id != uwbEndpoint.id) {
+            stop()
+            uwbEndpoint = UwbEndpoint(id, SecureRandom.getSeed(8))
+            uwbSessionScope = getSessionScope(deviceType)
+        }
   }
 
   override fun start() {
     if (rangingJob == null) {
-      rangingJob =
-          coroutineScope.launch { uwbSessionScope.prepareSession().collect { dispatchResult(it) } }
-      runningStateFlow.update { true }
+        rangingJob =
+            coroutineScope.launch {
+                uwbSessionScope.prepareSession().collect {
+                    resultDispatchers.forEach { handler -> handler(it) }
+                }
+            }
+        runningStateFlow.update { true }
     }
   }
 
