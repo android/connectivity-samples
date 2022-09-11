@@ -131,7 +131,6 @@ internal class NearbyConnections(
     }
     awaitClose {
       disconnectAll()
-      endpoints.clear()
       connectionsClient.stopDiscovery()
     }
   }
@@ -155,7 +154,6 @@ internal class NearbyConnections(
     awaitClose {
       disconnectAll()
       connectionsClient.stopAdvertising()
-      endpoints.clear()
     }
   }
 
