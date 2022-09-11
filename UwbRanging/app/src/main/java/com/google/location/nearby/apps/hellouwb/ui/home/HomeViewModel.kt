@@ -21,6 +21,7 @@ package com.google.location.nearby.apps.hellouwb.ui.home
 import androidx.core.uwb.RangingPosition
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import com.google.location.nearby.apps.hellouwb.data.UwbRangingControlSource
 import com.google.location.nearby.apps.uwbranging.EndpointEvents
 import com.google.location.nearby.apps.uwbranging.UwbEndpoint
@@ -68,7 +69,8 @@ class HomeViewModel(uwbRangingControlSource: UwbRangingControlSource) : ViewMode
         }
         _uiState.update { updateUiState() }
       }
-      .launchIn(CoroutineScope(Dispatchers.IO))
+      .launchIn(viewModelScope)
+
     uwbRangingControlSource.isRunning
       .onEach { running ->
         isRanging = running
