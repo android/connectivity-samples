@@ -71,8 +71,8 @@ class ControlViewModel(
                 lockJob?.cancel()
                 lockJob = null
                 when (it.deviceType) {
-                    DeviceType.CONTROLLER -> _uiState.update { ControlUiState.KeyState }
-                    DeviceType.CONTROLEE -> {
+                    DeviceType.CONTROLEE -> _uiState.update { ControlUiState.KeyState }
+                    DeviceType.CONTROLLER -> {
                         if (_uiState.value !is ControlUiState.LockState) {
                             _uiState.update { ControlUiState.LockState(isLocked = true) }
                             lockJob = startLockObserving()
