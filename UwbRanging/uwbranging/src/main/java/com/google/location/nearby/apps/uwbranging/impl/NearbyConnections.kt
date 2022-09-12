@@ -50,9 +50,6 @@ internal class NearbyConnections(
         CoroutineExceptionHandler { _, e -> Log.e("NearbyConnections", "Connection Error", e) }
     )
 
-  // Book keeping of active endpoints.
-  private val endpoints = mutableSetOf<String>()
-
   // Connection-phase Callbacks used by both controller and controlee
   private val connectionLifecycleCallback =
     object : ConnectionLifecycleCallback() {
@@ -64,15 +61,12 @@ internal class NearbyConnections(
 
       override fun onConnectionResult(endpointId: String, result: ConnectionResolution) {
         if (result.status.statusCode == ConnectionsStatusCodes.STATUS_OK) {
-          endpoints.add(endpointId)
           dispatchEvent(NearbyEvent.EndpointConnected(endpointId))
         }
       }
 
       override fun onDisconnected(endpointId: String) {
-        if (endpoints.remove(endpointId)) {
           dispatchEvent(NearbyEvent.EndpointLost(endpointId))
-        }
       }
     }
 
@@ -89,20 +83,15 @@ internal class NearbyConnections(
   private val endpointDiscoveryCallback =
     object : EndpointDiscoveryCallback() {
       override fun onEndpointFound(endpointId: String, info: DiscoveredEndpointInfo) {
-        if (endpoints.contains(endpointId)) {
-          return
-        }
         coroutineScope.launch {
           connectionsClient
             .requestConnection(CONNECTION_NAME, endpointId, connectionLifecycleCallback)
-            .await()
         }
       }
 
       override fun onEndpointLost(endpointId: String) {
-        if (endpoints.remove(endpointId)) {
-          dispatchEvent(NearbyEvent.EndpointLost(endpointId))
-        }
+        dispatchEvent(NearbyEvent.EndpointLost(endpointId))
+
       }
     }
 
@@ -159,7 +148,6 @@ internal class NearbyConnections(
 
   private fun disconnectAll() {
     connectionsClient.stopAllEndpoints()
-    endpoints.clear()
   }
 }
 

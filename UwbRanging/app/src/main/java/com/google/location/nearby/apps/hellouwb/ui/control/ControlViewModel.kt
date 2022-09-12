@@ -48,20 +48,30 @@ class ControlViewModel(
 
     private fun startLockObserving(): Job {
         return CoroutineScope(Dispatchers.IO).launch {
-            uwbRangingControlSource
-                .observeRangingResults()
-                .filterIsInstance<EndpointEvents.PositionUpdated>()
-                .collect {
-                    it.position.distance?.let {
-                        val state = _uiState.value as ControlUiState.LockState
-                        if (!state.isLocked && it.value > LOCK_DISTANCE) {
-                            _uiState.update { ControlUiState.LockState(isLocked = true) }
-                        }
-                        if (state.isLocked && it.value < UNLOCK_DISTANCE) {
-                            _uiState.update { ControlUiState.LockState(isLocked = false) }
+            launch {
+                uwbRangingControlSource
+                    .observeRangingResults()
+                    .filterIsInstance<EndpointEvents.PositionUpdated>()
+                    .collect {
+                        it.position.distance?.let {
+                            val state = _uiState.value as ControlUiState.LockState
+                            if (!state.isLocked && it.value > LOCK_DISTANCE) {
+                                _uiState.update { ControlUiState.LockState(isLocked = true) }
+                            }
+                            if (state.isLocked && it.value < UNLOCK_DISTANCE) {
+                                _uiState.update { ControlUiState.LockState(isLocked = false) }
+                            }
                         }
                     }
+            }
+            launch {
+                uwbRangingControlSource.isRunning.collect {
+                    val state = _uiState.value as ControlUiState.LockState
+                    if (!state.isLocked && !it) {
+                        _uiState.update { ControlUiState.LockState(isLocked = true) }
+                    }
                 }
+            }
         }
     }
 
