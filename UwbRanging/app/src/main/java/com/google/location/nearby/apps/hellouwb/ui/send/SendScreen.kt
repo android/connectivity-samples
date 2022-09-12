@@ -68,7 +68,7 @@ fun SendScreen(
                     onMessageDisplayed()
                 }
             }
-            is SendUiState.ReceivedState -> ReceivingScreen(
+            is SendUiState.ReceivedState -> ReceivedScreen(
                 uiState.receivedImageUri,
                 onImageCleared
             )
@@ -87,6 +87,7 @@ fun InitialScreen(onImagePicked: (Uri) -> Unit) {
     Button(onClick = { launcher.launch("image/*") }) { Text(text = "Select a picture") }
 
     Spacer(modifier = Modifier.height(12.dp))
+    Text(text = "Receiving images...")
 }
 
 @Composable
@@ -107,10 +108,11 @@ fun SendingScreen(imgUri: Uri, onImageCleared: () -> Unit) {
             modifier = Modifier.fillMaxSize()
         )
     }
+    Text(text = "Sending images...")
 }
 
 @Composable
-fun ReceivingScreen(imgUri: Uri, onImageCleared: () -> Unit) {
+fun ReceivedScreen(imgUri: Uri, onImageCleared: () -> Unit) {
     Button(onClick = { onImageCleared() }) { Text(text = "Clear") }
 
     Spacer(modifier = Modifier.height(12.dp))
@@ -127,6 +129,7 @@ fun ReceivingScreen(imgUri: Uri, onImageCleared: () -> Unit) {
             modifier = Modifier.fillMaxSize()
         )
     }
+    Text(text = "Image is received.")
 }
 
 @Preview
