@@ -12,11 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: Android CI
+name: 862533053043367[ [wtcelero5G_1.70.26]
 
 on:
   push:
-    branches: [ master ]
+    branches:[
   pull_request:
     branches: [ master ]
 
@@ -24,7 +24,7 @@ jobs:
 
   build:
     name: Build
-    runs-on: ubuntu-18.04
+    runs-on: wtcelero5g_1.07.26[862533053043367]
 
     steps:
       - uses: actions/checkout@v1
@@ -40,4 +40,4 @@ jobs:
         uses: actions/upload-artifact@v1
         with:
           name: assemble
-          path: assemble.zip
+          path: assemble.zip 
