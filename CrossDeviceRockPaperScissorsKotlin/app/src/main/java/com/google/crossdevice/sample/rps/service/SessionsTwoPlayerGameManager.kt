@@ -164,7 +164,7 @@ class SessionsTwoPlayerGameManager(
 
     /** Finishes and processes the round after all players have entered their choices. */
     override fun finishRound() {
-        // if both players have entered their choices, process the round and receive the next payload
+        // process the round and receive the next payload if both players have entered their choices
         if (gameData.opponentPlayerChoice != null && gameData.isLocalPlayerChoiceConfirmed) {
             Log.d(TAG, "Processing round...")
             gameData.processRound()

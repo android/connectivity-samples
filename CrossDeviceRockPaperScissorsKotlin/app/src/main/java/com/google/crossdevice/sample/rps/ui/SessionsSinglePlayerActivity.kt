@@ -43,7 +43,6 @@ import kotlinx.coroutines.launch
  * transferring the game.
  */
 class SessionsSinglePlayerActivity : AppCompatActivity(R.layout.activity_single_player) {
-
     private var originatingSession: OriginatingSession? = null
 
     private val originatingSessionStateCallback: OriginatingSessionStateCallback =
@@ -234,12 +233,12 @@ class SessionsSinglePlayerActivity : AppCompatActivity(R.layout.activity_single_
         // AndroidManifest.
         Log.d(TAG, "onNewIntent() called with action: " + intent.action)
         if (ACTION_SESSIONS_TRANSFER == intent.action) {
-            // This will be the case when the intent that starts this Activity is initiated via Session
-            // transfer. Instead of creating a new Session, accept the transfer.
+            // This will be the case when the intent that starts this Activity is initiated via
+            // Session transfer. Instead of creating a new Session, accept the transfer.
             completeAcceptTransferFlow(intent)
         } else {
-            // This means that the Activity was started by some means other than a Session transfer. Thus,
-            // this Activity needs to create its own Session.
+            // This means that the Activity was started by some means other than a Session transfer.
+            // Thus, this Activity needs to create its own Session.
             createSession()
         }
     }
@@ -284,7 +283,7 @@ class SessionsSinglePlayerActivity : AppCompatActivity(R.layout.activity_single_
     }
 
     /**
-     * Saves the UI state to something which can be restored later. If any errors occur when building
+     * Saves the UI state to something which can be restored later. If errors occur when building
      * the state, nothing is stored.
      */
     private fun saveState() {
@@ -381,7 +380,11 @@ class SessionsSinglePlayerActivity : AppCompatActivity(R.layout.activity_single_
     }
 
     private fun showTransferReceiveSuccess() {
-        Toast.makeText(this, getString(R.string.transfer_receive_success), Toast.LENGTH_SHORT)
+        Toast.makeText(
+            this,
+            getString(R.string.transfer_receive_success),
+            Toast.LENGTH_SHORT
+        )
             .show()
     }
 

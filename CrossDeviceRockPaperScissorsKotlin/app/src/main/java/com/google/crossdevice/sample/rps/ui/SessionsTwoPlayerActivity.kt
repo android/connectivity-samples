@@ -38,7 +38,6 @@ import com.google.crossdevice.sample.rps.service.SessionsTwoPlayerGameManager
  * API"-based GameManager.
  */
 class SessionsTwoPlayerActivity : AppCompatActivity(R.layout.activity_two_player) {
-
     private lateinit var findOpponentButton: Button
     private lateinit var disconnectButton: Button
     private lateinit var rockButton: Button

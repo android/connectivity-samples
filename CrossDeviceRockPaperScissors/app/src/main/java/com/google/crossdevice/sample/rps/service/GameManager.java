@@ -20,12 +20,12 @@ import android.content.Intent;
 
 import com.google.crossdevice.sample.rps.model.GameChoice;
 import com.google.crossdevice.sample.rps.model.GameData;
+import javax.annotation.Nullable;
 
 /**
  * Interface for defining GameManager APIs
  */
 public interface GameManager {
-
     /**
      * Gets the managed GameData object.
      */
@@ -45,7 +45,7 @@ public interface GameManager {
      * Sends the local player's choice for a given round (i.e. rock, paper or scissor) to a remote
      * participant.
      */
-    void sendGameChoice(GameChoice choice, Callback callback);
+    void sendGameChoice(GameChoice choice, @Nullable Callback callback);
 
     /**
      * Resets the game to default values.
