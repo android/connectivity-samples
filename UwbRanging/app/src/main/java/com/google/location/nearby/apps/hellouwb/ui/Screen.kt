@@ -26,8 +26,8 @@ import androidx.compose.material.icons.filled.SettingsRemote
 import androidx.compose.ui.graphics.vector.ImageVector
 
 sealed class Screen(val route: String, val title: String, val icon: ImageVector) {
-  object Home : Screen("home", "Home", Icons.Filled.Home)
+  object Home : Screen("home", "Ranging", Icons.Filled.Home)
   object Control : Screen("control", "Control", Icons.Filled.SettingsRemote)
-  object Send : Screen("send", "Send", Icons.Filled.Send)
-  object Settings : Screen("settings", "Setting", Icons.Filled.Settings)
+  object Send : Screen("send", "Share file", Icons.Filled.Send)
+  object Settings : Screen("settings", "Settings", Icons.Filled.Settings)
 }

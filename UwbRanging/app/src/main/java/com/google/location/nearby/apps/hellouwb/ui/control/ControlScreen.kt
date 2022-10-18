@@ -37,7 +37,7 @@ import androidx.compose.ui.unit.dp
 fun ControlScreen(uiState: ControlUiState, modifier: Modifier = Modifier) {
 
   CenterAlignedTopAppBar(
-    title = { androidx.compose.material3.Text("UWB Control") }, modifier = modifier
+    title = { androidx.compose.material3.Text("Device Control") }, modifier = modifier
   )
 
   Column(

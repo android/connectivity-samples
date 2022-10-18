@@ -48,7 +48,7 @@ fun SendScreen(
 ) {
 
     CenterAlignedTopAppBar(
-        title = { androidx.compose.material3.Text("UWB Secure Transfer") },
+        title = { androidx.compose.material3.Text("Data Transfer") },
         modifier = modifier
     )
 

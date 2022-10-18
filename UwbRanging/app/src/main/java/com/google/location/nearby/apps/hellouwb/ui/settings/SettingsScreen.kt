@@ -42,7 +42,7 @@ fun SettingsScreen(
     modifier: Modifier = Modifier,
 ) {
     CenterAlignedTopAppBar(
-        title = { Text("Device settings") },
+        title = { Text("Device Settings") },
 //        actions = {
 //            val icon = if (isRanging) Icons.Filled.NearMe else Icons.Filled.NearMeDisabled
 //            val iconColor = if (isRanging) Color.Green else Color.DarkGray
