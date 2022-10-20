@@ -1,24 +1,23 @@
 # Android Ultra-wideband sample
 
 ## Overview
-Android Ultra-wideband Sample' showcases the <b>[Jetpack UWB](https://developer.android.com/jetpack/androidx/releases/core-uwb)</b> 
-library current features.
+This sample showcases the <b>[Android UWB Jetpack library](https://developer.android.com/jetpack/androidx/releases/core-uwb)</b> 
+ current features.
 
-It includes five basic uses cases:
+It includes examples for:
 
+* <b>Device compatibility</b> - How to check if the Android device supports UWB.
 * <b>Device Discovery</b> - Ultra-wideband currently does not support a native way to discover devices, so an 
 out of band (OOB) mechanism must be provided.  This project uses the
 [NearBy Connections API](https://developers.google.com/nearby/connections/overview), but others radio protocols like 
 Bluetooth, BLE or Wifi could also be used. 
-* <b>Simple Ranging</b> - The <b>Ranging</b> screen displays the controllee's distance from the the controller
+* <b>Simple Ranging</b> - The <b>Ranging</b> screen displays the controllee's distance from the the controller.
 * <b>Device Control</b> - The <b>Control</b> screen simulates a use case where a door lock could be 
 opened when a UWB-capable device is near by.
 * <b>Share Media</b> - The <b>Share file</b> screen demonstrates how to transfer a media file using the
 selected OOB mechanism when devices are in close proximity.
 * <b>Settings</b> - In this screen you can select which Android device will play each role (Controller or Controlee).
 
-
-Additionally, the code shows you how to check if the Android device is UWB-capable.
 
 ## Pre-requisites
 * Two UWB-capable Android phones with Android 12 or higher
@@ -27,12 +26,13 @@ Additionally, the code shows you how to check if the Android device is UWB-capab
 
 ## What is it not?
   
-* An end to end example of the Ultra-wideband protocol.
+* An end to end example of Ultra-wideband technology.
  The main goal is to demonstrate basic ranging capabilities between two Android devices and 
 how a selected OOB mechanism could be used to facilitate real use cases.  For the latest information on the library status check [this article](https://developer.android.com/guide/topics/connectivity/uwb)
+* A reference for a real production app with proper security, network access, app permissions, user authentication, etc. Check out the [Now in Android app](https://github.com/android/nowinandroid) instead.
 * A UI/Material Design sample. The interface of the app is deliberately kept simple to focus on the UWB use cases. Check out the [Compose Samples](https://github.com/android/compose-samples) instead.
 * A complete Jetpack sample covering all libraries. Check out [Android Sunflower](https://github.com/googlesamples/android-sunflower) or the advanced [GitHub Browser Sample](https://github.com/googlesamples/android-architecture-components/tree/master/GithubBrowserSample) instead.
-* A real production app with proper security, network access, app permissions, user authentication, etc. Check out the [Now in Android app](https://github.com/android/nowinandroid) instead.
+
 
 ## Who is it for?
 
@@ -48,16 +48,7 @@ Clone the repository:
 ```
 git clone git@github.com:android/...
 ```
-This step checks out the master branch. If you want to change to a different sample:
-
-```
-git checkout origin/main
-```
-
-* A single-activity architecture, using **[Navigation Compose](https://developer.android.com/jetpack/compose/navigation)**.
-* A presentation layer that contains a Compose screen (View) and a **ViewModel** per screen (or feature).
-* Reactive UIs using **[Flow](https://developer.android.com/kotlin/flow)** and **[coroutines](https://kotlinlang.org/docs/coroutines-overview.html)** for asynchronous operations.
-
+This step checks out the master branch. 
 
 ### License
 
