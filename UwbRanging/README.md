@@ -1,12 +1,11 @@
 # Android Ultra-wideband sample
 
 ## Overview
-This sample showcases the <b>[Android UWB Jetpack library](https://developer.android.com/jetpack/androidx/releases/core-uwb)</b> 
- current features.
+This project showcases the current features of the 
+<b>[Android UWB Jetpack library](https://developer.android.com/jetpack/androidx/releases/core-uwb)</b>, 
+and includes code examples for:
 
-It includes examples for:
-
-* <b>Device compatibility</b> - How to check if the Android device supports UWB.
+* <b>Device compatibility</b> - How to check if an Android device supports UWB.
 * <b>Device Discovery</b> - Ultra-wideband currently does not support a native way to discover devices, so an 
 out of band (OOB) mechanism must be provided.  This project uses the
 [NearBy Connections API](https://developers.google.com/nearby/connections/overview), but others radio protocols like 
