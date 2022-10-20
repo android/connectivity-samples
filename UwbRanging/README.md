@@ -7,10 +7,9 @@ This project showcases the current features of the
 Includes code examples for:
 
 * <b>Device compatibility</b> - How to check if an Android device supports UWB.
-* <b>Device Discovery</b> - Ultra-wideband currently does not support a native way to discover devices, so an 
-out of band (OOB) mechanism must be provided.  This project uses the
-[NearBy Connections API](https://developers.google.com/nearby/connections/overview), but others radio protocols like 
-Bluetooth, BLE or Wifi could also be used. 
+* <b>Device Discovery</b> - Ultra-wideband currently does not support a native way to discover devices, so an out of band (OOB) mechanism must be provided.  This project uses the
+[NearBy Connections API](https://developers.google.com/nearby/connections/overview), but other radio protocols like 
+Bluetooth, BLE, or Wi-Fi could also be used. 
 * <b>Simple Ranging</b> - The <b>Ranging</b> screen displays the controllee's distance from the the controller.
 * <b>Device Control</b> - The <b>Control</b> screen simulates a use case where a door lock could be 
 opened when a UWB-capable device is near by.
@@ -41,14 +40,17 @@ how a selected OOB mechanism could be used to facilitate real use cases.  For th
 
 ## Opening in Android Studio
 
-To open this app in Android Studio, begin by checking out this folder, and then open it in the IDE.
+To open this app in Android Studio, begin by checking out the entire ```connectivity-samples``` project: 
 
-Clone the repository:
+1. Clone the repository, this step checks out the master branch.:
 
 ```
-git clone git@github.com:android/...
+git clone git@github.com:android/connectivity-samples.git
+
 ```
-This step checks out the master branch. 
+ 
+2. Open the ```UwbRanging``` folder in the IDE.
+
 
 ### License
 
