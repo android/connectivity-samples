@@ -2,8 +2,9 @@
 
 ## Overview
 This project showcases the current features of the 
-<b>[Android UWB Jetpack library](https://developer.android.com/jetpack/androidx/releases/core-uwb)</b>, 
-and includes code examples for:
+<b>[Android UWB Jetpack library](https://developer.android.com/jetpack/androidx/releases/core-uwb)</b>.
+
+Includes code examples for:
 
 * <b>Device compatibility</b> - How to check if an Android device supports UWB.
 * <b>Device Discovery</b> - Ultra-wideband currently does not support a native way to discover devices, so an 
