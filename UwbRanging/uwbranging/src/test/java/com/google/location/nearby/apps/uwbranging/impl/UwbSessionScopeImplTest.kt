@@ -16,7 +16,7 @@
  *
  */
 
-package com.google.location.nearby.apps.uwbranging.impl
+package com.google.apps.uwbranging.impl
 
 import androidx.core.uwb.RangingParameters
 import androidx.core.uwb.RangingPosition
@@ -26,8 +26,11 @@ import androidx.core.uwb.UwbClientSessionScope
 import androidx.core.uwb.UwbComplexChannel
 import androidx.core.uwb.UwbDevice
 import com.google.common.truth.Truth.assertThat
-import com.google.location.nearby.apps.uwbranging.EndpointEvents
-import com.google.location.nearby.apps.uwbranging.UwbEndpoint
+import com.google.apps.uwbranging.EndpointEvents
+import com.google.apps.uwbranging.UwbEndpoint
+import com.google.apps.uwbranging.impl.NearbyConnector
+import com.google.apps.uwbranging.impl.UwbOobEvent
+import com.google.apps.uwbranging.impl.UwbSessionScopeImpl
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.channelFlow

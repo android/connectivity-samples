@@ -1,4 +1,4 @@
-package com.google.location.nearby.apps.hellouwb
+package com.google.apps.hellouwb
 
 import org.junit.Assert.assertEquals
 import org.junit.Test

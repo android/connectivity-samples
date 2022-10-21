@@ -16,25 +16,22 @@
  *
  */
 
-package com.google.apps.hellouwb
-
-import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.platform.app.InstrumentationRegistry
-import org.junit.Assert.assertEquals
-import org.junit.Test
-import org.junit.runner.RunWith
+package com.google.apps.uwbranging
 
 /**
- * Instrumented test, which will execute on an Android device.
+ * A token class that describes a UWB device.
  *
- * See [testing documentation](http://d.android.com/tools/testing).
+ * @param id a unique identifier that identifies the UWB device. Unlike UWB address, this identifier
+ * is consistent during different UWB sessions.
  */
-@RunWith(AndroidJUnit4::class)
-class ExampleInstrumentedTest {
-  @Test
-  fun useAppContext() {
-    // Context of the app under test.
-    val appContext = InstrumentationRegistry.getInstrumentation().targetContext
-    assertEquals("com.google.apps.com.google.apps.com.google.apps.hellouwb", appContext.packageName)
+data class UwbEndpoint(val id: String, val metadata: ByteArray) {
+  override fun equals(other: Any?): Boolean {
+    if (this === other) return true
+    if (other !is UwbEndpoint) return false
+    return id == other.id
+  }
+
+  override fun hashCode(): Int {
+    return id.hashCode()
   }
 }

@@ -5,11 +5,11 @@ plugins {
 }
 
 android {
-    namespace 'com.google.location.nearby.apps.hellouwb'
+    namespace 'com.google.apps.hellouwb'
     compileSdk 33
 
     defaultConfig {
-        applicationId "com.google.location.nearby.apps.hellouwb"
+        applicationId "com.google.apps.hellouwb"
         minSdk 31
         targetSdk 33
         versionCode 1

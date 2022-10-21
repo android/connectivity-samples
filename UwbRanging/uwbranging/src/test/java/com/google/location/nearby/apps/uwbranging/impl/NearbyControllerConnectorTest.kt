@@ -16,7 +16,7 @@
  *
  */
 
-package com.google.location.nearby.apps.uwbranging.impl
+package com.google.apps.uwbranging.impl
 
 import androidx.core.uwb.RangingParameters
 import androidx.core.uwb.UwbAddress
@@ -24,12 +24,16 @@ import androidx.core.uwb.UwbComplexChannel
 import androidx.core.uwb.UwbControllerSessionScope
 import com.google.common.primitives.Shorts
 import com.google.common.truth.Truth.assertThat
-import com.google.location.nearby.apps.uwbranging.UwbEndpoint
-import com.google.location.nearby.apps.uwbranging.impl.proto.Control
-import com.google.location.nearby.apps.uwbranging.impl.proto.Oob
-import com.google.location.nearby.apps.uwbranging.impl.proto.UwbCapabilities
-import com.google.location.nearby.apps.uwbranging.impl.proto.UwbConfiguration
-import com.google.location.nearby.apps.uwbranging.impl.proto.UwbConnectionInfo
+import com.google.apps.uwbranging.UwbEndpoint
+import com.google.apps.uwbranging.impl.NearbyConnections
+import com.google.apps.uwbranging.impl.NearbyControllerConnector
+import com.google.apps.uwbranging.impl.NearbyEvent
+import com.google.apps.uwbranging.impl.UwbOobEvent
+import com.google.apps.uwbranging.impl.proto.Control
+import com.google.apps.uwbranging.impl.proto.Oob
+import com.google.apps.uwbranging.impl.proto.UwbCapabilities
+import com.google.apps.uwbranging.impl.proto.UwbConfiguration
+import com.google.apps.uwbranging.impl.proto.UwbConnectionInfo
 import com.google.protobuf.ByteString
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.awaitClose

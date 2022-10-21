@@ -16,7 +16,7 @@
  *
  */
 
-package com.google.location.nearby.apps.uwbranging.impl
+package com.google.apps.uwbranging.impl
 
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
@@ -30,6 +30,8 @@ import com.google.android.gms.nearby.connection.EndpointDiscoveryCallback
 import com.google.android.gms.nearby.connection.Payload
 import com.google.android.gms.nearby.connection.PayloadCallback
 import com.google.android.gms.tasks.Tasks
+import com.google.apps.uwbranging.impl.NearbyConnections
+import com.google.apps.uwbranging.impl.NearbyEvent
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi

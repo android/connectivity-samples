@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace 'com.google.location.nearby.apps.uwbranging'
+    namespace 'com.google.apps.uwbranging'
     compileSdk 33
 
     defaultConfig {
