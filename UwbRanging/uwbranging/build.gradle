@@ -1,0 +1,93 @@
+plugins {
+    id 'com.android.library'
+    id 'org.jetbrains.kotlin.android'
+    id 'com.google.protobuf'
+}
+
+android {
+    namespace 'com.google.apps.uwbranging'
+    compileSdk 33
+
+    defaultConfig {
+        minSdk 31
+        targetSdk 33
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        consumerProguardFiles "consumer-rules.pro"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
+    sourceSets {
+        main {
+            java {
+                srcDirs += 'build/generated/source/proto/main/java'
+            }
+            kotlin {
+                srcDirs += 'build/generated/source/proto/main/kotlin'
+            }
+            proto {
+                srcDir 'src/main/proto'
+            }
+        }
+    }
+    buildToolsVersion '33.0.0'
+}
+
+dependencies {
+    implementation 'androidx.core.uwb:uwb:1.0.0-alpha03'
+    implementation 'androidx.core:core-ktx:1.9.0'
+    implementation 'androidx.appcompat:appcompat:1.5.1'
+    implementation 'androidx.test:core:1.5.0-alpha02'
+    implementation 'com.google.android.material:material:1.6.1'
+    implementation 'com.google.android.gms:play-services-tasks:18.0.2'
+    implementation 'com.google.android.gms:play-services-nearby:18.3.0'
+    implementation 'com.google.truth:truth:1.1.3'
+    implementation 'com.google.guava:guava:31.1-jre'
+    implementation 'org.robolectric:robolectric:4.8.2'
+    testImplementation 'junit:junit:4.13.2'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.3'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.6.4'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4'
+    implementation 'com.google.protobuf:protobuf-javalite:3.21.5'
+    implementation 'com.google.protobuf:protobuf-kotlin-lite:3.21.5'
+    implementation 'org.mockito.kotlin:mockito-kotlin:4.0.0'
+    implementation 'org.mockito:mockito-core:4.7.0'
+    implementation 'org.mockito:mockito-inline:4.7.0'
+}
+
+protobuf {
+    protoc {
+        artifact = "com.google.protobuf:protoc:3.17.3"
+    }
+    plugins {
+        java {
+            artifact = "com.google.protobuf:protobuf-javalite:3.21.5"
+        }
+    }
+
+    // Generates the java Protobuf-lite code for the Protobufs in this project. See
+    // https://github.com/google/protobuf-gradle-plugin#customizing-protobuf-compilation
+    // for more information.
+    generateProtoTasks {
+        all().each { task ->
+            task.builtins {
+                java {
+                    option 'lite'
+                }
+            }
+        }
+    }
+}
