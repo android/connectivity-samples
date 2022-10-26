@@ -28,7 +28,6 @@ import com.google.crossdevice.sample.rps.model.TwoPlayerGameDataViewModel;
  * Implementation of GameManager using Cross device APIs.
  */
 public final class SinglePlayerGameManager implements GameManager {
-
     private static final String TAG = "SessionsSPGameManager";
 
     private final TwoPlayerGameDataViewModel gameData;

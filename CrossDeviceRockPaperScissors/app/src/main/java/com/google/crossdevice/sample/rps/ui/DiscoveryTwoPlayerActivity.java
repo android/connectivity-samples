@@ -42,8 +42,6 @@ import java.util.Arrays;
  * API"-based GameManager.
  */
 public class DiscoveryTwoPlayerActivity extends AppCompatActivity {
-
-
     private static final String TAG = "DiscoveryTwoPlayerActivity";
 
     private Button findOpponentButton;
@@ -144,99 +142,103 @@ public class DiscoveryTwoPlayerActivity extends AppCompatActivity {
     private void addObservers() {
         // Observes changes to Local Player's name
         final Observer<String> localPlayerNameObserver =
-                newName -> nameText.setText(getString(R.string.codename, newName));
-        gameManager.getGameData().getLocalPlayerName().observe(this, localPlayerNameObserver);
+            newName -> nameText.setText(getString(R.string.codename, newName));
+        gameManager.getGameData()
+            .getLocalPlayerName().observe(this, localPlayerNameObserver);
 
         // Observes changes to Remote Player's name
         final Observer<String> opponentPlayerNameObserver =
-                newName -> {
-                    opponentText.setText(
-                            getString(
-                                    R.string.opponent_name,
-                                    TextUtils.isEmpty(newName) ? getString(R.string.no_opponent) : newName));
-                };
-        gameManager.getGameData().getOpponentPlayerName().observe(this, opponentPlayerNameObserver);
+            newName -> {
+                opponentText.setText(
+                    getString(
+                        R.string.opponent_name,
+                        TextUtils.isEmpty(newName) ? getString(R.string.no_opponent) : newName));
+            };
+        gameManager.getGameData()
+            .getOpponentPlayerName().observe(this, opponentPlayerNameObserver);
 
         // Observes changes to the Local Player's score
         final Observer<Integer> localPlayerScoreObserver =
-                newLocalPlayerScore -> {
-                    updateScore(
-                            newLocalPlayerScore,
-                            gameManager.getGameData().getOpponentPlayerScore().getValue());
-                };
-        gameManager.getGameData().getLocalPlayerScore().observe(this, localPlayerScoreObserver);
+            newLocalPlayerScore -> {
+                updateScore(
+                    newLocalPlayerScore,
+                    gameManager.getGameData().getOpponentPlayerScore().getValue());
+            };
+        gameManager.getGameData()
+            .getLocalPlayerScore().observe(this, localPlayerScoreObserver);
 
         // Observes changes to the Opponent Player's score
         final Observer<Integer> opponentPlayerScoreObserver =
-                newOpponentPlayerScore -> {
-                    updateScore(
-                            gameManager.getGameData().getLocalPlayerScore().getValue(),
-                            newOpponentPlayerScore);
-                };
-        gameManager.getGameData().getOpponentPlayerScore().observe(this, opponentPlayerScoreObserver);
+            newOpponentPlayerScore -> {
+                updateScore(
+                    gameManager.getGameData().getLocalPlayerScore().getValue(),
+                    newOpponentPlayerScore);
+            };
+        gameManager.getGameData()
+            .getOpponentPlayerScore().observe(this, opponentPlayerScoreObserver);
 
         // Observes game state changes and updates UI accordingly
         final Observer<GameData.GameState> gameStateObserver =
-                gameState -> {
-                    if (!Arrays.asList(GameData.GameState.values()).contains(gameState)) {
-                        throw new RuntimeException("Invalid GameState passed to Observer");
-                    }
-                    switch (gameState) {
-                        case DISCONNECTED:
-                            setButtonState(false);
-                            setStatusText(getString(R.string.status_disconnected));
-                            updateScore(
-                                    gameManager.getGameData().getLocalPlayerScore().getValue(),
-                                    gameManager.getGameData().getOpponentPlayerScore().getValue());
-                            break;
-                        case SEARCHING:
-                            setStatusText(getString(R.string.status_searching));
-                            break;
-                        case WAITING_FOR_PLAYER_INPUT:
-                            setButtonState(true);
-                            // Only set show status connected if no rounds have been completed
-                            if (gameManager.getGameData().getRoundsCompleted() == 0) {
-                                setStatusText(getString(R.string.status_connected));
-                            }
-                            break;
-                        case WAITING_FOR_ROUND_RESULT:
-                            setStatusText(
+            gameState -> {
+                if (!Arrays.asList(GameData.GameState.values()).contains(gameState)) {
+                    throw new RuntimeException("Invalid GameState passed to Observer");
+                }
+                switch (gameState) {
+                    case DISCONNECTED:
+                        setButtonState(false);
+                        setStatusText(getString(R.string.status_disconnected));
+                        updateScore(
+                                gameManager.getGameData().getLocalPlayerScore().getValue(),
+                                gameManager.getGameData().getOpponentPlayerScore().getValue());
+                        break;
+                    case SEARCHING:
+                        setStatusText(getString(R.string.status_searching));
+                        break;
+                    case WAITING_FOR_PLAYER_INPUT:
+                        setButtonState(true);
+                        // Only set show status connected if no rounds have been completed
+                        if (gameManager.getGameData().getRoundsCompleted() == 0) {
+                            setStatusText(getString(R.string.status_connected));
+                        }
+                        break;
+                    case WAITING_FOR_ROUND_RESULT:
+                        setStatusText(
+                            getString(
+                                R.string.game_choice, gameManager.getGameData().getLocalPlayerChoice()));
+                        setGameChoicesEnabled(false);
+                        break;
+                    case ROUND_RESULT:
+                        if (!Arrays.asList(GameData.RoundWinner.values())
+                            .contains(gameManager.getGameData().getRoundWinner())) {
+                            throw new RuntimeException("Invalid RoundWinner in RoundResult");
+                        }
+                        switch (gameManager.getGameData().getRoundWinner()) {
+                            case LOCAL_PLAYER:
+                                setStatusText(
                                     getString(
-                                            R.string.game_choice, gameManager.getGameData().getLocalPlayerChoice()));
-                            setGameChoicesEnabled(false);
-                            break;
-                        case ROUND_RESULT:
-                            if (!Arrays.asList(GameData.RoundWinner.values())
-                                    .contains(gameManager.getGameData().getRoundWinner())) {
-                                throw new RuntimeException("Invalid RoundWinner in RoundResult");
-                            }
-                            switch (gameManager.getGameData().getRoundWinner()) {
-                                case LOCAL_PLAYER:
-                                    setStatusText(
-                                            getString(
-                                                    R.string.win_message,
-                                                    gameManager.getGameData().getLocalPlayerChoice(),
-                                                    gameManager.getGameData().getOpponentPlayerChoice()));
-                                    break;
-                                case OPPONENT:
-                                    setStatusText(
-                                            getString(
-                                                    R.string.loss_message,
-                                                    gameManager.getGameData().getLocalPlayerChoice(),
-                                                    gameManager.getGameData().getOpponentPlayerChoice()));
-                                    break;
-                                case TIE:
-                                    setStatusText(
-                                            getString(
-                                                    R.string.tie_message, gameManager.getGameData().getLocalPlayerChoice()));
-                                    break;
-                                default:
-                                    Log.d(TAG, "Ignoring RoundWinner: " + gameState);
-                            }
-                        default:
-                            Log.d(TAG, "Ignoring GameState: " + gameState);
-                    }
-                };
+                                        R.string.win_message,
+                                        gameManager.getGameData().getLocalPlayerChoice(),
+                                        gameManager.getGameData().getOpponentPlayerChoice()));
+                                break;
+                            case OPPONENT:
+                                setStatusText(
+                                    getString(
+                                        R.string.loss_message,
+                                        gameManager.getGameData().getLocalPlayerChoice(),
+                                        gameManager.getGameData().getOpponentPlayerChoice()));
+                                break;
+                            case TIE:
+                                setStatusText(
+                                    getString(
+                                        R.string.tie_message, gameManager.getGameData().getLocalPlayerChoice()));
+                                break;
+                            default:
+                                Log.d(TAG, "Ignoring RoundWinner: " + gameState);
+                        }
+                    default:
+                        Log.d(TAG, "Ignoring GameState: " + gameState);
+                }
+            };
         gameManager.getGameData().getGameState().observe(this, gameStateObserver);
     }
 
@@ -245,15 +247,15 @@ public class DiscoveryTwoPlayerActivity extends AppCompatActivity {
      */
     private void sendGameChoice(GameChoice choice) {
         gameManager.sendGameChoice(
-                choice,
-                new GameManager.Callback() {
-                    @Override
-                    public void onFailure() {
-                        Toast.makeText(
-                                DiscoveryTwoPlayerActivity.this, R.string.send_failure, Toast.LENGTH_SHORT)
-                                .show();
-                    }
-                });
+            choice,
+            new GameManager.Callback() {
+                @Override
+                public void onFailure() {
+                Toast.makeText(
+                    DiscoveryTwoPlayerActivity.this, R.string.send_failure, Toast.LENGTH_SHORT)
+                    .show();
+            }
+        });
     }
 
     /**

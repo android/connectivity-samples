@@ -47,7 +47,6 @@ import java.util.concurrent.Executor;
  * Implementation of GameManager using Discovery APIs.
  */
 public final class DiscoveryTwoPlayerGameManager implements GameManager {
-
     private static final String TAG = "DiscoveryTPGameManager";
     public static final String ACTION_WAKE_UP =
             "com.google.crossdevice.sample.rps.DISCOVERY_TWO_PLAYER_WAKEUP";
@@ -59,7 +58,7 @@ public final class DiscoveryTwoPlayerGameManager implements GameManager {
     private final Discovery discovery;
     private final DevicePickerLauncher devicePickerLauncher;
 
-    private RemoteConnection remotePlayer;
+    @Nullable private RemoteConnection remotePlayer;
 
     public DiscoveryTwoPlayerGameManager(Context context) {
         this.context = context;
@@ -70,18 +69,18 @@ public final class DiscoveryTwoPlayerGameManager implements GameManager {
         // Register the callback for selected devices. It will provides a list of Participant,
         // available for connections.
         devicePickerLauncher =
-                discovery.registerForResult(
-                        (ActivityResultCaller) context,
-                        participants -> {
-                            for (Participant participant : participants) {
-                                Log.d(TAG, "selected participant=" + participant);
-                                openRemoteConnection(participant);
-                                break;
-                            }
-                            if (participants.isEmpty()) {
-                                resetGame();
-                            }
-                        });
+            discovery.registerForResult(
+                (ActivityResultCaller) context,
+                participants -> {
+                    for (Participant participant : participants) {
+                        Log.d(TAG, "selected participant=" + participant);
+                        openRemoteConnection(participant);
+                        break;
+                    }
+                    if (participants.isEmpty()) {
+                        resetGame();
+                    }
+                });
         // Ensure data in the View Model is reset
         resetGame();
     }
@@ -110,32 +109,32 @@ public final class DiscoveryTwoPlayerGameManager implements GameManager {
         gameData.getGameState().setValue(GameData.GameState.SEARCHING);
         // Launches device picker dialog showing available devices to connect
         Futures.addCallback(
-                devicePickerLauncher.launchDevicePickerFuture(
-                        ImmutableList.of(),
-                        new StartComponentRequest.Builder()
-                                .setAction(ACTION_WAKE_UP)
-                                .setReason(context.getString(R.string.wakeup_reason))
-                                .build()),
-                new FutureCallback<Void>() {
-                    @Override
-                    public void onSuccess(Void result) {
-                        Log.d(TAG, "onSuccess launchFuture");
-                    }
+            devicePickerLauncher.launchDevicePickerFuture(
+                ImmutableList.of(),
+                new StartComponentRequest.Builder()
+                    .setAction(ACTION_WAKE_UP)
+                    .setReason(context.getString(R.string.wakeup_reason))
+                    .build()),
+            new FutureCallback<Void>() {
+                @Override
+                public void onSuccess(Void result) {
+                    Log.d(TAG, "onSuccess launchFuture");
+                }
 
-                    @Override
-                    public void onFailure(Throwable t) {
-                        Log.e(TAG, "Discovery failed: error getting devices ", t);
-                        resetGame();
-                    }
-                },
-                mainExecutor);
+                @Override
+                public void onFailure(@NonNull Throwable t) {
+                    Log.e(TAG, "Discovery failed: error getting devices ", t);
+                    resetGame();
+                }
+            },
+            mainExecutor);
     }
 
     /**
      * Sends the local player's game choice to the other remote player.
      */
     @Override
-    public void sendGameChoice(GameChoice choice, Callback callback) {
+    public void sendGameChoice(GameChoice choice, @Nullable Callback callback) {
         gameData.setLocalPlayerChoice(choice);
         gameData.getGameState().setValue(GameData.GameState.WAITING_FOR_ROUND_RESULT);
         sendPayloadToRemoteConnection(remotePlayer, callback);
@@ -154,7 +153,7 @@ public final class DiscoveryTwoPlayerGameManager implements GameManager {
      */
     @Override
     public void finishRound() {
-        // if both players have entered their choices, process the round and receive the next payload
+        // process the round and receive the next payload if both players have entered their choices
         if (gameData.getOpponentPlayerChoice() != null && gameData.isLocalPlayerChoiceConfirmed()) {
             Log.d(TAG, "Processing round...");
             gameData.processRound();
@@ -192,25 +191,27 @@ public final class DiscoveryTwoPlayerGameManager implements GameManager {
 
         // Registers call back to accept incoming remote connection
         Futures.addCallback(
-                participant.acceptConnectionFuture(GAME_CHANNEL_NAME),
-                new FutureCallback<RemoteConnection>() {
-                    @Override
-                    public void onSuccess(RemoteConnection result) {
-                        Log.i(TAG, "onConnectionResult: connection successful");
-                        updateRemotePlayer(result);
-                        // Ensure data from any previous game is reset
-                        resetGame();
-                        gameData.getGameState().setValue(GameData.GameState.WAITING_FOR_PLAYER_INPUT);
-                        gameData.getOpponentPlayerName().setValue(participant.getDisplayName().toString());
-                        receivePayloadFromRemoteConnection(result);
-                    }
+            participant.acceptConnectionFuture(GAME_CHANNEL_NAME),
+            new FutureCallback<RemoteConnection>() {
+                @Override
+                public void onSuccess(RemoteConnection result) {
+                    Log.i(TAG, "onConnectionResult: connection successful");
+                    updateRemotePlayer(result);
+                    // Ensure data from any previous game is reset
+                    resetGame();
+                    gameData.getGameState()
+                        .setValue(GameData.GameState.WAITING_FOR_PLAYER_INPUT);
+                    gameData.getOpponentPlayerName()
+                        .setValue(participant.getDisplayName().toString());
+                    receivePayloadFromRemoteConnection(result);
+                }
 
-                    @Override
-                    public void onFailure(Throwable t) {
-                        Log.e(TAG, "unable to open receiving connection", t);
-                    }
-                },
-                mainExecutor);
+                @Override
+                public void onFailure(@NonNull Throwable t) {
+                    Log.e(TAG, "unable to open receiving connection", t);
+                }
+            },
+            mainExecutor);
     }
 
     /**
@@ -224,62 +225,74 @@ public final class DiscoveryTwoPlayerGameManager implements GameManager {
 
         // Opens a remote connection and registers to receive data from participant device.
         Futures.addCallback(
-                participant.openConnectionFuture(GAME_CHANNEL_NAME),
-                new FutureCallback<RemoteConnection>() {
-                    @Override
-                    public void onSuccess(RemoteConnection remoteConnection) {
-                        Log.i(TAG, "onConnectionResult: connection successful");
+            participant.openConnectionFuture(GAME_CHANNEL_NAME),
+            new FutureCallback<RemoteConnection>() {
+                @Override
+                public void onSuccess(RemoteConnection remoteConnection) {
+                    Log.i(TAG, "onConnectionResult: connection successful");
 
-                        // Once there is a successful connection we update remote player information and
-                        // register to receive payload from them
-                        gameData.getGameState().setValue(GameData.GameState.WAITING_FOR_PLAYER_INPUT);
-                        gameData.getOpponentPlayerName().setValue(participant.getDisplayName().toString());
-                        remotePlayer = remoteConnection;
-                        receivePayloadFromRemoteConnection(remoteConnection);
-                    }
+                    // Once there is a successful connection update remote player information
+                    // and register to receive payload from them
+                    gameData.getGameState()
+                        .setValue(GameData.GameState.WAITING_FOR_PLAYER_INPUT);
+                    gameData.getOpponentPlayerName()
+                        .setValue(participant.getDisplayName().toString());
+                    remotePlayer = remoteConnection;
+                    receivePayloadFromRemoteConnection(remoteConnection);
+                }
 
-                    @Override
-                    public void onFailure(Throwable t) {
-                        Log.e(TAG, "error opening remote connection", t);
-                        resetGame();
-                    }
-                },
-                mainExecutor);
+                @Override
+                public void onFailure(@NonNull Throwable t) {
+                    Log.e(TAG, "error opening remote connection", t);
+                    resetGame();
+                }
+            },
+            mainExecutor);
     }
 
     /**
      * Sends data over a provided {@link RemoteConnection}.
      */
-    private void sendPayloadToRemoteConnection(RemoteConnection remoteConnection, Callback callback) {
+    private void sendPayloadToRemoteConnection(
+        @Nullable RemoteConnection remoteConnection, @Nullable Callback callback ) {
+        if (remoteConnection == null) {
+          Log.d(TAG, "sendPayloadToRemoteConnection() called with a null connection");
+          return;
+        }
+
         Log.d(TAG, "sendPayloadToRemoteConnection()");
 
-        // Sends a payload to a remote device
+          // Sends a payload to a remote device
         Futures.addCallback(
-                remoteConnection.sendFuture(gameData.getLocalPlayerChoice().name().getBytes(UTF_8)),
-                new FutureCallback<Void>() {
-                    @Override
-                    public void onSuccess(Void result) {
-                        Log.i(TAG, "sendPayloadToRemoteConnection() success");
-                        gameData.setLocalPlayerChoiceConfirmed(true);
-                        finishRound();
+            remoteConnection.sendFuture(gameData.getLocalPlayerChoice().name().getBytes(UTF_8)),
+            new FutureCallback<Void>() {
+                @Override
+                public void onSuccess(Void result) {
+                    Log.i(TAG, "sendPayloadToRemoteConnection() success");
+                    gameData.setLocalPlayerChoiceConfirmed(true);
+                    finishRound();
+                    if (callback != null) {
                         callback.onSuccess();
                     }
+                }
 
-                    @Override
-                    public void onFailure(Throwable t) {
-                        Log.e(TAG, "error sending payload", t);
-                        gameData.getGameState().setValue(GameData.GameState.WAITING_FOR_PLAYER_INPUT);
+                @Override
+                public void onFailure(@NonNull Throwable t) {
+                    Log.e(TAG, "error sending payload", t);
+                    gameData.getGameState().setValue(GameData.GameState.WAITING_FOR_PLAYER_INPUT);
+                    if (callback != null) {
                         callback.onFailure();
                     }
-                },
-                mainExecutor);
+                }
+            },
+            mainExecutor);
     }
 
     /**
      * Closes the given remote connection.
      */
     private void closeRemoteConnection(
-            RemoteConnection remoteConnection, FutureCallback<Void> callback) {
+            @Nullable RemoteConnection remoteConnection, FutureCallback<Void> callback) {
         if (remoteConnection != null) {
             Futures.addCallback(remoteConnection.closeFuture(), callback, mainExecutor);
         }
@@ -288,7 +301,7 @@ public final class DiscoveryTwoPlayerGameManager implements GameManager {
     /**
      * Creates a call back to receive payload data from peer remote connections
      */
-    private void receivePayloadFromRemoteConnection(RemoteConnection remoteConnection) {
+    private void receivePayloadFromRemoteConnection(@Nullable RemoteConnection remoteConnection) {
         if (remoteConnection == null) {
             Log.d(TAG, "receiveRemoteConnectionPayload() called with a null connection");
             return;
@@ -298,26 +311,27 @@ public final class DiscoveryTwoPlayerGameManager implements GameManager {
 
         // Receives payloads from a remote device
         remoteConnection.registerReceiver(
-                new ConnectionReceiver() {
-                    @Override
-                    public void onMessageReceived(
-                            @NonNull RemoteConnection connection, @NonNull byte[] payload) {
-                        Log.i(TAG, "receivePayloadFromRemoteConnection() success");
-                        // we set the game choice for player 2
-                        gameData.setOpponentPlayerChoice(GameChoice.valueOf(new String(payload, UTF_8)));
-                        finishRound();
-                    }
+            new ConnectionReceiver() {
+                @Override
+                public void onMessageReceived(
+                        @NonNull RemoteConnection connection, @NonNull byte[] payload) {
+                    Log.i(TAG, "receivePayloadFromRemoteConnection() success");
+                    // we set the game choice for player 2
+                    gameData.setOpponentPlayerChoice(
+                        GameChoice.valueOf(new String(payload, UTF_8)));
+                    finishRound();
+                }
 
-                    @Override
-                    public void onConnectionClosed(
-                            @NonNull RemoteConnection connection,
-                            @Nullable Throwable error,
-                            @Nullable String reason) {
-                        Log.i(TAG, "Connection closed. reason=" + reason, error);
-                        remotePlayer = null;
-                        resetGame();
-                    }
-                });
+                @Override
+                public void onConnectionClosed(
+                    @NonNull RemoteConnection connection,
+                    @Nullable Throwable error,
+                    @Nullable String reason) {
+                    Log.i(TAG, "Connection closed. reason=" + reason, error);
+                    remotePlayer = null;
+                    resetGame();
+                }
+            });
     }
 
     private void updateRemotePlayer(RemoteConnection remotePlayer) {
@@ -325,18 +339,18 @@ public final class DiscoveryTwoPlayerGameManager implements GameManager {
         if (this.remotePlayer != null) {
             Log.i(TAG, "Disconnecting from previous remote player");
             closeRemoteConnection(
-                    this.remotePlayer,
-                    new FutureCallback<Void>() {
-                        @Override
-                        public void onSuccess(Void result) {
-                            // Do nothing
-                        }
+                this.remotePlayer,
+                new FutureCallback<Void>() {
+                    @Override
+                    public void onSuccess(Void result) {
+                        // Do nothing
+                    }
 
-                        @Override
-                        public void onFailure(Throwable t) {
-                            Log.e(TAG, "Error closing previous remote connection, which is now orphaned", t);
-                        }
-                    });
+                    @Override
+                    public void onFailure(@NonNull Throwable t) {
+                        Log.e(TAG, "Error closing previous remote connection, which is now orphaned", t);
+                    }
+                });
         }
         this.remotePlayer = remotePlayer;
     }
@@ -345,20 +359,25 @@ public final class DiscoveryTwoPlayerGameManager implements GameManager {
      * Clears remote connection
      */
     private void closeConnections() {
-        closeRemoteConnection(
-                remotePlayer,
-                new FutureCallback<Void>() {
-                    @Override
-                    public void onSuccess(Void result) {
-                        remotePlayer = null;
-                        gameData.getGameState().setValue(GameData.GameState.DISCONNECTED);
-                        gameData.resetGameData();
-                    }
+        if (remotePlayer == null) {
+          // Connection already closed
+          return;
+        }
 
-                    @Override
-                    public void onFailure(Throwable t) {
-                        Log.e(TAG, "Error closing remote connection", t);
-                    }
-                });
+        closeRemoteConnection(
+            remotePlayer,
+            new FutureCallback<Void>() {
+                @Override
+                public void onSuccess(Void result) {
+                    remotePlayer = null;
+                    gameData.getGameState().setValue(GameData.GameState.DISCONNECTED);
+                    gameData.resetGameData();
+                }
+
+                @Override
+                public void onFailure(@NonNull Throwable t) {
+                    Log.e(TAG, "Error closing remote connection", t);
+                }
+            });
     }
 }

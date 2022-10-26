@@ -16,6 +16,7 @@
 
 package com.google.crossdevice.sample.rps.model;
 
+import androidx.annotation.Nullable;
 import androidx.lifecycle.MutableLiveData;
 
 import org.json.JSONObject;
@@ -58,12 +59,12 @@ public interface GameData {
     /**
      * Gets the GameChoice of the local player.
      */
-    GameChoice getLocalPlayerChoice();
+    @Nullable GameChoice getLocalPlayerChoice();
 
     /**
      * Gets the GameChoice of the opponent player.
      */
-    GameChoice getOpponentPlayerChoice();
+    @Nullable GameChoice getOpponentPlayerChoice();
 
     /**
      * Gets the score of the local player.

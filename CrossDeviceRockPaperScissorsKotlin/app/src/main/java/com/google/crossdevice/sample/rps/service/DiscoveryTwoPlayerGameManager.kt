@@ -49,7 +49,8 @@ class DiscoveryTwoPlayerGameManager(
         // Register the callback for selected devices. It will provides a list of Participant,
         // available for connections.
         devicePickerLauncher =
-            discovery.registerForResult(context as ActivityResultCaller) { participants: Collection<Participant> ->
+            discovery.registerForResult(context as ActivityResultCaller) {
+                    participants: Collection<Participant> ->
                 for (participant in participants) {
                     Log.d(TAG, "selected participant=$participant")
                     openRemoteConnection(participant)
@@ -99,7 +100,7 @@ class DiscoveryTwoPlayerGameManager(
 
     /** Finishes and processes the round after all players have entered their choices. */
     override fun finishRound() {
-        // if both players have entered their choices, process the round and receive the next payload
+        // process the round and receive the next payload if both players have entered their choices
         if (gameData.opponentPlayerChoice != null && gameData.isLocalPlayerChoiceConfirmed) {
             Log.d(TAG, "Processing round...")
             gameData.processRound()
@@ -181,7 +182,9 @@ class DiscoveryTwoPlayerGameManager(
         // Sends a payload to a remote device
         scope.launch {
             val sendResult =
-                remoteConnection.send(gameData.localPlayerChoice!!.name.toByteArray(StandardCharsets.UTF_8))
+                remoteConnection.send(
+                    gameData.localPlayerChoice!!.name.toByteArray(StandardCharsets.UTF_8)
+                )
             sendResult.onSuccess {
                 Log.i(TAG, "sendPayloadToRemoteConnection() success")
                 gameData.isLocalPlayerChoiceConfirmed = true

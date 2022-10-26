@@ -24,6 +24,7 @@ import android.util.Log;
 
 import androidx.activity.result.ActivityResultCaller;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 
 import com.google.ambient.crossdevice.sessions.PrimarySession;
@@ -52,81 +53,85 @@ import java.util.concurrent.Executor;
  * Implementation of GameManager using Sessions APIs.
  */
 public final class SessionsTwoPlayerGameManager implements GameManager {
-
     private static final String TAG = "SessionsTPGameManager";
     public static final String ACTION_WAKE_UP =
             "com.google.crossdevice.sample.rps.SESSIONS_TWO_PLAYER_WAKEUP";
 
     private final PrimarySessionStateCallback primarySessionStateCallback =
-            new PrimarySessionStateCallback() {
-                @Override
-                public void onShareFailureWithParticipant(
-                        @NonNull SessionId sessionId, @NonNull SessionException exception, SessionParticipant participant) {
-                    Log.e(TAG, "Share failure with participant: " + participant.getDisplayName(), exception);
-                }
+        new PrimarySessionStateCallback() {
+            @Override
+            public void onShareFailureWithParticipant(
+                @NonNull SessionId sessionId,
+                @NonNull SessionException exception,
+                SessionParticipant participant) {
+                Log.e(TAG, "Share failure with participant: " + participant.getDisplayName(), exception);
+            }
 
-                @Override
-                public void onParticipantDeparted(@NonNull SessionId sessionId, SessionParticipant participant) {
-                    Log.d(TAG, "SessionParticipant departed: " + participant.getDisplayName());
-                    /* The PrimarySession will only be destroyed if done explicitly. Since the only
-                     * participant has departed, the PrimarySession should now be destroyed. */
+            @Override
+            public void onParticipantDeparted(
+                @NonNull SessionId sessionId, SessionParticipant participant) {
+                Log.d(TAG, "SessionParticipant departed: " + participant.getDisplayName());
+                /* The PrimarySession will only be destroyed if done explicitly. Since the only
+                 * participant has departed, the PrimarySession should now be destroyed. */
+                destroyPrimarySession();
+            }
+
+            @Override
+            public void onParticipantJoined(
+                @NonNull SessionId sessionId, SessionParticipant participant) {
+                Log.d(TAG, "New Participant joined: " + participant.getDisplayName());
+                gameData.getGameState().setValue(GameData.GameState.WAITING_FOR_PLAYER_INPUT);
+                gameData.getOpponentPlayerName().setValue(participant.getDisplayName().toString());
+                if (primarySession == null) {
+                    Log.d(TAG, "Cannot add callback to joined participant since PrimarySession is null");
+                    return;
+                }
+                addRemoteConnectionCallback(primarySession, participant);
+            }
+
+            @Override
+            public void onPrimarySessionCleanup(@NonNull SessionId sessionId) {
+                Log.d(TAG, "PrimarySession cleanup");
+                primarySession = null;
+                resetGame();
+            }
+
+            @Override
+            public void onShareInitiated(
+                @NonNull SessionId sessionId, int numPotentialParticipants) {
+                if (numPotentialParticipants == 0) {
+                    Log.d(TAG, "No participants joining Session, destroying PrimarySession");
                     destroyPrimarySession();
                 }
+            }
 
-                @Override
-                public void onParticipantJoined(@NonNull SessionId sessionId, SessionParticipant participant) {
-                    Log.d(TAG, "New Participant joined: " + participant.getDisplayName());
-                    gameData.getGameState().setValue(GameData.GameState.WAITING_FOR_PLAYER_INPUT);
-                    gameData.getOpponentPlayerName().setValue(participant.getDisplayName().toString());
-                    if (primarySession == null) {
-                        Log.d(TAG, "Cannot add callback to joined participant since PrimarySession is null");
-                        return;
-                    }
-                    addRemoteConnectionCallback(primarySession, participant);
-                }
-
-                @Override
-                public void onPrimarySessionCleanup(@NonNull SessionId sessionId) {
-                    Log.d(TAG, "PrimarySession cleanup");
-                    primarySession = null;
-                    resetGame();
-                }
-
-                @Override
-                public void onShareInitiated(@NonNull SessionId sessionId, int numPotentialParticipants) {
-                    if (numPotentialParticipants == 0) {
-                        Log.d(TAG, "No participants joining Session, destroying PrimarySession");
-                        destroyPrimarySession();
-                    }
-                }
-
-                /** Add a callback to SessionParticipant for handling received messages */
-                private void addRemoteConnectionCallback(
-                        PrimarySession session, SessionParticipant participant) {
-                    session
-                            .getSecondaryRemoteConnectionForParticipant(participant)
-                            .registerReceiver((participant1, payload) -> handleMessageReceived(payload));
-                }
-            };
+            /** Add a callback to SessionParticipant for handling received messages */
+            private void addRemoteConnectionCallback(
+                PrimarySession session, SessionParticipant participant) {
+                session
+                    .getSecondaryRemoteConnectionForParticipant(participant)
+                    .registerReceiver((participant1, payload) -> handleMessageReceived(payload));
+            }
+        };
 
     private final SecondarySessionStateCallback secondarySessionStateCallback =
-            new SecondarySessionStateCallback() {
-                @Override
-                public void onSecondarySessionCleanup(@NonNull SessionId sessionId) {
-                    secondarySession = null;
-                    secondaryConnection = null;
-                    resetGame();
-                }
-            };
+        new SecondarySessionStateCallback() {
+            @Override
+            public void onSecondarySessionCleanup(@NonNull SessionId sessionId) {
+                secondarySession = null;
+                secondaryConnection = null;
+                resetGame();
+            }
+        };
 
     private final Context context;
     private final Executor mainExecutor;
     private final TwoPlayerGameDataViewModel gameData;
     private final Sessions sessions;
 
-    private PrimarySession primarySession;
-    private SecondarySession secondarySession;
-    private SessionRemoteConnection secondaryConnection;
+    @Nullable private PrimarySession primarySession;
+    @Nullable private SecondarySession secondarySession;
+    @Nullable private SessionRemoteConnection secondaryConnection;
 
     public SessionsTwoPlayerGameManager(Context context) {
         this.context = context;
@@ -162,37 +167,38 @@ public final class SessionsTwoPlayerGameManager implements GameManager {
     public void findOpponent() {
         gameData.getGameState().setValue(GameData.GameState.SEARCHING);
 
-        SessionId sessionId = sessions.createSession(/* applicationSessionTag */ null);
+        SessionId sessionId = sessions
+            .createSession(/* applicationSessionTag */ null);
         Futures.addCallback(
-                sessions.shareSessionFuture(
-                        sessionId,
-                        new StartComponentRequest.Builder()
-                                .setAction(ACTION_WAKE_UP)
-                                .setReason(context.getString(R.string.wakeup_reason))
-                                .build(),
-                        Collections.emptyList(),
-                        primarySessionStateCallback),
-                new FutureCallback<PrimarySession>() {
-                    @Override
-                    public void onSuccess(PrimarySession result) {
-                        Log.d(TAG, "Successfully launched opponent picker");
-                        primarySession = result;
-                    }
+            sessions.shareSessionFuture(
+                sessionId,
+                new StartComponentRequest.Builder()
+                    .setAction(ACTION_WAKE_UP)
+                    .setReason(context.getString(R.string.wakeup_reason))
+                    .build(),
+                Collections.emptyList(),
+                primarySessionStateCallback),
+            new FutureCallback<PrimarySession>() {
+                @Override
+                public void onSuccess(PrimarySession result) {
+                    Log.d(TAG, "Successfully launched opponent picker");
+                    primarySession = result;
+                }
 
-                    @Override
-                    public void onFailure(Throwable t) {
-                        Log.e(TAG, "Failed to launch opponent picker", t);
-                        resetGame();
-                    }
-                },
-                mainExecutor);
+                @Override
+                public void onFailure(@NonNull Throwable t) {
+                    Log.e(TAG, "Failed to launch opponent picker", t);
+                    resetGame();
+                }
+            },
+            mainExecutor);
     }
 
     /**
      * Sends the local player's game choice to the other remote player.
      */
     @Override
-    public void sendGameChoice(GameChoice choice, Callback callback) {
+    public void sendGameChoice(GameChoice choice, @Nullable Callback callback) {
         gameData.setLocalPlayerChoice(choice);
         gameData.getGameState().setValue(GameData.GameState.WAITING_FOR_ROUND_RESULT);
         broadcastGameChoice(callback);
@@ -211,7 +217,7 @@ public final class SessionsTwoPlayerGameManager implements GameManager {
      */
     @Override
     public void finishRound() {
-        // if both players have entered their choices, process the round and receive the next payload
+        // process the round and receive the next payload if both players have entered their choices
         if (gameData.getOpponentPlayerChoice() != null && gameData.isLocalPlayerChoiceConfirmed()) {
             Log.d(TAG, "Processing round...");
             gameData.processRound();
@@ -239,21 +245,21 @@ public final class SessionsTwoPlayerGameManager implements GameManager {
      */
     private void getSecondarySessionAndRemoteConnection(Intent intent) {
         Futures.addCallback(
-                sessions.getSecondarySessionFuture(intent, secondarySessionStateCallback),
-                new FutureCallback<SecondarySession>() {
-                    @Override
-                    public void onSuccess(SecondarySession result) {
-                        Log.d(TAG, "Succeeded to get SecondarySession");
-                        updateSecondarySession(result);
-                        getRemoteConnectionAndRegisterReceiver(result);
-                    }
+            sessions.getSecondarySessionFuture(intent, secondarySessionStateCallback),
+            new FutureCallback<SecondarySession>() {
+                @Override
+                public void onSuccess(SecondarySession result) {
+                    Log.d(TAG, "Succeeded to get SecondarySession");
+                    updateSecondarySession(result);
+                    getRemoteConnectionAndRegisterReceiver(result);
+                }
 
-                    @Override
-                    public void onFailure(Throwable t) {
-                        Log.e(TAG, "Failed to get SessionHandle", t);
-                    }
-                },
-                mainExecutor);
+                @Override
+                public void onFailure(@NonNull Throwable t) {
+                    Log.e(TAG, "Failed to get SessionHandle", t);
+                }
+            },
+            mainExecutor);
     }
 
     /**
@@ -261,18 +267,19 @@ public final class SessionsTwoPlayerGameManager implements GameManager {
      */
     private void getRemoteConnectionAndRegisterReceiver(SecondarySession sessionHandle) {
         secondaryConnection = sessionHandle.getDefaultRemoteConnection();
-        secondaryConnection.registerReceiver((participant, payload) -> handleMessageReceived(payload));
+        secondaryConnection
+            .registerReceiver((participant, payload) -> handleMessageReceived(payload));
         resetGame();
         gameData.getGameState().setValue(GameData.GameState.WAITING_FOR_PLAYER_INPUT);
         gameData
-                .getOpponentPlayerName()
-                .setValue(secondaryConnection.getParticipant().getDisplayName().toString());
+            .getOpponentPlayerName()
+            .setValue(secondaryConnection.getParticipant().getDisplayName().toString());
     }
 
     /**
      * Sends the game choice to whichever connection is open.
      */
-    private void broadcastGameChoice(Callback callback) {
+    private void broadcastGameChoice(@Nullable Callback callback) {
         Log.i(TAG, "Sending game choice");
 
         ListenableFuture<Void> sendMessageFuture = getSendMessageFuture();
@@ -283,23 +290,27 @@ public final class SessionsTwoPlayerGameManager implements GameManager {
         }
 
         Futures.addCallback(
-                sendMessageFuture,
-                new FutureCallback<Void>() {
-                    @Override
-                    public void onSuccess(Void result) {
-                        Log.i(TAG, "Successfully sent game choice");
-                        gameData.setLocalPlayerChoiceConfirmed(true);
-                        finishRound();
+            sendMessageFuture,
+            new FutureCallback<Void>() {
+                @Override
+                public void onSuccess(Void result) {
+                    Log.i(TAG, "Successfully sent game choice");
+                    gameData.setLocalPlayerChoiceConfirmed(true);
+                    finishRound();
+                    if (callback != null) {
                         callback.onSuccess();
                     }
+                }
 
-                    @Override
-                    public void onFailure(Throwable t) {
-                        Log.e(TAG, "Failed to send game choice", t);
+                @Override
+                public void onFailure(@NonNull Throwable t) {
+                    Log.e(TAG, "Failed to send game choice", t);
+                    if (callback != null) {
                         callback.onFailure();
                     }
-                },
-                mainExecutor);
+                }
+            },
+            mainExecutor);
     }
 
     private ListenableFuture<Void> getSendMessageFuture() {
@@ -318,27 +329,33 @@ public final class SessionsTwoPlayerGameManager implements GameManager {
      */
     private void destroySecondarySession(
             SecondarySession secondarySession, FutureCallback<Void> callback) {
-        Futures.addCallback(secondarySession.destroySecondarySessionFuture(), callback, mainExecutor);
+        Futures.addCallback(
+            secondarySession.destroySecondarySessionFuture(), callback, mainExecutor);
     }
 
     /**
      * Destroys a PrimarySession.
      */
     private void destroyPrimarySession() {
-        Futures.addCallback(
-                primarySession.destroyPrimarySessionAndStopSharingFuture(),
-                new FutureCallback<Void>() {
-                    @Override
-                    public void onSuccess(Void result) {
-                        Log.i(TAG, "Destroyed primary session handle");
-                    }
+        if (primarySession == null) {
+            // Already destroyed
+            return;
+        }
 
-                    @Override
-                    public void onFailure(Throwable t) {
-                        Log.e(TAG, "Failed to destroy primary session handle", t);
-                    }
-                },
-                mainExecutor);
+        Futures.addCallback(
+            primarySession.destroyPrimarySessionAndStopSharingFuture(),
+            new FutureCallback<Void>() {
+                @Override
+                public void onSuccess(Void result) {
+                    Log.i(TAG, "Destroyed primary session handle");
+                }
+
+                @Override
+                public void onFailure(@NonNull Throwable t) {
+                    Log.e(TAG, "Failed to destroy primary session handle", t);
+                }
+            },
+            mainExecutor);
     }
 
     /**
@@ -349,18 +366,18 @@ public final class SessionsTwoPlayerGameManager implements GameManager {
         // Close any existing connection
         if (this.secondarySession != null) {
             destroySecondarySession(
-                    this.secondarySession,
-                    new FutureCallback<Void>() {
-                        @Override
-                        public void onSuccess(Void result) {
-                            Log.i(TAG, "Successfully disconnected from the previous SecondarySession");
-                        }
+                this.secondarySession,
+                new FutureCallback<Void>() {
+                    @Override
+                    public void onSuccess(Void result) {
+                        Log.i(TAG, "Successfully disconnected from the previous SecondarySession");
+                    }
 
-                        @Override
-                        public void onFailure(Throwable t) {
-                            Log.e(TAG, "Error destroying previous secondary session, which is now orphaned", t);
-                        }
-                    });
+                    @Override
+                    public void onFailure(@NonNull Throwable t) {
+                        Log.e(TAG, "Error destroying previous secondary session, which is now orphaned", t);
+                    }
+                });
         }
         this.secondarySession = secondarySession;
     }
@@ -369,24 +386,22 @@ public final class SessionsTwoPlayerGameManager implements GameManager {
      * Closes any open PrimarySession or SecondarySession.
      */
     private void closeConnections() {
-        if (primarySession != null) {
-            destroyPrimarySession();
-        }
+        destroyPrimarySession();
 
         if (secondarySession != null) {
             destroySecondarySession(
-                    secondarySession,
-                    new FutureCallback<Void>() {
-                        @Override
-                        public void onSuccess(Void result) {
-                            Log.i(TAG, "Successfully destroyed SecondarySession");
-                        }
+                secondarySession,
+                new FutureCallback<Void>() {
+                    @Override
+                    public void onSuccess(Void result) {
+                        Log.i(TAG, "Successfully destroyed SecondarySession");
+                    }
 
-                        @Override
-                        public void onFailure(Throwable t) {
-                            Log.e(TAG, "Failed to destroy secondary session handle", t);
-                        }
-                    });
+                    @Override
+                    public void onFailure(@NonNull Throwable t) {
+                        Log.e(TAG, "Failed to destroy secondary session handle", t);
+                    }
+                });
         }
     }
 

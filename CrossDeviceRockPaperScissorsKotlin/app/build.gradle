@@ -3,6 +3,8 @@ plugins {
     id 'org.jetbrains.kotlin.android'
 }
 
+def crossdeviceVersion = findProperty("crossdeviceVersion") ?: "0.1.0-preview01"
+
 android {
     compileSdk 32
 
@@ -43,6 +45,6 @@ dependencies {
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.4.3'
 
     // Cross device SDK:
-    implementation 'com.google.ambient.crossdevice:crossdevice:0.1.0-preview01'
+    implementation "com.google.ambient.crossdevice:crossdevice:${crossdeviceVersion}"
 
 }

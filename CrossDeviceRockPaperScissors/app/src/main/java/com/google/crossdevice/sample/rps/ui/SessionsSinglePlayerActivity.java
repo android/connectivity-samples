@@ -25,6 +25,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
@@ -63,57 +64,54 @@ public class SessionsSinglePlayerActivity extends AppCompatActivity {
     private static final String TAG = "SessionsSinglePlayerActivity";
 
     public static final String ACTION_SESSIONS_TRANSFER =
-            "com.google.crossdevice.sample.rps.SESSIONS_TRANSFER";
+        "com.google.crossdevice.sample.rps.SESSIONS_TRANSFER";
 
-    private OriginatingSession originatingSession;
+    @Nullable private OriginatingSession originatingSession;
 
     private final OriginatingSessionStateCallback originatingSessionStateCallback =
-            new OriginatingSessionStateCallback() {
-                @Override
-                public void onConnected(SessionId sessionId) {
-                    Log.d(TAG, "onConnected() called within OriginatingSessionStateCallback");
-                    SessionRemoteConnection connection = originatingSession.getStartupRemoteConnection();
-                    Futures.addCallback(
-                            connection.sendFuture(transferableState.getState().toString().getBytes()),
-                            new FutureCallback<Void>() {
-                                @Override
-                                public void onSuccess(Void result) {
-                                    Log.d(TAG, "Successfully sent initialization message");
-                                }
+        new OriginatingSessionStateCallback() {
+            @Override
+            public void onConnected(@NonNull SessionId sessionId) {
+                Log.d(TAG, "onConnected() called within OriginatingSessionStateCallback");
+                SessionRemoteConnection connection = originatingSession.getStartupRemoteConnection();
+                Futures.addCallback(
+                    connection.sendFuture(transferableState.getState().toString().getBytes()),
+                    new FutureCallback<Void>() {
+                        @Override
+                        public void onSuccess(Void result) {
+                            Log.d(TAG, "Successfully sent initialization message");
+                        }
 
-                                @Override
-                                public void onFailure(Throwable t) {
-                                    Log.d(TAG, "Failed to send initialization message", t);
-                                }
-                            },
-                            mainExecutor);
-                }
+                        @Override
+                        public void onFailure(@NonNull Throwable t) {
+                            Log.d(TAG, "Failed to send initialization message", t);
+                        }
+                    },
+                    mainExecutor);
+            }
 
-                @Override
-                public void onSessionTransferred(SessionId sessionId) {
-                    Log.d(TAG, "Successfully transferred: " + sessionId);
-                    resetGame();
-                    createSession();
-                    showTransferSuccess();
-                }
+            @Override
+            public void onSessionTransferred(@NonNull SessionId sessionId) {
+                Log.d(TAG, "Successfully transferred: " + sessionId);
+                resetGame();
+                createSession();
+                showTransferSuccess();
+            }
 
-                @Override
-                public void onTransferFailure(SessionId sessionId, SessionException exception) {
-                    Log.d(TAG, "Failed to transfer: " + sessionId, exception);
-                    SessionsSinglePlayerActivity.this.sessionId.setValue(sessionId);
-                    loadState(transferableState);
-                    showTransferFailure();
-                }
-            };
+            @Override
+            public void onTransferFailure(@NonNull SessionId sessionId, SessionException exception) {
+                Log.d(TAG, "Failed to transfer: " + sessionId, exception);
+                SessionsSinglePlayerActivity.this.sessionId.setValue(sessionId);
+                loadState(transferableState);
+                showTransferFailure();
+            }
+        };
 
     private final ReceivingSessionStateCallback receivingSessionStateCallback =
-            new ReceivingSessionStateCallback() {
-                @Override
-                public void onTransferFailure(SessionId sessionId, SessionException exception) {
-                    Log.d(TAG, "Failed to transfer: " + sessionId, exception);
-                    showTransferFailure();
-                }
-            };
+        (sessionId, exception) -> {
+            Log.d(TAG, "Failed to transfer: " + sessionId, exception);
+            showTransferFailure();
+        };
 
     private final MutableLiveData<SessionId> sessionId = new MutableLiveData<>();
     private final TransferableGameState transferableState = new TransferableGameState();
@@ -178,80 +176,84 @@ public class SessionsSinglePlayerActivity extends AppCompatActivity {
     private void addObservers() {
         // Observes changes to Local Player's name
         final Observer<String> localPlayerNameObserver =
-                newName -> nameText.setText(getString(R.string.codename, newName));
+            newName -> nameText.setText(getString(R.string.codename, newName));
         gameManager.getGameData().getLocalPlayerName().observe(this, localPlayerNameObserver);
 
         // Observes changes to Remote Player's name
         final Observer<String> opponentPlayerNameObserver =
-                newName -> {
-                    opponentText.setText(
-                            getString(
-                                    R.string.opponent_name,
-                                    TextUtils.isEmpty(newName) ? getString(R.string.no_opponent) : newName));
-                };
-        gameManager.getGameData().getOpponentPlayerName().observe(this, opponentPlayerNameObserver);
+            newName -> {
+                opponentText.setText(
+                    getString(
+                        R.string.opponent_name,
+                        TextUtils.isEmpty(newName) ? getString(R.string.no_opponent) : newName));
+            };
+        gameManager.getGameData()
+            .getOpponentPlayerName().observe(this, opponentPlayerNameObserver);
 
         // Observes changes to the Local Player's score
         final Observer<Integer> localPlayerScoreObserver =
-                newLocalPlayerScore -> {
-                    updateScore(newLocalPlayerScore,
-                            gameManager.getGameData().getOpponentPlayerScore().getValue());
-                };
-        gameManager.getGameData().getLocalPlayerScore().observe(this, localPlayerScoreObserver);
+            newLocalPlayerScore -> {
+                updateScore(newLocalPlayerScore,
+                    gameManager.getGameData().getOpponentPlayerScore().getValue());
+            };
+        gameManager.getGameData()
+            .getLocalPlayerScore().observe(this, localPlayerScoreObserver);
 
         // Observes changes to the Opponent Player's score
         final Observer<Integer> opponentPlayerScoreObserver =
-                newOpponentPlayerScore -> {
-                    updateScore(gameManager.getGameData().getLocalPlayerScore().getValue(),
-                            newOpponentPlayerScore);
-                };
-        gameManager.getGameData().getOpponentPlayerScore().observe(this, opponentPlayerScoreObserver);
+            newOpponentPlayerScore -> {
+                updateScore(gameManager.getGameData().getLocalPlayerScore().getValue(),
+                    newOpponentPlayerScore);
+            };
+        gameManager.getGameData()
+            .getOpponentPlayerScore().observe(this, opponentPlayerScoreObserver);
 
         // Observes game state changes and updates UI accordingly
         final Observer<GameData.GameState> gameStateObserver =
-                gameState -> {
-                    if (!Arrays.asList(GameData.GameState.values()).contains(gameState)) {
-                        throw new RuntimeException("Invalid GameState passed to Observer");
-                    }
-                    switch (gameState) {
-                        case WAITING_FOR_PLAYER_INPUT:
-                            if (gameManager.getGameData().getRoundsCompleted() == 0) {
-                                setStatusText(getString(R.string.status_session_created));
-                            }
-                            break;
-                        case ROUND_RESULT:
-                            if (!Arrays.asList(GameData.RoundWinner.values())
-                                    .contains(gameManager.getGameData().getRoundWinner())) {
-                                throw new RuntimeException("Invalid RoundWinner in RoundResult");
-                            }
-                            switch (gameManager.getGameData().getRoundWinner()) {
-                                case LOCAL_PLAYER:
-                                    setStatusText(
-                                            getString(
-                                                    R.string.win_message,
-                                                    gameManager.getGameData().getLocalPlayerChoice(),
-                                                    gameManager.getGameData().getOpponentPlayerChoice()));
-                                    break;
-                                case OPPONENT:
-                                    setStatusText(
-                                            getString(
-                                                    R.string.loss_message,
-                                                    gameManager.getGameData().getLocalPlayerChoice(),
-                                                    gameManager.getGameData().getOpponentPlayerChoice()));
-                                    break;
-                                case TIE:
-                                    setStatusText(
-                                            getString(
-                                                    R.string.tie_message, gameManager.getGameData().getLocalPlayerChoice()));
-                                    break;
-                                default:
-                                    Log.d(TAG, "Ignoring RoundWinner: " + gameState);
-                            }
-                            break;
-                        default:
-                            Log.d(TAG, "Ignoring GameState: " + gameState);
-                    }
-                };
+            gameState -> {
+                if (!Arrays.asList(GameData.GameState.values()).contains(gameState)) {
+                    throw new RuntimeException("Invalid GameState passed to Observer");
+                }
+                switch (gameState) {
+                    case WAITING_FOR_PLAYER_INPUT:
+                        if (gameManager.getGameData().getRoundsCompleted() == 0) {
+                            setStatusText(getString(R.string.status_session_created));
+                        }
+                        break;
+                    case ROUND_RESULT:
+                        if (!Arrays.asList(GameData.RoundWinner.values())
+                                .contains(gameManager.getGameData().getRoundWinner())) {
+                            throw new RuntimeException("Invalid RoundWinner in RoundResult");
+                        }
+                        switch (gameManager.getGameData().getRoundWinner()) {
+                            case LOCAL_PLAYER:
+                                setStatusText(
+                                    getString(
+                                        R.string.win_message,
+                                        gameManager.getGameData().getLocalPlayerChoice(),
+                                        gameManager.getGameData().getOpponentPlayerChoice()));
+                                break;
+                            case OPPONENT:
+                                setStatusText(
+                                    getString(
+                                        R.string.loss_message,
+                                        gameManager.getGameData().getLocalPlayerChoice(),
+                                        gameManager.getGameData().getOpponentPlayerChoice()));
+                                break;
+                            case TIE:
+                                setStatusText(
+                                    getString(
+                                        R.string.tie_message,
+                                        gameManager.getGameData().getLocalPlayerChoice()));
+                                break;
+                            default:
+                                Log.d(TAG, "Ignoring RoundWinner: " + gameState);
+                        }
+                        break;
+                    default:
+                        Log.d(TAG, "Ignoring GameState: " + gameState);
+                }
+            };
         gameManager.getGameData().getGameState().observe(this, gameStateObserver);
 
         // Observes changes to the Session
@@ -342,7 +344,7 @@ public class SessionsSinglePlayerActivity extends AppCompatActivity {
     }
 
     /**
-     * Saves the UI state to something which can be restored later. If any errors occur when building
+     * Saves the UI state to something which can be restored later. If errors occur when building
      * the state, nothing is stored.
      */
     private void saveState() {
@@ -376,7 +378,8 @@ public class SessionsSinglePlayerActivity extends AppCompatActivity {
         }
 
         Log.d(TAG, "Creating a new Session");
-        SessionId newSessionId = sessions.createSession(/* applicationSessionTag */ null);
+        SessionId newSessionId = sessions
+            .createSession(/* applicationSessionTag */ null);
         sessionId.setValue(newSessionId);
         gameManager.findOpponent();
     }
@@ -392,29 +395,29 @@ public class SessionsSinglePlayerActivity extends AppCompatActivity {
         }
 
         Futures.addCallback(
-                sessions.transferSessionFuture(
-                        sessionId.getValue(),
-                        new StartComponentRequest.Builder()
-                                .setAction(ACTION_SESSIONS_TRANSFER)
-                                .setReason(getString(R.string.transfer_reason))
-                                .build(),
-                        Collections.emptyList(),
-                        originatingSessionStateCallback),
-                new FutureCallback<OriginatingSession>() {
-                    @Override
-                    public void onSuccess(OriginatingSession result) {
-                        // Save the originating session.
-                        Log.d(TAG, "Successfully received originating session");
-                        originatingSession = result;
-                    }
+            sessions.transferSessionFuture(
+                sessionId.getValue(),
+                new StartComponentRequest.Builder()
+                    .setAction(ACTION_SESSIONS_TRANSFER)
+                    .setReason(getString(R.string.transfer_reason))
+                    .build(),
+                Collections.emptyList(),
+                originatingSessionStateCallback),
+            new FutureCallback<OriginatingSession>() {
+                @Override
+                public void onSuccess(OriginatingSession result) {
+                    // Save the originating session.
+                    Log.d(TAG, "Successfully received originating session");
+                    originatingSession = result;
+                }
 
-                    @Override
-                    public void onFailure(Throwable t) {
-                        Log.d(TAG, "onFailure called for transferSessionFuture", t);
-                    }
-                },
-                mainExecutor);
-        SessionsSinglePlayerActivity.this.sessionId.setValue(null);
+                @Override
+                public void onFailure(@NonNull Throwable t) {
+                    Log.d(TAG, "onFailure called for transferSessionFuture", t);
+                }
+            },
+            mainExecutor);
+        sessionId.setValue(null);
     }
 
     /**
@@ -429,20 +432,20 @@ public class SessionsSinglePlayerActivity extends AppCompatActivity {
      */
     private void getReceivingSessionAndRemoteConnection(Intent intent) {
         Futures.addCallback(
-                sessions.getReceivingSessionFuture(intent, receivingSessionStateCallback),
-                new FutureCallback<ReceivingSession>() {
-                    @Override
-                    public void onSuccess(ReceivingSession result) {
-                        Log.d(TAG, "Succeeded to get TransferrableSessionHandle");
-                        receiveAndProcessInitializationMessage(result);
-                    }
+            sessions.getReceivingSessionFuture(intent, receivingSessionStateCallback),
+            new FutureCallback<ReceivingSession>() {
+                @Override
+                public void onSuccess(ReceivingSession result) {
+                    Log.d(TAG, "Succeeded to get TransferrableSessionHandle");
+                    receiveAndProcessInitializationMessage(result);
+                }
 
-                    @Override
-                    public void onFailure(Throwable t) {
-                        Log.d(TAG, "Failed to get TransferrableSessionHandle", t);
-                    }
-                },
-                mainExecutor);
+                @Override
+                public void onFailure(@NonNull Throwable t) {
+                    Log.d(TAG, "Failed to get TransferrableSessionHandle", t);
+                }
+            },
+            mainExecutor);
     }
 
     /**
@@ -450,13 +453,10 @@ public class SessionsSinglePlayerActivity extends AppCompatActivity {
      */
     private void receiveAndProcessInitializationMessage(ReceivingSession receivingSession) {
         receivingSession.getStartupRemoteConnection().registerReceiver(
-                new SessionConnectionReceiver() {
-                    @Override
-                    public void onMessageReceived(SessionParticipant participant, byte[] payload) {
-                        Log.d(TAG, "Success to receive initialization message of size: " + payload.length);
-                        applicationInitialization(receivingSession, payload);
-                    }
-                });
+            (participant, payload) -> {
+                Log.d(TAG, "Success to receive initialization message of size: " + payload.length);
+                applicationInitialization(receivingSession, payload);
+            });
     }
 
     /**
@@ -464,37 +464,37 @@ public class SessionsSinglePlayerActivity extends AppCompatActivity {
      */
     private void applicationInitialization(ReceivingSession sessionHandle, byte[] initMessage) {
         Futures.addCallback(
-                sessionHandle.onCompleteFuture(),
-                new FutureCallback<SessionId>() {
-                    @Override
-                    public void onSuccess(SessionId result) {
-                        Log.d(TAG, "Succeeded to complete receive transfer for: " + result);
-                        // Disconnect from existing Session (if applicable) before accepting transfer
-                        disconnectFromSession(
-                                SessionsSinglePlayerActivity.this.sessionId.getValue(),
-                                new FutureCallback<Void>() {
-                                    @Override
-                                    public void onSuccess(Void result) {
-                                        Log.d(TAG, "Succeeded to remove the old session");
-                                    }
+            sessionHandle.onCompleteFuture(),
+            new FutureCallback<SessionId>() {
+                @Override
+                public void onSuccess(SessionId result) {
+                    Log.d(TAG, "Succeeded to complete receive transfer for: " + result);
+                    // Disconnect from existing Session (if applicable) before accepting transfer
+                    disconnectFromSession(
+                        SessionsSinglePlayerActivity.this.sessionId.getValue(),
+                        new FutureCallback<Void>() {
+                            @Override
+                            public void onSuccess(Void result) {
+                                Log.d(TAG, "Succeeded to remove the old session");
+                            }
 
-                                    @Override
-                                    public void onFailure(Throwable t) {
-                                        Log.d(TAG, "Failed to remove the old session, which is now orphaned", t);
-                                    }
-                                });
-                        // Update SessionId
-                        SessionsSinglePlayerActivity.this.sessionId.setValue(result);
-                        loadStateFromInitMessage(initMessage);
-                        showTransferReceiveSuccess();
-                    }
+                            @Override
+                            public void onFailure(@NonNull Throwable t) {
+                                Log.d(TAG, "Failed to remove the old session, which is now orphaned", t);
+                            }
+                        });
+                    // Update SessionId
+                    SessionsSinglePlayerActivity.this.sessionId.setValue(result);
+                    loadStateFromInitMessage(initMessage);
+                    showTransferReceiveSuccess();
+                }
 
-                    @Override
-                    public void onFailure(Throwable t) {
-                        Log.d(TAG, "Failed to complete receive transfer", t);
-                    }
-                },
-                mainExecutor);
+                @Override
+                public void onFailure(Throwable t) {
+                    Log.d(TAG, "Failed to complete receive transfer", t);
+                }
+            },
+            mainExecutor);
     }
 
     private void showTransferReceiveSuccess() {
@@ -514,26 +514,26 @@ public class SessionsSinglePlayerActivity extends AppCompatActivity {
      */
     private void disconnect() {
         disconnectFromSession(
-                sessionId.getValue(),
-                new FutureCallback<Void>() {
-                    @Override
-                    public void onSuccess(Void result) {
-                        Log.d(TAG, "Successfully disconnected from: " + sessionId);
-                        sessionId.setValue(null);
-                        gameManager.disconnect();
-                    }
+            sessionId.getValue(),
+            new FutureCallback<Void>() {
+                @Override
+                public void onSuccess(Void result) {
+                    Log.d(TAG, "Successfully disconnected from: " + sessionId);
+                    sessionId.setValue(null);
+                    gameManager.disconnect();
+                }
 
-                    @Override
-                    public void onFailure(Throwable t) {
-                        Log.d(TAG, "Failed to disconnect from: " + sessionId.getValue(), t);
-                    }
-                });
+                @Override
+                public void onFailure(@NonNull Throwable t) {
+                    Log.d(TAG, "Failed to disconnect from: " + sessionId.getValue(), t);
+                }
+            });
     }
 
     /**
      * Disconnects from the provided session.
      */
-    private void disconnectFromSession(SessionId id, FutureCallback<Void> callback) {
+    private void disconnectFromSession(@Nullable SessionId id, FutureCallback<Void> callback) {
         if (id == null) {
             Log.d(TAG, "Skipping disconnect, sessionId is null");
             return;
@@ -552,7 +552,7 @@ public class SessionsSinglePlayerActivity extends AppCompatActivity {
     private void updateScore(int newSelfScore, int newOpponentPlayerScore) {
         scoreText.setText(getString(R.string.game_score, newSelfScore, newOpponentPlayerScore));
         scoreText.setContentDescription(getString(R.string.game_score_talk_back,
-                newSelfScore,
-                newOpponentPlayerScore));
+            newSelfScore,
+            newOpponentPlayerScore));
     }
 }

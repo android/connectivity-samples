@@ -19,6 +19,7 @@ package com.google.crossdevice.sample.rps.model;
 import android.content.Context;
 import android.util.Log;
 
+import androidx.annotation.Nullable;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
@@ -34,7 +35,6 @@ import java.util.Random;
  * observers in the UI.
  */
 public final class TwoPlayerGameDataViewModel extends ViewModel implements GameData {
-
     private static final String TAG = "TwoPlayerGameDataViewModel";
 
     private static final String KEY_LOCAL_PLAYER_NAME = "LOCAL_PLAYER_NAME";
@@ -47,9 +47,10 @@ public final class TwoPlayerGameDataViewModel extends ViewModel implements GameD
     private final MutableLiveData<String> opponentPlayerName = new MutableLiveData<>();
     private final MutableLiveData<Integer> localPlayerScore = new MutableLiveData<>();
     private final MutableLiveData<Integer> opponentPlayerScore = new MutableLiveData<>();
-    private final MutableLiveData<GameState> gameState = new MutableLiveData<>(GameState.DISCONNECTED);
-    private GameChoice localPlayerChoice;
-    private GameChoice opponentPlayerChoice;
+    private final MutableLiveData<GameState> gameState =
+        new MutableLiveData<>(GameState.DISCONNECTED);
+    @Nullable private GameChoice localPlayerChoice;
+    @Nullable private GameChoice opponentPlayerChoice;
     private boolean localPlayerChoiceConfirmed;
     private RoundWinner roundWinner = RoundWinner.PENDING;
     private int roundsCompleted;
@@ -57,7 +58,7 @@ public final class TwoPlayerGameDataViewModel extends ViewModel implements GameD
 
     public static TwoPlayerGameDataViewModel createInstance(Context context) {
         return new ViewModelProvider((ViewModelStoreOwner) context)
-                .get(TwoPlayerGameDataViewModel.class);
+            .get(TwoPlayerGameDataViewModel.class);
     }
 
     /**
@@ -96,14 +97,14 @@ public final class TwoPlayerGameDataViewModel extends ViewModel implements GameD
      * Retrieves Local Player's game choice.
      */
     @Override
-    public GameChoice getLocalPlayerChoice() {
+    public @Nullable GameChoice getLocalPlayerChoice() {
         return localPlayerChoice;
     }
 
     /**
      * Sets Local Player's game choice.
      */
-    public void setLocalPlayerChoice(GameChoice choice) {
+    public void setLocalPlayerChoice(@Nullable GameChoice choice) {
         this.localPlayerChoice = choice;
     }
 
@@ -111,14 +112,14 @@ public final class TwoPlayerGameDataViewModel extends ViewModel implements GameD
      * Retrieves Opponent Player's game choice.
      */
     @Override
-    public GameChoice getOpponentPlayerChoice() {
+    public @Nullable GameChoice getOpponentPlayerChoice() {
         return opponentPlayerChoice;
     }
 
     /**
      * Sets Opponent Player's game choice.
      */
-    public void setOpponentPlayerChoice(GameChoice choice) {
+    public void setOpponentPlayerChoice(@Nullable GameChoice choice) {
         this.opponentPlayerChoice = choice;
     }
 
@@ -201,6 +202,9 @@ public final class TwoPlayerGameDataViewModel extends ViewModel implements GameD
      * Processes the round to determine who wins and auto-increment the winner's score.
      */
     public void processRound() {
+        assert localPlayerChoice != null;
+        assert opponentPlayerChoice != null;
+
         if (localPlayerChoice.beats(opponentPlayerChoice)) {
             incrementLocalPlayerScore();
             roundWinner = RoundWinner.LOCAL_PLAYER;
@@ -247,12 +251,11 @@ public final class TwoPlayerGameDataViewModel extends ViewModel implements GameD
         JSONObject jsonGameData = new JSONObject();
         try {
             jsonGameData
-                    .put(KEY_LOCAL_PLAYER_NAME, localPlayerName.getValue())
-                    .put(KEY_OPPONENT_PLAYER_NAME, opponentPlayerName.getValue())
-                    .put(KEY_LOCAL_PLAYER_SCORE, localPlayerScore.getValue())
-                    .put(KEY_OPPONENT_PLAYER_SCORE, opponentPlayerScore.getValue())
-                    .put(KEY_ROUNDS_COMPLETED, roundsCompleted);
-
+                .put(KEY_LOCAL_PLAYER_NAME, localPlayerName.getValue())
+                .put(KEY_OPPONENT_PLAYER_NAME, opponentPlayerName.getValue())
+                .put(KEY_LOCAL_PLAYER_SCORE, localPlayerScore.getValue())
+                .put(KEY_OPPONENT_PLAYER_SCORE, opponentPlayerScore.getValue())
+                .put(KEY_ROUNDS_COMPLETED, roundsCompleted);
         } catch (JSONException e) {
             Log.d(TAG, "Failed to get state", e);
         }
