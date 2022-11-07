@@ -12,6 +12,6 @@ dependencyResolutionManagement {
         mavenCentral()
     }
 }
-rootProject.name = "com.google.apps.com.google.apps.hellouwb"
+rootProject.name = "com.google.apps.hellouwb"
 include ':app'
 include ':uwbranging'

@@ -1,4 +1,10 @@
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        google()
+        mavenCentral()
+    }
+}
+rootProject.name = "com.example.android.bluetoothchat"
+include ':Application'
 
-
-
-include 'Application'

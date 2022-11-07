@@ -28,7 +28,7 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 
 private const val CONNECTION_SERVICE_ID = "com.google.apps.hellouwb"
-private const val CONNECTION_NAME = "com.google.apps.com.hellouwb"
+private const val CONNECTION_NAME = "com.google.apps.hellouwb"
 
 /**
  * Nearby Connections API wrapper.
