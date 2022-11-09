@@ -22,45 +22,45 @@ import org.json.JSONObject
 
 /** Contains the data needed when sharing a game data with another device */
 class ShareableGameState {
-    var gameData: JSONObject? = null
+  var gameData: JSONObject? = null
 
-    fun setGameData(gameData: JSONObject?): ShareableGameState {
-        this.gameData = gameData
-        return this
-    }
+  fun setGameData(gameData: JSONObject?): ShareableGameState {
+    this.gameData = gameData
+    return this
+  }
 
-    fun getState(): JSONObject {
-        val jsonState = JSONObject()
-        try {
-            jsonState.put(KEY_GAME_DATA, gameData)
-        } catch (e: JSONException) {
-            Log.d(TAG, "Failed to get state", e)
-        }
-        return jsonState
+  fun getState(): JSONObject {
+    val jsonState = JSONObject()
+    try {
+      jsonState.put(KEY_GAME_DATA, gameData)
+    } catch (e: JSONException) {
+      Log.d(TAG, "Failed to get state", e)
     }
+    return jsonState
+  }
 
-    fun loadState(state: JSONObject) {
-        gameData = null
-        try {
-            if (state.has(KEY_GAME_DATA)) {
-                gameData = state.getJSONObject(KEY_GAME_DATA)
-            }
-        } catch (e: JSONException) {
-            Log.d(TAG, "Failed to load state", e)
-        }
+  fun loadState(state: JSONObject) {
+    gameData = null
+    try {
+      if (state.has(KEY_GAME_DATA)) {
+        gameData = state.getJSONObject(KEY_GAME_DATA)
+      }
+    } catch (e: JSONException) {
+      Log.d(TAG, "Failed to load state", e)
     }
+  }
 
-    fun loadBytes(bytes: ByteArray): ShareableGameState {
-        try {
-            loadState(JSONObject(String(bytes)))
-        } catch (e: JSONException) {
-            Log.d(TAG, "Failed to parse bytes")
-        }
-        return this
+  fun loadBytes(bytes: ByteArray): ShareableGameState {
+    try {
+      loadState(JSONObject(String(bytes)))
+    } catch (e: JSONException) {
+      Log.d(TAG, "Failed to parse bytes")
     }
+    return this
+  }
 
-    companion object {
-        private const val TAG = "ShareableGameState"
-        private const val KEY_GAME_DATA = "GAME_DATA"
-    }
+  companion object {
+    private const val TAG = "ShareableGameState"
+    private const val KEY_GAME_DATA = "GAME_DATA"
+  }
 }

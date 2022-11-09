@@ -3,8 +3,6 @@ plugins {
     id 'org.jetbrains.kotlin.android'
 }
 
-def crossdeviceVersion = findProperty("crossdeviceVersion") ?: "0.1.0-preview01"
-
 android {
     compileSdk 32
 
@@ -34,15 +32,11 @@ android {
 }
 
 dependencies {
+    def crossdeviceVersion = findProperty("crossdeviceVersion") ?: "0.1.0-preview01"
 
-    implementation 'androidx.core:core-ktx:1.7.0'
     implementation 'androidx.appcompat:appcompat:1.4.2'
     implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.5.0'
     implementation 'com.google.android.material:material:1.6.1'
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.1'
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-guava:1.4.3'
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.4.3'
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.4.3'
 
     // Cross device SDK:
     implementation "com.google.ambient.crossdevice:crossdevice:${crossdeviceVersion}"

@@ -17,70 +17,45 @@
 package com.google.crossdevice.sample.rps.service;
 
 import android.content.Intent;
-
+import androidx.annotation.Nullable;
 import com.google.crossdevice.sample.rps.model.GameChoice;
 import com.google.crossdevice.sample.rps.model.GameData;
-import javax.annotation.Nullable;
 
-/**
- * Interface for defining GameManager APIs
- */
+/** Interface for defining GameManager APIs */
 public interface GameManager {
-    /**
-     * Gets the managed GameData object.
-     */
-    GameData getGameData();
+  /** Gets the managed GameData object. */
+  GameData getGameData();
 
-    /**
-     * Disconnects from connection endpoint when connected to a session.
-     */
-    void disconnect();
+  /** Disconnects from connection endpoint when connected to a session. */
+  void disconnect();
 
-    /**
-     * Initializes discovery of other devices in order to find an opponent.
-     */
-    void findOpponent();
+  /** Initializes discovery of other devices in order to find an opponent. */
+  void findOpponent();
 
-    /**
-     * Sends the local player's choice for a given round (i.e. rock, paper or scissor) to a remote
-     * participant.
-     */
-    void sendGameChoice(GameChoice choice, @Nullable Callback callback);
+  /**
+   * Sends the local player's choice for a given round (i.e. rock, paper or scissor) to a remote
+   * participant.
+   */
+  void sendGameChoice(GameChoice choice, @Nullable Callback callback);
 
-    /**
-     * Resets the game to default values.
-     */
-    void resetGame();
+  /** Resets the game to default values. */
+  void resetGame();
 
-    /**
-     * Processes the round after all players have made their move.
-     */
-    void finishRound();
+  /** Processes the round after all players have made their move. */
+  void finishRound();
 
-    /**
-     * Accepts incoming invitation from a remote participant
-     */
-    void acceptGameInvitation(Intent intent);
+  /** Accepts incoming invitation from a remote participant */
+  void acceptGameInvitation(Intent intent);
 
-    /**
-     * Returns whether the GameManager is the game host or not
-     */
-    boolean isHost();
+  /** Returns whether the GameManager is the game host or not */
+  boolean isHost();
 
-    /**
-     * Can be passed to methods in GameManager when notification of success or failure is desired.
-     */
-    abstract class Callback {
-        /**
-         * Called when the desired operation succeeds.
-         */
-        public void onSuccess() {
-        }
+  /** Can be passed to methods in GameManager when notification of success or failure is desired. */
+  abstract class Callback {
+    /** Called when the desired operation succeeds. */
+    public void onSuccess() {}
 
-        /**
-         * Called when the desired operation fails.
-         */
-        public void onFailure() {
-        }
-    }
+    /** Called when the desired operation fails. */
+    public void onFailure() {}
+  }
 }

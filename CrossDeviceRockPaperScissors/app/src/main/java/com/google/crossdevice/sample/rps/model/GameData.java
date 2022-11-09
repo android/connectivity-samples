@@ -18,91 +18,62 @@ package com.google.crossdevice.sample.rps.model;
 
 import androidx.annotation.Nullable;
 import androidx.lifecycle.MutableLiveData;
-
 import org.json.JSONObject;
 
-/**
- * Interface for defining game data APIs
- */
+/** Interface for defining game data APIs */
 public interface GameData {
-    /**
-     * Enum class used to maintain the state of the game/round
-     */
-    enum GameState {
-        DISCONNECTED,
-        SEARCHING,
-        WAITING_FOR_PLAYER_INPUT,
-        WAITING_FOR_ROUND_RESULT,
-        ROUND_RESULT
-    }
+  /** Enum class used to maintain the state of the game/round */
+  enum GameState {
+    DISCONNECTED,
+    SEARCHING,
+    WAITING_FOR_PLAYER_INPUT,
+    WAITING_FOR_ROUND_RESULT,
+    ROUND_RESULT
+  }
 
-    /**
-     * Enum class used to indicate winner of a round
-     */
-    enum RoundWinner {
-        PENDING,
-        LOCAL_PLAYER,
-        OPPONENT,
-        TIE
-    }
+  /** Enum class used to indicate winner of a round */
+  enum RoundWinner {
+    PENDING,
+    LOCAL_PLAYER,
+    OPPONENT,
+    TIE
+  }
 
-    /**
-     * Gets the name of the local player.
-     */
-    MutableLiveData<String> getLocalPlayerName();
+  /** Gets the name of the local player. */
+  MutableLiveData<String> getLocalPlayerName();
 
-    /**
-     * Gets the name of the opponent player.
-     */
-    MutableLiveData<String> getOpponentPlayerName();
+  /** Gets the name of the opponent player. */
+  MutableLiveData<String> getOpponentPlayerName();
 
-    /**
-     * Gets the GameChoice of the local player.
-     */
-    @Nullable GameChoice getLocalPlayerChoice();
+  /** Gets the GameChoice of the local player. */
+  @Nullable
+  GameChoice getLocalPlayerChoice();
 
-    /**
-     * Gets the GameChoice of the opponent player.
-     */
-    @Nullable GameChoice getOpponentPlayerChoice();
+  /** Gets the GameChoice of the opponent player. */
+  @Nullable
+  GameChoice getOpponentPlayerChoice();
 
-    /**
-     * Gets the score of the local player.
-     */
-    MutableLiveData<Integer> getLocalPlayerScore();
+  /** Gets the score of the local player. */
+  MutableLiveData<Integer> getLocalPlayerScore();
 
-    /**
-     * Gets the score of the opponent player.
-     */
-    MutableLiveData<Integer> getOpponentPlayerScore();
+  /** Gets the score of the opponent player. */
+  MutableLiveData<Integer> getOpponentPlayerScore();
 
-    /**
-     * Gets the current status of the game.
-     */
-    MutableLiveData<GameState> getGameState();
+  /** Gets the current status of the game. */
+  MutableLiveData<GameState> getGameState();
 
-    /**
-     * Gets the number of opponents in the game.
-     */
-    MutableLiveData<Integer> getNumberOfOpponents();
+  /** Gets the number of opponents in the game. */
+  MutableLiveData<Integer> getNumberOfOpponents();
 
-    /**
-     * Gets winner of the most recent round.
-     */
-    RoundWinner getRoundWinner();
+  /** Gets winner of the most recent round. */
+  RoundWinner getRoundWinner();
 
-    /**
-     * Gets the number of rounds completed.
-     */
-    int getRoundsCompleted();
+  /** Gets the number of rounds completed. */
+  int getRoundsCompleted();
 
-    /**
-     * Gets a serializable object representing the state of the game variables
-     */
-    JSONObject getSerializableState();
+  /** Gets a serializable object representing the state of the game variables */
+  JSONObject getSerializableState();
 
-    /**
-     * Loads a serializable object, restoring a specified state of the game.
-     */
-    void loadSerializableState(JSONObject gameData);
+  /** Loads a serializable object, restoring a specified state of the game. */
+  void loadSerializableState(JSONObject gameData);
 }

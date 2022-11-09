@@ -24,17 +24,14 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Observer;
-
 import com.google.crossdevice.sample.rps.R;
 import com.google.crossdevice.sample.rps.model.GameChoice;
 import com.google.crossdevice.sample.rps.model.GameData;
 import com.google.crossdevice.sample.rps.service.DiscoveryTwoPlayerGameManager;
 import com.google.crossdevice.sample.rps.service.GameManager;
-
 import java.util.Arrays;
 
 /**
@@ -42,259 +39,237 @@ import java.util.Arrays;
  * API"-based GameManager.
  */
 public class DiscoveryTwoPlayerActivity extends AppCompatActivity {
-    private static final String TAG = "DiscoveryTwoPlayerActivity";
+  private static final String TAG = "DiscoveryTwoPlayerActivity";
 
-    private Button findOpponentButton;
-    private Button disconnectButton;
-    private Button rockButton;
-    private Button paperButton;
-    private Button scissorsButton;
+  private Button findOpponentButton;
+  private Button disconnectButton;
+  private Button rockButton;
+  private Button paperButton;
+  private Button scissorsButton;
 
-    private TextView nameText;
-    private TextView opponentText;
-    private TextView statusText;
-    private TextView scoreText;
+  private TextView nameText;
+  private TextView opponentText;
+  private TextView statusText;
+  private TextView scoreText;
 
-    private GameManager gameManager;
+  private GameManager gameManager;
 
-    @Override
-    protected void onCreate(@Nullable Bundle bundle) {
-        super.onCreate(bundle);
-        setContentView(R.layout.activity_two_player);
+  @Override
+  protected void onCreate(@Nullable Bundle bundle) {
+    super.onCreate(bundle);
+    setContentView(R.layout.activity_two_player);
 
-        findOpponentButton = findViewById(R.id.find_opponent);
-        disconnectButton = findViewById(R.id.disconnect);
-        rockButton = findViewById(R.id.rock);
-        paperButton = findViewById(R.id.paper);
-        scissorsButton = findViewById(R.id.scissors);
+    findOpponentButton = findViewById(R.id.find_opponent);
+    disconnectButton = findViewById(R.id.disconnect);
+    rockButton = findViewById(R.id.rock);
+    paperButton = findViewById(R.id.paper);
+    scissorsButton = findViewById(R.id.scissors);
 
-        nameText = findViewById(R.id.name);
-        opponentText = findViewById(R.id.opponent_info);
-        statusText = findViewById(R.id.status);
-        scoreText = findViewById(R.id.score);
+    nameText = findViewById(R.id.name);
+    opponentText = findViewById(R.id.opponent_info);
+    statusText = findViewById(R.id.status);
+    scoreText = findViewById(R.id.score);
 
-        gameManager = new DiscoveryTwoPlayerGameManager(this);
+    gameManager = new DiscoveryTwoPlayerGameManager(this);
 
-        addObservers();
-        handleIntent(getIntent());
+    addObservers();
+    handleIntent(getIntent());
+  }
+
+  @Override
+  protected void onDestroy() {
+    // we clean-up and stop all connections
+    gameManager.disconnect();
+    super.onDestroy();
+  }
+
+  @Override
+  protected void onNewIntent(Intent intent) {
+    super.onNewIntent(intent);
+    handleIntent(intent);
+  }
+
+  /** Handles incoming requests to this activity. */
+  private void handleIntent(Intent intent) {
+    // Handle incoming requests to this application.
+    // Note that we are using launchMode="singleTop" for this activity, as registered in the
+    // AndroidManifest.
+    Log.d(TAG, "onNewIntent() called with action:" + intent.getAction());
+    if (DiscoveryTwoPlayerGameManager.ACTION_WAKE_UP.equals(intent.getAction())) {
+      // Attempt to open up a connection with the participant
+      gameManager.acceptGameInvitation(intent);
     }
+  }
 
-    @Override
-    protected void onDestroy() {
-        // we clean-up and stop all connections
-        gameManager.disconnect();
-        super.onDestroy();
+  /** Initializes discovery of other devices. */
+  public void findOpponent(View view) {
+    gameManager.findOpponent();
+    setStatusText(getString(R.string.status_searching));
+    findOpponentButton.setEnabled(false);
+  }
+
+  /** Disconnects from the opponent and reset the UI. */
+  public void disconnect(View view) {
+    gameManager.disconnect();
+  }
+
+  /** Sends a {@link GameChoice} to the other player. */
+  public void makeMove(View view) {
+    if (view.getId() == R.id.rock) {
+      sendGameChoice(GameChoice.ROCK);
+    } else if (view.getId() == R.id.paper) {
+      sendGameChoice(GameChoice.PAPER);
+    } else if (view.getId() == R.id.scissors) {
+      sendGameChoice(GameChoice.SCISSORS);
     }
+  }
 
-    @Override
-    protected void onNewIntent(Intent intent) {
-        super.onNewIntent(intent);
-        handleIntent(intent);
-    }
+  /**
+   * Creates observers listening to changes to GameData's LiveData fields and updates UI
+   * accordingly.
+   */
+  private void addObservers() {
+    // Observes changes to Local Player's name
+    final Observer<String> localPlayerNameObserver =
+        newName -> nameText.setText(getString(R.string.codename, newName));
+    gameManager.getGameData().getLocalPlayerName().observe(this, localPlayerNameObserver);
 
-    /**
-     * Handles incoming requests to this activity.
-     */
-    private void handleIntent(Intent intent) {
-        // Handle incoming requests to this application.
-        // Note that we are using launchMode="singleTop" for this activity, as registered in the
-        // AndroidManifest.
-        Log.d(TAG, "onNewIntent() called with action:" + intent.getAction());
-        if (DiscoveryTwoPlayerGameManager.ACTION_WAKE_UP.equals(intent.getAction())) {
-            // Attempt to open up a connection with the participant
-            gameManager.acceptGameInvitation(intent);
-        }
-    }
+    // Observes changes to Remote Player's name
+    final Observer<String> opponentPlayerNameObserver =
+        newName -> {
+          opponentText.setText(
+              getString(
+                  R.string.opponent_name,
+                  TextUtils.isEmpty(newName) ? getString(R.string.no_opponent) : newName));
+        };
+    gameManager.getGameData().getOpponentPlayerName().observe(this, opponentPlayerNameObserver);
 
-    /**
-     * Initializes discovery of other devices.
-     */
-    public void findOpponent(View view) {
-        gameManager.findOpponent();
-        setStatusText(getString(R.string.status_searching));
-        findOpponentButton.setEnabled(false);
-    }
+    // Observes changes to the Local Player's score
+    final Observer<Integer> localPlayerScoreObserver =
+        newLocalPlayerScore -> {
+          updateScore(
+              newLocalPlayerScore, gameManager.getGameData().getOpponentPlayerScore().getValue());
+        };
+    gameManager.getGameData().getLocalPlayerScore().observe(this, localPlayerScoreObserver);
 
-    /**
-     * Disconnects from the opponent and reset the UI.
-     */
-    public void disconnect(View view) {
-        gameManager.disconnect();
-    }
+    // Observes changes to the Opponent Player's score
+    final Observer<Integer> opponentPlayerScoreObserver =
+        newOpponentPlayerScore -> {
+          updateScore(
+              gameManager.getGameData().getLocalPlayerScore().getValue(), newOpponentPlayerScore);
+        };
+    gameManager.getGameData().getOpponentPlayerScore().observe(this, opponentPlayerScoreObserver);
 
-    /**
-     * Sends a {@link GameChoice} to the other player.
-     */
-    public void makeMove(View view) {
-        if (view.getId() == R.id.rock) {
-            sendGameChoice(GameChoice.ROCK);
-        } else if (view.getId() == R.id.paper) {
-            sendGameChoice(GameChoice.PAPER);
-        } else if (view.getId() == R.id.scissors) {
-            sendGameChoice(GameChoice.SCISSORS);
-        }
-    }
+    // Observes game state changes and updates UI accordingly
+    final Observer<GameData.GameState> gameStateObserver =
+        gameState -> {
+          if (!Arrays.asList(GameData.GameState.values()).contains(gameState)) {
+            throw new RuntimeException("Invalid GameState passed to Observer");
+          }
+          switch (gameState) {
+            case DISCONNECTED:
+              setButtonState(false);
+              setStatusText(getString(R.string.status_disconnected));
+              updateScore(
+                  gameManager.getGameData().getLocalPlayerScore().getValue(),
+                  gameManager.getGameData().getOpponentPlayerScore().getValue());
+              break;
+            case SEARCHING:
+              setStatusText(getString(R.string.status_searching));
+              break;
+            case WAITING_FOR_PLAYER_INPUT:
+              setButtonState(true);
+              // Only set show status connected if no rounds have been completed
+              if (gameManager.getGameData().getRoundsCompleted() == 0) {
+                setStatusText(getString(R.string.status_connected));
+              }
+              break;
+            case WAITING_FOR_ROUND_RESULT:
+              setStatusText(
+                  getString(
+                      R.string.game_choice, gameManager.getGameData().getLocalPlayerChoice()));
+              setGameChoicesEnabled(false);
+              break;
+            case ROUND_RESULT:
+              if (!Arrays.asList(GameData.RoundWinner.values())
+                  .contains(gameManager.getGameData().getRoundWinner())) {
+                throw new RuntimeException("Invalid RoundWinner in RoundResult");
+              }
+              switch (gameManager.getGameData().getRoundWinner()) {
+                case LOCAL_PLAYER:
+                  setStatusText(
+                      getString(
+                          R.string.win_message,
+                          gameManager.getGameData().getLocalPlayerChoice(),
+                          gameManager.getGameData().getOpponentPlayerChoice()));
+                  break;
+                case OPPONENT:
+                  setStatusText(
+                      getString(
+                          R.string.loss_message,
+                          gameManager.getGameData().getLocalPlayerChoice(),
+                          gameManager.getGameData().getOpponentPlayerChoice()));
+                  break;
+                case TIE:
+                  setStatusText(
+                      getString(
+                          R.string.tie_message, gameManager.getGameData().getLocalPlayerChoice()));
+                  break;
+                default:
+                  Log.d(TAG, "Ignoring RoundWinner: " + gameState);
+              }
+              break;
+            default:
+              Log.d(TAG, "Ignoring GameState: " + gameState);
+          }
+        };
+    gameManager.getGameData().getGameState().observe(this, gameStateObserver);
+  }
 
-    /**
-     * Creates observers listening to changes to GameData's LiveData fields and updates UI
-     * accordingly.
-     */
-    private void addObservers() {
-        // Observes changes to Local Player's name
-        final Observer<String> localPlayerNameObserver =
-            newName -> nameText.setText(getString(R.string.codename, newName));
-        gameManager.getGameData()
-            .getLocalPlayerName().observe(this, localPlayerNameObserver);
-
-        // Observes changes to Remote Player's name
-        final Observer<String> opponentPlayerNameObserver =
-            newName -> {
-                opponentText.setText(
-                    getString(
-                        R.string.opponent_name,
-                        TextUtils.isEmpty(newName) ? getString(R.string.no_opponent) : newName));
-            };
-        gameManager.getGameData()
-            .getOpponentPlayerName().observe(this, opponentPlayerNameObserver);
-
-        // Observes changes to the Local Player's score
-        final Observer<Integer> localPlayerScoreObserver =
-            newLocalPlayerScore -> {
-                updateScore(
-                    newLocalPlayerScore,
-                    gameManager.getGameData().getOpponentPlayerScore().getValue());
-            };
-        gameManager.getGameData()
-            .getLocalPlayerScore().observe(this, localPlayerScoreObserver);
-
-        // Observes changes to the Opponent Player's score
-        final Observer<Integer> opponentPlayerScoreObserver =
-            newOpponentPlayerScore -> {
-                updateScore(
-                    gameManager.getGameData().getLocalPlayerScore().getValue(),
-                    newOpponentPlayerScore);
-            };
-        gameManager.getGameData()
-            .getOpponentPlayerScore().observe(this, opponentPlayerScoreObserver);
-
-        // Observes game state changes and updates UI accordingly
-        final Observer<GameData.GameState> gameStateObserver =
-            gameState -> {
-                if (!Arrays.asList(GameData.GameState.values()).contains(gameState)) {
-                    throw new RuntimeException("Invalid GameState passed to Observer");
-                }
-                switch (gameState) {
-                    case DISCONNECTED:
-                        setButtonState(false);
-                        setStatusText(getString(R.string.status_disconnected));
-                        updateScore(
-                                gameManager.getGameData().getLocalPlayerScore().getValue(),
-                                gameManager.getGameData().getOpponentPlayerScore().getValue());
-                        break;
-                    case SEARCHING:
-                        setStatusText(getString(R.string.status_searching));
-                        break;
-                    case WAITING_FOR_PLAYER_INPUT:
-                        setButtonState(true);
-                        // Only set show status connected if no rounds have been completed
-                        if (gameManager.getGameData().getRoundsCompleted() == 0) {
-                            setStatusText(getString(R.string.status_connected));
-                        }
-                        break;
-                    case WAITING_FOR_ROUND_RESULT:
-                        setStatusText(
-                            getString(
-                                R.string.game_choice, gameManager.getGameData().getLocalPlayerChoice()));
-                        setGameChoicesEnabled(false);
-                        break;
-                    case ROUND_RESULT:
-                        if (!Arrays.asList(GameData.RoundWinner.values())
-                            .contains(gameManager.getGameData().getRoundWinner())) {
-                            throw new RuntimeException("Invalid RoundWinner in RoundResult");
-                        }
-                        switch (gameManager.getGameData().getRoundWinner()) {
-                            case LOCAL_PLAYER:
-                                setStatusText(
-                                    getString(
-                                        R.string.win_message,
-                                        gameManager.getGameData().getLocalPlayerChoice(),
-                                        gameManager.getGameData().getOpponentPlayerChoice()));
-                                break;
-                            case OPPONENT:
-                                setStatusText(
-                                    getString(
-                                        R.string.loss_message,
-                                        gameManager.getGameData().getLocalPlayerChoice(),
-                                        gameManager.getGameData().getOpponentPlayerChoice()));
-                                break;
-                            case TIE:
-                                setStatusText(
-                                    getString(
-                                        R.string.tie_message, gameManager.getGameData().getLocalPlayerChoice()));
-                                break;
-                            default:
-                                Log.d(TAG, "Ignoring RoundWinner: " + gameState);
-                        }
-                    default:
-                        Log.d(TAG, "Ignoring GameState: " + gameState);
-                }
-            };
-        gameManager.getGameData().getGameState().observe(this, gameStateObserver);
-    }
-
-    /**
-     * Sends the user's selection of rock, paper, or scissors to the opponent.
-     */
-    private void sendGameChoice(GameChoice choice) {
-        gameManager.sendGameChoice(
-            choice,
-            new GameManager.Callback() {
-                @Override
-                public void onFailure() {
-                Toast.makeText(
+  /** Sends the user's selection of rock, paper, or scissors to the opponent. */
+  private void sendGameChoice(GameChoice choice) {
+    gameManager.sendGameChoice(
+        choice,
+        new GameManager.Callback() {
+          @Override
+          public void onFailure() {
+            Toast.makeText(
                     DiscoveryTwoPlayerActivity.this, R.string.send_failure, Toast.LENGTH_SHORT)
-                    .show();
-            }
+                .show();
+          }
         });
-    }
+  }
 
-    /**
-     * Enables/disables buttons depending on the connection status.
-     */
-    private void setButtonState(boolean connected) {
-        findOpponentButton.setEnabled(!connected);
-        findOpponentButton.setVisibility(connected ? View.GONE : View.VISIBLE);
-        disconnectButton.setVisibility(connected ? View.VISIBLE : View.GONE);
-        setGameChoicesEnabled(connected);
-    }
+  /** Enables/disables buttons depending on the connection status. */
+  private void setButtonState(boolean connected) {
+    findOpponentButton.setEnabled(!connected);
+    findOpponentButton.setVisibility(connected ? View.GONE : View.VISIBLE);
+    disconnectButton.setVisibility(connected ? View.VISIBLE : View.GONE);
+    setGameChoicesEnabled(connected);
+  }
 
-    /**
-     * Enables/disables the rock, paper, and scissors buttons.
-     */
-    private void setGameChoicesEnabled(boolean enabled) {
-        rockButton.setEnabled(enabled);
-        paperButton.setEnabled(enabled);
-        scissorsButton.setEnabled(enabled);
-    }
+  /** Enables/disables the rock, paper, and scissors buttons. */
+  private void setGameChoicesEnabled(boolean enabled) {
+    rockButton.setEnabled(enabled);
+    paperButton.setEnabled(enabled);
+    scissorsButton.setEnabled(enabled);
+  }
 
-    /**
-     * Shows a status message to the user.
-     */
-    private void setStatusText(String text) {
-        statusText.setText(text);
-        statusText.setContentDescription(text);
-    }
+  /** Shows a status message to the user. */
+  private void setStatusText(String text) {
+    statusText.setText(text);
+    statusText.setContentDescription(text);
+  }
 
-    /**
-     * Updates the current score based on the latest score data.
-     *
-     * @param newSelfScore           The value for new score of the local player.
-     * @param newOpponentPlayerScore The value for new score of the opponent.
-     */
-    private void updateScore(int newSelfScore, int newOpponentPlayerScore) {
-        scoreText.setText(getString(R.string.game_score, newSelfScore, newOpponentPlayerScore));
-        scoreText.setContentDescription(getString(R.string.game_score_talk_back,
-                newSelfScore,
-                newOpponentPlayerScore));
-    }
+  /**
+   * Updates the current score based on the latest score data.
+   *
+   * @param newSelfScore The value for new score of the local player.
+   * @param newOpponentPlayerScore The value for new score of the opponent.
+   */
+  private void updateScore(int newSelfScore, int newOpponentPlayerScore) {
+    scoreText.setText(getString(R.string.game_score, newSelfScore, newOpponentPlayerScore));
+    scoreText.setContentDescription(
+        getString(R.string.game_score_talk_back, newSelfScore, newOpponentPlayerScore));
+  }
 }
