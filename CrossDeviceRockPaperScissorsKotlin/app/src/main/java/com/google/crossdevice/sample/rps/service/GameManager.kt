@@ -22,39 +22,39 @@ import com.google.crossdevice.sample.rps.model.GameData
 
 /** Interface for defining GameManager APIs */
 interface GameManager {
-    /** Gets the managed GameData object. */
-    val gameData: GameData
+  /** Gets the managed GameData object. */
+  val gameData: GameData
 
-    /** Disconnects from connection endpoint when connected to a session. */
-    fun disconnect()
+  /** Disconnects from connection endpoint when connected to a session. */
+  fun disconnect()
 
-    /** Initializes discovery of other devices in order to find an opponent. */
-    fun findOpponent()
+  /** Initializes discovery of other devices in order to find an opponent. */
+  fun findOpponent()
 
-    /**
-     * Sends the local player's choice for a given round (i.e. rock, paper or scissor) to a remote
-     * participant.
-     */
-    fun sendGameChoice(choice: GameChoice, callback: Callback)
+  /**
+   * Sends the local player's choice for a given round (i.e. rock, paper or scissor) to a remote
+   * participant.
+   */
+  fun sendGameChoice(choice: GameChoice, callback: Callback)
 
-    /** Resets the game to default values. */
-    fun resetGame()
+  /** Resets the game to default values. */
+  fun resetGame()
 
-    /** Processes the round after all players have made their move. */
-    fun finishRound()
+  /** Processes the round after all players have made their move. */
+  fun finishRound()
 
-    /** Accepts incoming invitation from a remote participant */
-    fun acceptGameInvitation(intent: Intent)
+  /** Accepts incoming invitation from a remote participant */
+  fun acceptGameInvitation(intent: Intent)
 
-    /** Returns whether the GameManager is the game host or not */
-    fun isHost(): Boolean
+  /** Returns whether the GameManager is the game host or not */
+  fun isHost(): Boolean
 
-    /** Can be passed to methods in GameManager when notification of success or failure is desired. */
-    abstract class Callback {
-        /** Called when the desired operation succeeds. */
-        open fun onSuccess() {}
+  /** Can be passed to methods in GameManager when notification of success or failure is desired. */
+  abstract class Callback {
+    /** Called when the desired operation succeeds. */
+    open fun onSuccess() {}
 
-        /** Called when the desired operation fails. */
-        open fun onFailure() {}
-    }
+    /** Called when the desired operation fails. */
+    open fun onFailure() {}
+  }
 }

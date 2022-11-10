@@ -25,59 +25,59 @@ import com.google.crossdevice.sample.rps.model.TwoPlayerGameDataViewModel.Compan
 
 /** Implementation of GameManager using DTDI APIs. */
 class SinglePlayerGameManager(context: Context?) : GameManager {
-    override val gameData = createInstance(context)
+  override val gameData = createInstance(context)
 
-    init {
-        resetGame()
-    }
+  init {
+    resetGame()
+  }
 
-    /** Generates the opponent's name and starts waiting for player input. */
-    override fun findOpponent() {
-        generateOpponentName()
-        gameData.gameState.value = GameData.GameState.WAITING_FOR_PLAYER_INPUT
-    }
+  /** Generates the opponent's name and starts waiting for player input. */
+  override fun findOpponent() {
+    generateOpponentName()
+    gameData.gameState.value = GameData.GameState.WAITING_FOR_PLAYER_INPUT
+  }
 
-    /** Sets the player's choice and finishes the round */
-    override fun sendGameChoice(choice: GameChoice, callback: GameManager.Callback) {
-        gameData.localPlayerChoice = choice
-        finishRound()
-    }
+  /** Sets the player's choice and finishes the round */
+  override fun sendGameChoice(choice: GameChoice, callback: GameManager.Callback) {
+    gameData.localPlayerChoice = choice
+    finishRound()
+  }
 
-    override fun disconnect() {
-        gameData.gameState.value = GameData.GameState.DISCONNECTED
-    }
+  override fun disconnect() {
+    gameData.gameState.value = GameData.GameState.DISCONNECTED
+  }
 
-    override fun acceptGameInvitation(intent: Intent) {
-        // do nothing
-    }
+  override fun acceptGameInvitation(intent: Intent) {
+    // do nothing
+  }
 
-    /** Always returns true, since Single Player mode is always its own host. */
-    override fun isHost(): Boolean {
-        return true
-    }
+  /** Always returns true, since Single Player mode is always its own host. */
+  override fun isHost(): Boolean {
+    return true
+  }
 
-    /** Resets game data to default values. */
-    override fun resetGame() {
-        gameData.resetGameData()
-    }
+  /** Resets game data to default values. */
+  override fun resetGame() {
+    gameData.resetGameData()
+  }
 
-    /** Sets the opponent's choice and processes the round. */
-    override fun finishRound() {
-        generateOpponentChoice()
-        gameData.processRound()
-    }
+  /** Sets the opponent's choice and processes the round. */
+  override fun finishRound() {
+    generateOpponentChoice()
+    gameData.processRound()
+  }
 
-    /** Generates a choice for the opponent. */
-    private fun generateOpponentChoice() {
-        gameData.setRandomOpponentChoice()
-    }
+  /** Generates a choice for the opponent. */
+  private fun generateOpponentChoice() {
+    gameData.setRandomOpponentChoice()
+  }
 
-    /** Generates a name player and opponent. */
-    private fun generateOpponentName() {
-        gameData.opponentPlayerName.value = generate()
-    }
+  /** Generates a name player and opponent. */
+  private fun generateOpponentName() {
+    gameData.opponentPlayerName.value = generate()
+  }
 
-    companion object {
-        private const val TAG = "SessionsSPGameManager"
-    }
+  companion object {
+    private const val TAG = "SessionsSPGameManager"
+  }
 }

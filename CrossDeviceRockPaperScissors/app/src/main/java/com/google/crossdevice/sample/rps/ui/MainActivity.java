@@ -19,39 +19,35 @@ package com.google.crossdevice.sample.rps.ui;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-
 import com.google.crossdevice.sample.rps.R;
 
-/**
- * Activity for selecting the kind of Rock Paper Scissors game to play
- */
+/** Activity for selecting the kind of Rock Paper Scissors game to play */
 public final class MainActivity extends AppCompatActivity {
 
-    @Override
-    protected void onCreate(@Nullable Bundle bundle) {
-        super.onCreate(bundle);
-        setContentView(R.layout.activity_main);
-    }
+  @Override
+  protected void onCreate(@Nullable Bundle bundle) {
+    super.onCreate(bundle);
+    setContentView(R.layout.activity_main);
+  }
 
-    public void onModeSelected(View view) {
-        Intent intent = getIntentForModeSelected(view.getId());
+  public void onModeSelected(View view) {
+    Intent intent = getIntentForModeSelected(view.getId());
 
-        if (intent != null) {
-            startActivity(intent);
-        }
+    if (intent != null) {
+      startActivity(intent);
     }
+  }
 
-    private Intent getIntentForModeSelected(int id) {
-        if (id == R.id.two_player_discovery_api) {
-            return new Intent(this, DiscoveryTwoPlayerActivity.class);
-        } else if (id == R.id.two_player_sessions_api) {
-            return new Intent(this, SessionsTwoPlayerActivity.class);
-        } else if (id == R.id.single_player_sessions_api) {
-            return new Intent(this, SessionsSinglePlayerActivity.class);
-        }
-        return null;
+  private Intent getIntentForModeSelected(int id) {
+    if (id == R.id.two_player_discovery_api) {
+      return new Intent(this, DiscoveryTwoPlayerActivity.class);
+    } else if (id == R.id.two_player_sessions_api) {
+      return new Intent(this, SessionsTwoPlayerActivity.class);
+    } else if (id == R.id.single_player_sessions_api) {
+      return new Intent(this, SessionsSinglePlayerActivity.class);
     }
+    return null;
+  }
 }

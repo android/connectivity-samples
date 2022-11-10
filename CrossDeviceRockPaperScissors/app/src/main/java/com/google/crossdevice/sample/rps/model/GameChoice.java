@@ -16,40 +16,37 @@
 
 package com.google.crossdevice.sample.rps.model;
 
-/**
- * Class to enumerate game choices and rules
- */
+/** Class to enumerate game choices and rules */
 public enum GameChoice {
-    ROCK,
-    PAPER,
-    SCISSORS;
+  ROCK,
+  PAPER,
+  SCISSORS;
 
-    public boolean beats(GameChoice other) {
-        return other == this.inferior();
-    }
+  public boolean beats(GameChoice other) {
+    return other == this.inferior();
+  }
 
-    public GameChoice superior() {
-        switch (this) {
-            case ROCK:
-                return PAPER;
-            case PAPER:
-                return SCISSORS;
-            case SCISSORS:
-                return ROCK;
-        }
-        throw new RuntimeException("Enum switch not exhaustive");
+  public GameChoice superior() {
+    switch (this) {
+      case ROCK:
+        return PAPER;
+      case PAPER:
+        return SCISSORS;
+      case SCISSORS:
+        return ROCK;
     }
+    throw new RuntimeException("Enum switch not exhaustive");
+  }
 
-    public GameChoice inferior() {
-        switch (this) {
-            case ROCK:
-                return SCISSORS;
-            case PAPER:
-                return ROCK;
-            case SCISSORS:
-                return PAPER;
-        }
-        throw new RuntimeException("Enum switch not exhaustive");
+  public GameChoice inferior() {
+    switch (this) {
+      case ROCK:
+        return SCISSORS;
+      case PAPER:
+        return ROCK;
+      case SCISSORS:
+        return PAPER;
     }
+    throw new RuntimeException("Enum switch not exhaustive");
+  }
 }
-

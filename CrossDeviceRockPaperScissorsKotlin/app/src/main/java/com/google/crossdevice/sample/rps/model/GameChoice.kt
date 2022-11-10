@@ -18,27 +18,27 @@ package com.google.crossdevice.sample.rps.model
 
 /** Class to enumerate game choices and rules */
 enum class GameChoice {
-    ROCK,
-    PAPER,
-    SCISSORS;
+  ROCK,
+  PAPER,
+  SCISSORS;
 
-    fun beats(other: GameChoice): Boolean {
-        return other == inferior()
-    }
+  fun beats(other: GameChoice): Boolean {
+    return other == inferior()
+  }
 
-    fun superior(): GameChoice {
-        return when (this) {
-            ROCK -> PAPER
-            PAPER -> SCISSORS
-            SCISSORS -> ROCK
-        }
+  fun superior(): GameChoice {
+    return when (this) {
+      ROCK -> PAPER
+      PAPER -> SCISSORS
+      SCISSORS -> ROCK
     }
+  }
 
-    fun inferior(): GameChoice {
-        return when (this) {
-            ROCK -> SCISSORS
-            PAPER -> ROCK
-            SCISSORS -> PAPER
-        }
+  fun inferior(): GameChoice {
+    return when (this) {
+      ROCK -> SCISSORS
+      PAPER -> ROCK
+      SCISSORS -> PAPER
     }
+  }
 }

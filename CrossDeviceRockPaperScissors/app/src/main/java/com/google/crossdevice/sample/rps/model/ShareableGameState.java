@@ -16,54 +16,50 @@
 
 package com.google.crossdevice.sample.rps.model;
 
-
 import android.util.Log;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 
-/**
- * Contains the data needed when sharing a game data with another device
- */
+/** Contains the data needed when sharing a game data with another device */
 public final class ShareableGameState {
-    private static final String TAG = "ShareableGameState";
+  private static final String TAG = "ShareableGameState";
 
-    private static final String KEY_GAME_DATA = "GAME_DATA";
+  private static final String KEY_GAME_DATA = "GAME_DATA";
 
-    public JSONObject gameData;
+  public JSONObject gameData;
 
-    public ShareableGameState setGameData(JSONObject gameData) {
-        this.gameData = gameData;
-        return this;
+  public ShareableGameState setGameData(JSONObject gameData) {
+    this.gameData = gameData;
+    return this;
+  }
+
+  public JSONObject getState() {
+    JSONObject jsonState = new JSONObject();
+    try {
+      jsonState.put(KEY_GAME_DATA, gameData);
+    } catch (JSONException e) {
+      Log.d(TAG, "Failed to get state", e);
     }
+    return jsonState;
+  }
 
-    public JSONObject getState() {
-        JSONObject jsonState = new JSONObject();
-        try {
-            jsonState.put(KEY_GAME_DATA, gameData);
-        } catch (JSONException e) {
-            Log.d(TAG, "Failed to get state", e);
-        }
-        return jsonState;
+  public void loadState(JSONObject state) {
+    gameData = null;
+    try {
+      if (state.has(KEY_GAME_DATA)) {
+        gameData = state.getJSONObject(KEY_GAME_DATA);
+      }
+    } catch (JSONException e) {
+      Log.d(TAG, "Failed to load state", e);
     }
+  }
 
-    public void loadState(JSONObject state) {
-        gameData = null;
-        try {
-            if (state.has(KEY_GAME_DATA)) {
-                gameData = state.getJSONObject(KEY_GAME_DATA);
-            }
-        } catch (JSONException e) {
-            Log.d(TAG, "Failed to load state", e);
-        }
+  public ShareableGameState loadBytes(byte[] bytes) {
+    try {
+      loadState(new JSONObject(new String(bytes)));
+    } catch (JSONException e) {
+      Log.d(TAG, "Failed to parse bytes");
     }
-
-    public ShareableGameState loadBytes(byte[] bytes) {
-        try {
-            loadState(new JSONObject(new String(bytes)));
-        } catch (JSONException e) {
-            Log.d(TAG, "Failed to parse bytes");
-        }
-        return this;
-    }
+    return this;
+  }
 }

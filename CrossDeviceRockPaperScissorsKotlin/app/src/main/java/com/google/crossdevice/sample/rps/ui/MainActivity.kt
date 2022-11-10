@@ -23,19 +23,16 @@ import com.google.crossdevice.sample.rps.R
 
 /** Activity for selecting the kind of Rock Paper Scissors game to play */
 class MainActivity : AppCompatActivity(R.layout.activity_main) {
-    fun onModeSelected(view: View) {
-        getIntentForModeSelected(view.id)?.let { startActivity(it) }
-    }
+  fun onModeSelected(view: View) {
+    getIntentForModeSelected(view.id)?.let { startActivity(it) }
+  }
 
-    private fun getIntentForModeSelected(id: Int): Intent? {
-        return when (id) {
-            R.id.two_player_discovery_api ->
-                Intent(this, DiscoveryTwoPlayerActivity::class.java)
-            R.id.two_player_sessions_api ->
-                Intent(this, SessionsTwoPlayerActivity::class.java)
-            R.id.single_player_sessions_api ->
-                Intent(this, SessionsSinglePlayerActivity::class.java)
-            else -> null
-        }
+  private fun getIntentForModeSelected(id: Int): Intent? {
+    return when (id) {
+      R.id.two_player_discovery_api -> Intent(this, DiscoveryTwoPlayerActivity::class.java)
+      R.id.two_player_sessions_api -> Intent(this, SessionsTwoPlayerActivity::class.java)
+      R.id.single_player_sessions_api -> Intent(this, SessionsSinglePlayerActivity::class.java)
+      else -> null
     }
+  }
 }
