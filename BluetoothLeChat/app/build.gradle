@@ -18,12 +18,12 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 
 android {
-    compileSdkVersion 30
+    compileSdkVersion 33
 
     defaultConfig {
         applicationId "com.example.bluetoothlechat"
-        minSdkVersion 23
-        targetSdkVersion 30
+        minSdkVersion 28
+        targetSdkVersion 33
         versionCode 1
         versionName "1.0"
 
