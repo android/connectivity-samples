@@ -29,7 +29,7 @@ import androidx.lifecycle.MutableLiveData
 import com.example.bluetoothlechat.bluetooth.Message.RemoteMessage
 import com.example.bluetoothlechat.chat.DeviceConnectionState
 
-private const val TAG = "ChatServer"
+private const val TAG = "blechat_ChatServer"
 
 object ChatServer {
 
@@ -75,6 +75,7 @@ object ChatServer {
     private var messageCharacteristic: BluetoothGattCharacteristic? = null
 
     fun startServer(app: Application) {
+        Log.d(TAG, "startServer")
         bluetoothManager = app.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
         if (!adapter.isEnabled) {
             // prompt the user to enable bluetooth
@@ -87,6 +88,7 @@ object ChatServer {
     }
 
     fun stopServer() {
+        Log.d(TAG, "stopServer")
         stopAdvertising()
     }
 
@@ -101,6 +103,7 @@ object ChatServer {
     fun getYourDeviceAddress(): String = bluetoothManager.adapter.address
 
     fun setCurrentChatConnection(device: BluetoothDevice) {
+        Log.d(TAG, "setCurrentChatConnection, device: $device")
         currentDevice = device
         // Set gatt so BluetoothChatFragment can display the device data
         _deviceConnection.value = DeviceConnectionState.Connected(device)
@@ -108,12 +111,13 @@ object ChatServer {
     }
 
     private fun connectToChatDevice(device: BluetoothDevice) {
+        Log.d(TAG, "connectToChatDevice, device: $device")
         gattClientCallback = GattClientCallback()
         gattClient = device.connectGatt(app, false, gattClientCallback)
     }
 
     fun sendMessage(message: String): Boolean {
-        Log.d(TAG, "Send a message")
+        Log.d(TAG, "Send a message: $message")
         messageCharacteristic?.let { characteristic ->
             characteristic.writeType = BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT
 
@@ -138,6 +142,7 @@ object ChatServer {
      * can read and modify.
      */
     private fun setupGattServer(app: Application) {
+        Log.d(TAG, "setupGattServer")
         gattServerCallback = GattServerCallback()
 
         gattServer = bluetoothManager.openGattServer(
@@ -152,6 +157,7 @@ object ChatServer {
      * Function to create the GATT Server with the required characteristics and descriptors
      */
     private fun setupGattService(): BluetoothGattService {
+        Log.d(TAG, "setupGattService")
         // Setup gatt service
         val service = BluetoothGattService(SERVICE_UUID, BluetoothGattService.SERVICE_TYPE_PRIMARY)
         // need to ensure that the property is writable and has the write permission
@@ -198,6 +204,7 @@ object ChatServer {
      * Returns an AdvertiseData object which includes the Service UUID and Device Name.
      */
     private fun buildAdvertiseData(): AdvertiseData {
+        Log.d(TAG, "buildAdvertiseData")
         /**
          * Note: There is a strict limit of 31 Bytes on packets sent over BLE Advertisements.
          * This limit is outlined in section 2.3.1.1 of this document:
@@ -224,8 +231,10 @@ object ChatServer {
      * and disable the built-in timeout since this code uses its own timeout runnable.
      */
     private fun buildAdvertiseSettings(): AdvertiseSettings {
+        Log.d(TAG, "buildAdvertiseSettings")
         return AdvertiseSettings.Builder()
-            .setAdvertiseMode(AdvertiseSettings.ADVERTISE_MODE_LOW_POWER)
+            //.setAdvertiseMode(AdvertiseSettings.ADVERTISE_MODE_LOW_POWER)
+            .setAdvertiseMode(AdvertiseSettings.ADVERTISE_MODE_BALANCED)
             .setTimeout(0)
             .build()
     }
@@ -236,6 +245,10 @@ object ChatServer {
     private class GattServerCallback : BluetoothGattServerCallback() {
         override fun onConnectionStateChange(device: BluetoothDevice, status: Int, newState: Int) {
             super.onConnectionStateChange(device, status, newState)
+            if(!device.uuids.contains(ParcelUuid(SERVICE_UUID))){
+                Log.d(TAG, "onConnectionStateChange: Server $device ${device.name}  is not target uuid!")
+                return
+            }
             val isSuccess = status == BluetoothGatt.GATT_SUCCESS
             val isConnected = newState == BluetoothProfile.STATE_CONNECTED
             Log.d(

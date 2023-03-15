@@ -34,7 +34,7 @@ import com.example.bluetoothlechat.gone
 import com.example.bluetoothlechat.scan.DeviceScanViewState.*
 import com.example.bluetoothlechat.visible
 
-private const val TAG = "DeviceScanFragment"
+private const val TAG = "blechat_DeviceScanFragment"
 const val GATT_KEY = "gatt_bundle_key"
 
 class DeviceScanFragment : Fragment() {
@@ -52,6 +52,7 @@ class DeviceScanFragment : Fragment() {
     }
 
     private val viewStateObserver = Observer<DeviceScanViewState> { state ->
+        Log.d(TAG, "viewStateObserver, state: $state")
         when (state) {
             is ActiveScan -> showLoading()
             is ScanResults -> showResults(state.scanResults)
@@ -61,6 +62,7 @@ class DeviceScanFragment : Fragment() {
     }
 
     private val onDeviceSelected: (BluetoothDevice) -> Unit = { device ->
+        Log.d(TAG, "onDeviceSelected, device: $device")
         ChatServer.setCurrentChatConnection(device)
         // navigate back to chat fragment
         findNavController().popBackStack()
@@ -71,6 +73,7 @@ class DeviceScanFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        Log.d(TAG, "onCreateView")
         _binding = FragmentDeviceScanBinding.inflate(inflater, container, false)
         val devAddr = getString(R.string.your_device_address) + ChatServer.getYourDeviceAddress()
         binding.yourDeviceAddr.text = devAddr
@@ -84,11 +87,13 @@ class DeviceScanFragment : Fragment() {
 
     override fun onStart() {
         super.onStart()
+        Log.d(TAG, "onStart")
         requireActivity().setTitle(R.string.device_list_title)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        Log.d(TAG, "onViewCreated")
         viewModel.viewState.observe(viewLifecycleOwner, viewStateObserver)
     }
 
@@ -103,6 +108,7 @@ class DeviceScanFragment : Fragment() {
     }
 
     private fun showResults(scanResults: Map<String, BluetoothDevice>) {
+        Log.d(TAG, "showResults: $scanResults")
         if (scanResults.isNotEmpty()) {
             binding.deviceList.visible()
             deviceScanAdapter.updateItems(scanResults.values.toList())
@@ -117,6 +123,7 @@ class DeviceScanFragment : Fragment() {
     }
 
     private fun showNoDevices() {
+        Log.d(TAG, "showNoDevices")
         binding.noDevices.visible()
 
         binding.deviceList.gone()

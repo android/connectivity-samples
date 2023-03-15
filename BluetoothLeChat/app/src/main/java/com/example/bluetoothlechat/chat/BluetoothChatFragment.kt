@@ -34,7 +34,7 @@ import com.example.bluetoothlechat.databinding.FragmentBluetoothChatBinding
 import com.example.bluetoothlechat.gone
 import com.example.bluetoothlechat.visible
 
-private const val TAG = "BluetoothChatFragment"
+private const val TAG = "blechat_BluetoothChatFragment"
 
 class BluetoothChatFragment : Fragment() {
 
@@ -44,6 +44,7 @@ class BluetoothChatFragment : Fragment() {
         get() = _binding!!
 
     private val deviceConnectionObserver = Observer<DeviceConnectionState> { state ->
+        Log.d(TAG, "deviceConnectionObserver: state: $state")
         when(state) {
             is DeviceConnectionState.Connected -> {
                 val device = state.device
@@ -78,6 +79,7 @@ class BluetoothChatFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        Log.d(TAG, "onCreateView")
         _binding = FragmentBluetoothChatBinding.inflate(inflater, container, false)
 
         Log.d(TAG, "chatWith: set adapter $adapter")
@@ -95,6 +97,7 @@ class BluetoothChatFragment : Fragment() {
 
     override fun onStart() {
         super.onStart()
+        Log.d(TAG, "onStart")
         requireActivity().setTitle(R.string.chat_title)
         ChatServer.connectionRequest.observe(viewLifecycleOwner, connectionRequestObserver)
         ChatServer.deviceConnection.observe(viewLifecycleOwner, deviceConnectionObserver)
@@ -103,10 +106,12 @@ class BluetoothChatFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
+        Log.d(TAG, "onDestroyView")
         _binding = null
     }
 
     private fun chatWith(device: BluetoothDevice) {
+        Log.d(TAG, "chatWith: device: $device")
         binding.connectedContainer.visible()
         binding.notConnectedContainer.gone()
 
@@ -124,6 +129,7 @@ class BluetoothChatFragment : Fragment() {
     }
 
     private fun showDisconnected() {
+        Log.d(TAG, "showDisconnected")
         hideKeyboard()
         binding.notConnectedContainer.visible()
         binding.connectedContainer.gone()

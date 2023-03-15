@@ -28,7 +28,7 @@ import androidx.navigation.fragment.findNavController
 import com.example.bluetoothlechat.R
 import com.example.bluetoothlechat.databinding.FragmentLocationRequiredBinding
 
-private const val TAG = "LocationRequiredFrag"
+private const val TAG = "blechat_LocationRequiredFrag"
 private const val LOCATION_REQUEST_CODE = 0
 
 // Fragment responsible for checking if the app has the ACCESS_FINE_LOCATION permission.
@@ -45,6 +45,7 @@ class LocationRequiredFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        Log.d(TAG, "onCreateView: ")
         _binding = FragmentLocationRequiredBinding.inflate(inflater, container, false)
 
         // hide the error messages while checking the permissions
@@ -60,6 +61,7 @@ class LocationRequiredFragment : Fragment() {
 
     override fun onStart() {
         super.onStart()
+        Log.d(TAG, "onStart: ")
         // check location permission when the Fragment becomes visible on screen
         checkLocationPermission()
     }
@@ -90,6 +92,7 @@ class LocationRequiredFragment : Fragment() {
     }
 
     private fun checkLocationPermission() {
+        Log.d(TAG, "checkLocationPermission: ")
         val hasLocationPermission = ContextCompat.checkSelfPermission(
             requireContext(),
             Manifest.permission.ACCESS_FINE_LOCATION

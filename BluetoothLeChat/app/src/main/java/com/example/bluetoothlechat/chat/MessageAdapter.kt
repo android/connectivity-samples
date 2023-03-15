@@ -23,7 +23,7 @@ import com.example.bluetoothlechat.bluetooth.Message
 import com.example.bluetoothlechat.R
 import java.lang.IllegalArgumentException
 
-private const val TAG = "MessageAdapter"
+private const val TAG = "blechat_MessageAdapter"
 private const val REMOTE_MESSAGE = 0
 private const val LOCAL_MESSAGE = 1
 

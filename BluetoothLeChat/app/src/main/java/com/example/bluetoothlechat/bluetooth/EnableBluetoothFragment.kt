@@ -19,6 +19,7 @@ import android.app.Activity
 import android.bluetooth.BluetoothAdapter
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -27,7 +28,7 @@ import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import com.example.bluetoothlechat.R
 import com.example.bluetoothlechat.databinding.FragmentEnableBluetoothBinding
-
+private const val TAG = "blechat_EnableBluetoothFragment"
 class EnableBluetoothFragment : Fragment() {
 
     private var _binding: FragmentEnableBluetoothBinding? = null
@@ -36,14 +37,17 @@ class EnableBluetoothFragment : Fragment() {
         get() = _binding!!
 
     private val bluetoothEnableObserver = Observer<Boolean> { shouldPrompt ->
+        Log.d(TAG, "bluetoothEnableObserver, shouldPrompt: $shouldPrompt")
         if (!shouldPrompt) {
             // Don't need to prompt so navigate to LocationRequiredFragment
+            Log.d(TAG, "bluetoothEnableObserver, navigate")
             findNavController().navigate(R.id.action_check_location_permissions)
         }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Log.d(TAG, "onCreate")
         ChatServer.requestEnableBluetooth.observe(this, bluetoothEnableObserver)
     }
 
@@ -52,6 +56,7 @@ class EnableBluetoothFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        Log.d(TAG, "onCreateView")
         _binding = FragmentEnableBluetoothBinding.inflate(inflater, container, false)
 
         binding.errorAction.setOnClickListener {
@@ -69,6 +74,7 @@ class EnableBluetoothFragment : Fragment() {
         data: Intent?
     ) {
         super.onActivityResult(requestCode, resultCode, data)
+        Log.d(TAG, "onActivityResult： requestCode：$requestCode")
         when (requestCode) {
             REQUEST_ENABLE_BT -> {
                 if (resultCode == Activity.RESULT_OK) {

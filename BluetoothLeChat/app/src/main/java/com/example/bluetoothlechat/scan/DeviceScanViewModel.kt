@@ -28,7 +28,7 @@ import com.example.bluetoothlechat.bluetooth.SERVICE_UUID
 import com.example.bluetoothlechat.scan.DeviceScanViewState.*
 
 
-private const val TAG = "DeviceScanViewModel"
+private const val TAG = "blechat_DeviceScanViewModel"
 // 30 second scan period
 private const val SCAN_PERIOD = 30000L
 
@@ -115,7 +115,8 @@ class DeviceScanViewModel(app: Application) : AndroidViewModel(app) {
      */
     private fun buildScanSettings(): ScanSettings {
         return ScanSettings.Builder()
-            .setScanMode(ScanSettings.SCAN_MODE_LOW_POWER)
+            //.setScanMode(ScanSettings.SCAN_MODE_LOW_POWER)
+            .setScanMode(ScanSettings.SCAN_MODE_BALANCED)
             .build()
     }
 
