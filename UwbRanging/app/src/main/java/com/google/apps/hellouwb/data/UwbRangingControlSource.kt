@@ -29,6 +29,8 @@ interface UwbRangingControlSource {
 
     var deviceType: DeviceType
 
+    var configType: ConfigType
+
     fun updateEndpointId(id: String)
 
     fun start()

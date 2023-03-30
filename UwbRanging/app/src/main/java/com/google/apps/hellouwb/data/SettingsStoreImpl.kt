@@ -57,6 +57,14 @@ internal class SettingsStoreImpl(
     }
   }
 
+  override fun updateConfigType(configType: ConfigType) {
+    coroutineScope.launch {
+      context.settingsDataStore.updateData { settings ->
+        settings.toBuilder().setConfigType(configType).build()
+      }
+    }
+  }
+
   override fun updateDeviceDisplayName(displayName: String) {
     coroutineScope.launch {
       context.settingsDataStore.updateData { settings ->

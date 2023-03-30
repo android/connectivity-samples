@@ -20,6 +20,7 @@ package com.google.apps.hellouwb.ui.settings
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.google.apps.hellouwb.data.ConfigType
 import com.google.apps.hellouwb.data.DeviceType
 import com.google.apps.hellouwb.data.SettingsStore
 import com.google.apps.hellouwb.data.UwbRangingControlSource
@@ -44,6 +45,14 @@ class SettingsViewModel(
     }
     uwbRangingControlSource.deviceType = deviceType
     settingsStore.updateDeviceType(deviceType)
+  }
+
+  fun updateConfigType(configType: ConfigType) {
+    if (configType == uiState.value.configType) {
+      return
+    }
+    uwbRangingControlSource.configType = configType
+    settingsStore.updateConfigType(configType)
   }
 
   companion object {

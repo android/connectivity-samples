@@ -42,7 +42,8 @@ internal class UwbRangingControlSourceImpl(
 
   private var uwbEndpoint = UwbEndpoint(endpointId, SecureRandom.getSeed(8))
 
-  private var uwbSessionScope: UwbSessionScope = getSessionScope(DeviceType.CONTROLLER)
+  private var uwbSessionScope: UwbSessionScope =
+    getSessionScope(DeviceType.CONTROLLER, ConfigType.CONFIG_UNICAST_DS_TWR)
 
   private var rangingJob: Job? = null
 
@@ -56,11 +57,15 @@ internal class UwbRangingControlSourceImpl(
 
   override val isRunning = runningStateFlow.asStateFlow()
 
-  private fun getSessionScope(deviceType: DeviceType): UwbSessionScope {
+  private fun getSessionScope(deviceType: DeviceType, configType: ConfigType): UwbSessionScope {
     return when (deviceType) {
       DeviceType.CONTROLEE -> uwbConnectionManager.controleeUwbScope(uwbEndpoint)
       DeviceType.CONTROLLER ->
-        uwbConnectionManager.controllerUwbScope(uwbEndpoint, RangingParameters.UWB_CONFIG_ID_1)
+        uwbConnectionManager.controllerUwbScope(uwbEndpoint, when (configType) {
+          ConfigType.CONFIG_UNICAST_DS_TWR -> RangingParameters.CONFIG_UNICAST_DS_TWR
+          ConfigType.CONFIG_MULTICAST_DS_TWR -> RangingParameters.CONFIG_MULTICAST_DS_TWR
+          else -> throw java.lang.IllegalStateException()
+        })
       else -> throw IllegalStateException()
     }
   }
@@ -69,11 +74,19 @@ internal class UwbRangingControlSourceImpl(
     return resultFlow
   }
 
-  override var deviceType by
+  override var deviceType: DeviceType by
   Delegates.observable(DeviceType.CONTROLLER) { _, oldValue, newValue ->
     if (oldValue != newValue) {
       stop()
-      uwbSessionScope = getSessionScope(newValue)
+      uwbSessionScope = getSessionScope(newValue, configType)
+    }
+  }
+
+  override var configType: ConfigType by
+  Delegates.observable(ConfigType.CONFIG_UNICAST_DS_TWR) { _, oldValue, newValue ->
+    if (oldValue != newValue) {
+      stop()
+      uwbSessionScope = getSessionScope(deviceType, newValue)
     }
   }
 
@@ -81,7 +94,7 @@ internal class UwbRangingControlSourceImpl(
     if (id != uwbEndpoint.id) {
       stop()
       uwbEndpoint = UwbEndpoint(id, SecureRandom.getSeed(8))
-      uwbSessionScope = getSessionScope(deviceType)
+      uwbSessionScope = getSessionScope(deviceType, configType)
     }
   }
 

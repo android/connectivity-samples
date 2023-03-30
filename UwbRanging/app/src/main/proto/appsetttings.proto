@@ -25,8 +25,14 @@ enum DeviceType {
   CONTROLEE = 1;
 }
 
+enum ConfigType {
+  CONFIG_UNICAST_DS_TWR = 0;
+  CONFIG_MULTICAST_DS_TWR = 1;
+}
+
 message AppSettings {
   DeviceType device_type = 1;
   string device_display_name = 2;
   string device_uuid = 3;
+  ConfigType config_type = 4;
 }

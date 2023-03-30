@@ -27,5 +27,7 @@ interface SettingsStore {
 
   fun updateDeviceType(deviceType: DeviceType)
 
+  fun updateConfigType(configType: ConfigType)
+
   fun updateDeviceDisplayName(displayName: String)
 }

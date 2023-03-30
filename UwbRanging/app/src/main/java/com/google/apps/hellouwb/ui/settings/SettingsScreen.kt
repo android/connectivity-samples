@@ -32,6 +32,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.google.apps.hellouwb.data.AppSettings
 import com.google.apps.hellouwb.data.DeviceType
+import com.google.apps.hellouwb.data.ConfigType
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
@@ -39,6 +40,7 @@ fun SettingsScreen(
     uiState: AppSettings,
     updateDeviceDisplayName: (String) -> Unit,
     updateDeviceType: (DeviceType) -> Unit,
+    updateConfigType: (ConfigType) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     CenterAlignedTopAppBar(
@@ -107,6 +109,30 @@ fun SettingsScreen(
                         Text("Controlee")
                     }
                 }
+                Text("Config Type:", Modifier.padding(20.dp))
+                Row(Modifier.padding(5.dp)) {
+                    val selectedValue = remember { mutableStateOf(uiState.configType) }
+                    Column(Modifier.width(120.dp)) {
+                        RadioButton(
+                            selected = selectedValue.value == ConfigType.CONFIG_UNICAST_DS_TWR,
+                            onClick = {
+                                updateConfigType(ConfigType.CONFIG_UNICAST_DS_TWR)
+                                selectedValue.value = ConfigType.CONFIG_UNICAST_DS_TWR
+                            },
+                        )
+                        Text("CONFIG_UNICAST_DS_TWR")
+                    }
+                    Column(Modifier.width(120.dp)) {
+                        RadioButton(
+                            selected = selectedValue.value == ConfigType.CONFIG_MULTICAST_DS_TWR,
+                            onClick = {
+                                updateConfigType(ConfigType.CONFIG_MULTICAST_DS_TWR)
+                                selectedValue.value = ConfigType.CONFIG_MULTICAST_DS_TWR
+                            }
+                        )
+                        Text("CONFIG_MULTICAST_DS_TWR")
+                    }
+                }
             }
         }
     }
@@ -119,7 +145,9 @@ fun PreviewSettingsScreen() {
         AppSettings.newBuilder()
             .setDeviceDisplayName("UWB")
             .setDeviceType(DeviceType.CONTROLEE)
+            .setConfigType(ConfigType.CONFIG_MULTICAST_DS_TWR)
             .build(),
+        {},
         {},
         {}
     )

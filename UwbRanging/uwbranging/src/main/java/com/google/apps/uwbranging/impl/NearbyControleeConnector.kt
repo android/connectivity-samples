@@ -91,7 +91,8 @@ internal class NearbyControleeConnector(
         UwbConnectionInfo.newBuilder()
           .setCapabilities(
             UwbCapabilities.newBuilder()
-              .addAllSupportedConfigIds(listOf(RangingParameters.UWB_CONFIG_ID_1))
+              .addAllSupportedConfigIds(listOf(RangingParameters.CONFIG_UNICAST_DS_TWR,
+                                               RangingParameters.CONFIG_MULTICAST_DS_TWR))
               .setSupportsAzimuth(scope.rangingCapabilities.isAzimuthalAngleSupported)
               .setSupportsElevation(scope.rangingCapabilities.isElevationAngleSupported)
               .build()

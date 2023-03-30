@@ -28,6 +28,7 @@ fun SettingsRoute(settingsViewModel: SettingsViewModel) {
   SettingsScreen(
     uiState = uiState,
     updateDeviceDisplayName = { settingsViewModel.updateDeviceDisplayName(it) },
-    updateDeviceType = { settingsViewModel.updateDeviceType(it) }
+    updateDeviceType = { settingsViewModel.updateDeviceType(it) },
+    updateConfigType = { settingsViewModel.updateConfigType(it) }
   )
 }
