@@ -87,11 +87,14 @@ public class MainActivity extends FragmentActivity implements DownloadCallback {
 
     @Override
     public void updateFromDownload(String result) {
-        if (result != null) {
-            mDataText.setText(result);
-        } else {
-            mDataText.setText(getString(R.string.connection_error));
-        }
+        // Ensure that this is run from UI thread
+        runOnUiThread(() -> {
+            if (result != null) {
+                mDataText.setText(result);
+            } else {
+                mDataText.setText(getString(R.string.connection_error));
+            }
+        });
     }
 
     @Override
@@ -105,26 +108,26 @@ public class MainActivity extends FragmentActivity implements DownloadCallback {
     @Override
     public void finishDownloading() {
         mDownloading = false;
-        if (mNetworkFragment != null) {
-            mNetworkFragment.cancelDownload();
-        }
     }
 
     @Override
     public void onProgressUpdate(int progressCode, int percentComplete) {
-        switch(progressCode) {
-            // You can add UI behavior for progress updates here.
-            case Progress.ERROR:
-                break;
-            case Progress.CONNECT_SUCCESS:
-                break;
-            case Progress.GET_INPUT_STREAM_SUCCESS:
-                break;
-            case Progress.PROCESS_INPUT_STREAM_IN_PROGRESS:
-                mDataText.setText("" + percentComplete + "%");
-                break;
-            case Progress.PROCESS_INPUT_STREAM_SUCCESS:
-                break;
-        }
+        // Ensure that this is run from UI thread
+        runOnUiThread(() -> {
+            switch (progressCode) {
+                // You can add UI behavior for progress updates here.
+                case Progress.ERROR:
+                    break;
+                case Progress.CONNECT_SUCCESS:
+                    break;
+                case Progress.GET_INPUT_STREAM_SUCCESS:
+                    break;
+                case Progress.PROCESS_INPUT_STREAM_IN_PROGRESS:
+                    mDataText.setText("" + percentComplete + "%");
+                    break;
+                case Progress.PROCESS_INPUT_STREAM_SUCCESS:
+                    break;
+            }
+        });
     }
 }
