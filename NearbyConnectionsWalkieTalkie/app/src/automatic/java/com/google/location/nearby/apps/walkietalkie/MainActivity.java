@@ -3,11 +3,17 @@ package com.google.location.nearby.apps.walkietalkie;
 import android.Manifest;
 import android.animation.Animator;
 import android.animation.ObjectAnimator;
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
+import android.database.Cursor;
 import android.media.AudioManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.ParcelFileDescriptor;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -15,6 +21,8 @@ import androidx.annotation.UiThread;
 import androidx.annotation.WorkerThread;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.ViewCompat;
+
+import android.provider.OpenableColumns;
 import android.text.SpannableString;
 import android.text.format.DateFormat;
 import android.text.method.ScrollingMovementMethod;
@@ -22,12 +30,17 @@ import android.text.style.ForegroundColorSpan;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewAnimationUtils;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.google.android.gms.nearby.connection.ConnectionInfo;
 import com.google.android.gms.nearby.connection.Payload;
 import com.google.android.gms.nearby.connection.Strategy;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Random;
 
 /**
@@ -43,6 +56,8 @@ import java.util.Random;
  * down the volume keys and speaking into the phone. Advertising and discovery have both stopped.
  */
 public class MainActivity extends ConnectionsActivity {
+
+  private final Collection<Payload> payloads = new ArrayList<>();
   /** If true, debug logs are shown on the device. */
   private static final boolean DEBUG = true;
 
@@ -149,7 +164,71 @@ public class MainActivity extends ConnectionsActivity {
     mName = generateRandomName();
 
     ((TextView) findViewById(R.id.name)).setText(mName);
+
+    Button shareButton = findViewById(R.id.button_share);
+    shareButton.setOnClickListener(view -> {
+              Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+              intent.addCategory(Intent.CATEGORY_OPENABLE);
+              intent.setType("image/*");
+              activityResultLaunch.launch(intent);
+            }
+    );
   }
+
+  ActivityResultLauncher<Intent> activityResultLaunch = registerForActivityResult(
+          new ActivityResultContracts.StartActivityForResult(),
+          result -> {
+            int resultCode = result.getResultCode();
+            Intent resultData = result.getData();
+            if (resultCode == Activity.RESULT_OK && resultData != null) {
+              Uri uri = resultData.getData();
+              Payload filePayload;
+              try {
+                ParcelFileDescriptor pfd = getContentResolver().openFileDescriptor(uri, "r");
+                filePayload = Payload.fromFile(pfd);
+                logV("Payload created successfully");
+              } catch (FileNotFoundException e) {
+                logV("File not found");
+                return;
+              }
+
+              String filenameMessage = filePayload.getId() + ":" + getFileName(uri);
+
+              logV("FileNameMessage : " + filenameMessage);
+              Payload filenameBytesPayload;
+              if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                filenameBytesPayload =
+                        Payload.fromBytes(filenameMessage.getBytes(StandardCharsets.UTF_8));
+                payloads.add(filenameBytesPayload);
+              }
+
+              payloads.add(filePayload);
+            }
+          });
+
+  private String getFileName(Uri uri) {
+    String result = null;
+    if (uri.getScheme().equals("content")) {
+      Cursor cursor = getContentResolver().query(uri, null, null, null, null);
+      try {
+        int idx = 0;
+        if (cursor != null && cursor.moveToFirst() && (idx = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)) >= 0) {
+          result = cursor.getString(idx);
+        }
+      } finally {
+        cursor.close();
+      }
+    }
+    if (result == null) {
+      result = uri.getPath();
+      int cut = result.lastIndexOf('/');
+      if (cut != -1) {
+        result = result.substring(cut + 1);
+      }
+    }
+    return result;
+  }
+
 
   @Override
   public boolean dispatchKeyEvent(KeyEvent event) {
@@ -231,6 +310,11 @@ public class MainActivity extends ConnectionsActivity {
             this, getString(R.string.toast_connected, endpoint.getName()), Toast.LENGTH_SHORT)
         .show();
     setState(State.CONNECTED);
+    for (Payload payload : payloads) {
+      send(payload);
+    }
+    payloads.clear();
+    findViewById(R.id.button_share).setEnabled(true);
   }
 
   @Override
@@ -239,6 +323,7 @@ public class MainActivity extends ConnectionsActivity {
             this, getString(R.string.toast_disconnected, endpoint.getName()), Toast.LENGTH_SHORT)
         .show();
     setState(State.SEARCHING);
+    findViewById(R.id.button_share).setEnabled(false);
   }
 
   @Override
@@ -247,6 +332,7 @@ public class MainActivity extends ConnectionsActivity {
     if (getState() == State.SEARCHING) {
       startDiscovering();
     }
+    findViewById(R.id.button_share).setEnabled(false);
   }
 
   /**
