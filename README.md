@@ -1,4 +1,6 @@
-> **Warning**
+> [!CAUTION]
+> This codelab is deprecated and will be removed soon.
+> 
 > Bluetooth samples have been migrated to the new
 > [platform-samples repo](https://github.com/android/platform-samples/tree/main/samples/connectivity). Others might follow.
 
