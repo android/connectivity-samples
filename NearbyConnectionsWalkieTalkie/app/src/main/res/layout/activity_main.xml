@@ -44,4 +44,18 @@
         android:textSize="20sp"
         android:textColor="@color/textColor" />
 
+    <Button
+        android:id="@+id/button_share"
+        style="@android:style/Widget.Material.Button.Colored"
+        android:layout_width="173dp"
+        android:layout_height="93dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="120dp"
+        android:enabled="false"
+        android:gravity="center_horizontal|center_vertical"
+        android:text="@string/button_share"
+        android:textAppearance="@style/TextAppearance.AppCompat.Display1"
+        android:visibility="visible"
+        tools:visibility="visible" />
+
 </FrameLayout>
