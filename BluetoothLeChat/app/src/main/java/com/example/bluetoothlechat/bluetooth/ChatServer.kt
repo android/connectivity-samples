@@ -301,10 +301,7 @@ object ChatServer {
     private class DeviceAdvertiseCallback : AdvertiseCallback() {
         override fun onStartFailure(errorCode: Int) {
             super.onStartFailure(errorCode)
-            // Send error state to display
-            val errorMessage = "Advertise failed with error: $errorCode"
-            Log.d(TAG, "Advertising failed")
-            //_viewState.value = DeviceScanViewState.Error(errorMessage)
+            Log.d(TAG, "Advertising failed with error: $errorCode")
         }
 
         override fun onStartSuccess(settingsInEffect: AdvertiseSettings) {
