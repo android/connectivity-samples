@@ -1,16 +1,20 @@
 package com.google.location.nearby.apps.walkietalkie;
 
 import android.Manifest;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import androidx.annotation.CallSuper;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.AppCompatActivity;
+import android.os.Environment;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -32,6 +36,12 @@ import com.google.android.gms.nearby.connection.Strategy;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -169,10 +179,22 @@ public abstract class ConnectionsActivity extends AppCompatActivity {
   /** Callbacks for payloads (bytes of data) sent from another device to us. */
   private final PayloadCallback mPayloadCallback =
       new PayloadCallback() {
+        private final Map<Long, Payload> filePayloads = new HashMap<>();
+        private final Map<Long, String> filePayloadFilenames = new HashMap<>();
+        @RequiresApi(api = Build.VERSION_CODES.KITKAT)
         @Override
         public void onPayloadReceived(String endpointId, Payload payload) {
           logD(String.format("onPayloadReceived(endpointId=%s, payload=%s)", endpointId, payload));
           onReceive(mEstablishedConnections.get(endpointId), payload);
+
+            if (payload.getType() == Payload.Type.BYTES) {
+                String payloadFilenameMessage = new String(payload.asBytes(), StandardCharsets.UTF_8);
+                long payloadId = addPayloadFilename(payloadFilenameMessage);
+                processPayload(payloadId);
+            } else if (payload.getType() == Payload.Type.FILE) {
+                // Add this to our tracking map, so that we can retrieve the payload later.
+                filePayloads.put(payload.getId(), payload);
+            }
         }
 
         @Override
@@ -180,7 +202,58 @@ public abstract class ConnectionsActivity extends AppCompatActivity {
           logD(
               String.format(
                   "onPayloadTransferUpdate(endpointId=%s, update=%s)", endpointId, update));
+          if (update.getStatus() == PayloadTransferUpdate.Status.SUCCESS) {
+            processPayload(update.getPayloadId());
+          }
         }
+
+        private void processPayload(long payloadId) {
+          Payload filePayload = filePayloads.get(payloadId);
+          String filename = filePayloadFilenames.get(payloadId);
+          if (filePayload != null && filename != null) {
+            filePayloads.remove(payloadId);
+            filePayloadFilenames.remove(payloadId);
+
+            // Get the received file (which will be in the Downloads folder)
+            Uri uri = filePayload.asFile().asUri();
+            ContentResolver contentResolver = getApplicationContext().getContentResolver();
+            try {
+              File path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+              logV("Saving file to " + path.toString() + " with name " + filename);
+              InputStream in = contentResolver.openInputStream(uri);
+              copyStream(in, new FileOutputStream(new File(path, filename)));
+            } catch (IOException e) {
+              logE("Cannot save file", e);
+            } finally {
+              contentResolver.delete(uri, null, null);
+            }
+          }
+        }
+
+        /** Copies a stream from one location to another. */
+        private void copyStream(InputStream in, OutputStream out) throws IOException {
+            try (in; out) {
+                byte[] buffer = new byte[1024];
+                int read;
+                while ((read = in.read(buffer)) != -1) {
+                    out.write(buffer, 0, read);
+                }
+                out.flush();
+            }
+        }
+
+        /**
+         * Extracts the payloadId and filename from the message and stores it in the
+         * filePayloadFilenames map. The format is payloadId:filename.
+         */
+        private long addPayloadFilename(String payloadFilenameMessage) {
+          String[] parts = payloadFilenameMessage.split(":");
+          long payloadId = Long.parseLong(parts[0]);
+          String filename = parts[1];
+          filePayloadFilenames.put(payloadId, filename);
+          return payloadId;
+        }
+
       };
 
   /** Called when our Activity is first created. */
