@@ -1,6 +1,8 @@
 > **Warning**
-> Bluetooth samples have been migrated to the new
-> [platform-samples repo](https://github.com/android/platform-samples/tree/main/samples/connectivity). Others might follow.
+> This sample has been deprecated and is no longer being maintained.
+> 
+> To find other samples that may be of interest, see [https://developer.android.com/samples](https://developer.android.com/samples).
+
 
 Connectivity Samples Repository
 ===============================
